@@ -1,7 +1,5 @@
 package com.seciii.prism063.core.controller;
 
-import com.seciii.prism063.common.Result;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
