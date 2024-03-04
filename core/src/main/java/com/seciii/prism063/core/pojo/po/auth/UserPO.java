@@ -1,7 +1,7 @@
 package com.seciii.prism063.core.pojo.po.auth;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.*;
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -13,20 +13,25 @@ import java.time.LocalDateTime;
  * @date 2024.02.29
  */
 @Data
+@Builder
+@TableName("t_auth_user")
 public class UserPO {
     /**
      * 用户id
      */
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
      * 用户名
      */
+    @TableField("username")
     private String username;
 
     /**
      * 用户密码
      */
+    @TableField("password")
     private String password;
 
     /**

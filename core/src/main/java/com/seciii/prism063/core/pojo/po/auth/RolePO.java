@@ -1,7 +1,7 @@
 package com.seciii.prism063.core.pojo.po.auth;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.*;
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -13,15 +13,19 @@ import java.time.LocalDateTime;
  * @date 2024.03.04
  */
 @Data
+@Builder
+@TableName("t_auth_role")
 public class RolePO {
     /**
      * 角色id
      */
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
      * 角色描述
      */
+    @TableField("description")
     private String description;
 
     /**
