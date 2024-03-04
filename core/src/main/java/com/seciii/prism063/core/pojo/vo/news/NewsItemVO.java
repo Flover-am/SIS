@@ -5,16 +5,16 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
+
 /**
- * 新闻VO类
- *
- * @author xueruichen
- * @date 2024.02.29
+ * 新闻条目VO类
+ * @date 2024.03.04
+ * @auther wangmingsong
  */
 @Getter
 @Setter
 @Builder
-public class NewsVO {
+public class NewsItemVO {
     /**
      * 新闻id
      */
@@ -25,11 +25,6 @@ public class NewsVO {
      */
     @NotNull
     private String title;
-    /**
-     * 新闻内容
-     */
-    @NotNull
-    private String content;
     /**
      * 新闻来源
      */
@@ -43,15 +38,5 @@ public class NewsVO {
     /**
      * 新闻分类
      */
-    private String category;    //TODO:新闻分类具体实现
-    /**
-     * 新闻创建时间戳
-     */
-    @NotNull
-    private String createTime;
-    /**
-     * 新闻更新时间戳
-     */
-    @NotNull
-    private String updateTime;
+    private String category; //TODO:新闻分类具体实现
 }
