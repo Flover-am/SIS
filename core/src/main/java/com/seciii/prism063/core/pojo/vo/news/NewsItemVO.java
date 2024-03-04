@@ -8,6 +8,7 @@ import javax.validation.constraints.NotNull;
 
 /**
  * 新闻条目VO类
+ *
  * @date 2024.03.04
  * @auther wangmingsong
  */
