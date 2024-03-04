@@ -6,5 +6,5 @@ echo "prism036-backend:$version is built successfully!"
 docker stop prism036-backend || true
 docker rm prism036-backend || true
 echo "prism036-backend is stopped and removed successfully!"
-docker run --name=prism036-backend -itd -p 8080:8080 prism036-backend:$version
+docker run --name=prism036-backend -itd -p 8080:8080 --restart=on-failure:3 prism036-backend:$version
 echo "prism036-backend is running successfully!"
