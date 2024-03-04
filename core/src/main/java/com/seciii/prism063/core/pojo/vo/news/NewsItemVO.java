@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 
 /**
  * 新闻条目VO类
@@ -35,7 +36,7 @@ public class NewsItemVO {
      * 新闻时间
      */
     @NotNull
-    private String time;
+    private LocalDate time;
     /**
      * 新闻分类
      */

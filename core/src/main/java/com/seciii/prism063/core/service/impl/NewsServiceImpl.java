@@ -49,7 +49,7 @@ public class NewsServiceImpl implements NewsService {
                        .id(newsPO.getId())
                        .title(newsPO.getTitle())
                        .source(newsPO.getSource())
-                       .time(newsPO.getTime().toString())
+                       .time(newsPO.getTime())
                        .build()
         ).toList();
     }
@@ -65,9 +65,9 @@ public class NewsServiceImpl implements NewsService {
                 .title(newsPO.getTitle())
                 .content(newsPO.getContent())
                 .source(newsPO.getSource())
-                .time(newsPO.getTime().toString())
-                .createTime(newsPO.getCreateTime().toString())
-                .updateTime(newsPO.getUpdateTime().toString())
+                .time(newsPO.getTime())
+                .createTime(newsPO.getCreateTime())
+                .updateTime(newsPO.getUpdateTime())
                 .build();
     }
 }

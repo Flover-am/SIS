@@ -4,7 +4,7 @@ package com.seciii.prism063.core.pojo.po;
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 
-import java.sql.Date;
+import java.time.LocalDate;
 
 /**
  * 新闻PO类
@@ -39,7 +39,7 @@ public class NewsPO {
      * 新闻时间
      */
     @TableField("news_time")
-    private Date time;
+    private LocalDate time;
     /**
      * 新闻分类(暂未使用)
      */
@@ -49,11 +49,11 @@ public class NewsPO {
      * 新闻创建时间戳
      */
     @TableField(value="create_time",fill= FieldFill.INSERT)
-    private Date createTime;
+    private LocalDate createTime;
     /**
      * 新闻更新时间戳
      */
     @TableField(value="update_time",fill=FieldFill.INSERT_UPDATE)
-    private Date updateTime;
+    private LocalDate updateTime;
 
 }
