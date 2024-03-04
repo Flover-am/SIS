@@ -23,6 +23,7 @@
         <common.version>0.0.1-SNAPSHOT</common.version>
         <!-- 外部依赖-->
         <mybatis-plus.version>3.5.3.1</mybatis-plus.version>
+        <hutool.varsion>5.8.20</hutool.varsion>
     </properties>
 
     <dependencyManagement>
@@ -36,6 +37,11 @@
                 <groupId>com.seciii</groupId>
                 <artifactId>common</artifactId>
                 <version>${common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-all</artifactId>
+                <version>${hutool.varsion}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
