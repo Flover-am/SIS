@@ -1,6 +1,7 @@
 package com.seciii.prism063.core.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seciii.prism063.core.mapper.NewsMapper;
 import com.seciii.prism063.core.pojo.po.NewsPO;
 import com.seciii.prism063.core.pojo.vo.news.NewsItemVO;
@@ -18,7 +19,7 @@ import java.util.List;
  * @date 2024.02.29
  */
 @Service
-public class NewsServiceImpl implements NewsService {
+public class NewsServiceImpl extends ServiceImpl<NewsMapper,NewsPO> implements NewsService {
     @Autowired
     NewsMapper newsMapper;
 
