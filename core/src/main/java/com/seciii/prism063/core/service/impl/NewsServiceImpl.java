@@ -50,13 +50,39 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper,NewsPO> implements N
         return toNewsVO(newsPO);
     }
     @Override
-    public boolean deleteNews(Long id)throws NewsException {
+    public void modifyNewsTitle(Long id, String title)throws NewsException {
+        NewsPO newsPO=newsMapper.selectById(id);
+        if(newsPO==null){
+            throw new NewsException(ErrorType.NEWS_NOT_FOUND);
+        }
+        newsPO.setTitle(title);
+        newsMapper.updateById(newsPO);
+    }
+    @Override
+    public void modifyNewsContent(Long id, String content)throws NewsException {
+        NewsPO newsPO=newsMapper.selectById(id);
+        if(newsPO==null){
+            throw new NewsException(ErrorType.NEWS_NOT_FOUND);
+        }
+        newsPO.setContent(content);
+        newsMapper.updateById(newsPO);
+    }
+    @Override
+    public void modifyNewsSource(Long id, String source)throws NewsException {
+        NewsPO newsPO=newsMapper.selectById(id);
+        if(newsPO==null){
+            throw new NewsException(ErrorType.NEWS_NOT_FOUND);
+        }
+        newsPO.setSource(source);
+        newsMapper.updateById(newsPO);
+    }
+    @Override
+    public void deleteNews(Long id)throws NewsException {
         int result=newsMapper.deleteById(id);
         //TODO: 确定删除接口的返回值
         if(result==0){
             throw new NewsException(ErrorType.NEWS_NOT_FOUND);
         }
-        return true;
     }
 
     /**

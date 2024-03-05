@@ -32,11 +32,32 @@ public interface NewsService {
      * @return 新闻VO
      */
     NewsVO getNewsDetail(Long id);
+
+    /**
+     * 修改新闻标题
+     * @param id 新闻id
+     * @param title 新标题
+     */
+    void modifyNewsTitle(Long id, String title);
+
+    /**
+     * 修改新闻内容
+     * @param id 新闻id
+     * @param content 新内容
+     */
+    void modifyNewsContent(Long id, String content);
+
+    /**
+     * 修改新闻来源
+     * @param id 新闻id
+     * @param source 新来源
+     */
+    void modifyNewsSource(Long id, String source);
+
     /**
      * 删除新闻
      * @param id 新闻id
-     * @return 删除结果，成功为true
      */
-    boolean deleteNews(Long id);
+    void deleteNews(Long id);
 
 }
