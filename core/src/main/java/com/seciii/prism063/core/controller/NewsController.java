@@ -5,10 +5,7 @@ import com.seciii.prism063.core.pojo.vo.news.NewsItemVO;
 import com.seciii.prism063.core.pojo.vo.news.NewsVO;
 import com.seciii.prism063.core.service.NewsService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -37,5 +34,10 @@ public class NewsController {
     public Result<NewsVO> getNewsDetail(@PathVariable Long id){
         NewsVO newsVO= newsService.getNewsDetail(id);
         return Result.success(newsVO);
+    }
+    @DeleteMapping("news/delete/{id}")
+    public Result<Void> deleteNews(@PathVariable Long id){
+        newsService.deleteNews(id);
+        return Result.success();
     }
 }

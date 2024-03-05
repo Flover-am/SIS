@@ -49,6 +49,14 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper,NewsPO> implements N
         }
         return toNewsVO(newsPO);
     }
+    @Override
+    public boolean deleteNews(Long id)throws NewsException {
+        int result=newsMapper.deleteById(id);
+        if(result==0){
+            throw new NewsException(ErrorType.NEWS_NOT_FOUND);
+        }
+        return true;
+    }
 
     /**
      * 将新闻PO列表转换为新闻条目VO列表

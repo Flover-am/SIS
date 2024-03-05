@@ -1,5 +1,6 @@
 package com.seciii.prism063.core.service;
 
+import com.seciii.prism063.common.exception.NewsException;
 import com.seciii.prism063.core.pojo.vo.news.NewsItemVO;
 import com.seciii.prism063.core.pojo.vo.news.NewsVO;
 
@@ -31,5 +32,11 @@ public interface NewsService {
      * @return 新闻VO
      */
     NewsVO getNewsDetail(Long id);
+    /**
+     * 删除新闻
+     * @param id 新闻id
+     * @return 删除结果，成功为true
+     */
+    boolean deleteNews(Long id);
 
 }
