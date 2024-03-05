@@ -19,7 +19,7 @@ public interface NewsService {
     List<NewsItemVO> getNewsList();
 
     /**
-     * 按页数获取新闻列表
+     * 按页数和页大小获取新闻列表
      * @param pageNo 页数
      * @return 对应页数新闻条目VO列表
      */
