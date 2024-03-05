@@ -52,6 +52,7 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper,NewsPO> implements N
     @Override
     public boolean deleteNews(Long id)throws NewsException {
         int result=newsMapper.deleteById(id);
+        //TODO: 确定删除接口的返回值
         if(result==0){
             throw new NewsException(ErrorType.NEWS_NOT_FOUND);
         }
