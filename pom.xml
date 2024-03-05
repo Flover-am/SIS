@@ -24,6 +24,7 @@
         <!-- 外部依赖-->
         <mybatis-plus.version>3.5.3.1</mybatis-plus.version>
         <hutool.varsion>5.8.20</hutool.varsion>
+        <satoken.version>1.37.0</satoken.version>
     </properties>
 
     <dependencyManagement>
@@ -42,6 +43,12 @@
                 <groupId>cn.hutool</groupId>
                 <artifactId>hutool-all</artifactId>
                 <version>${hutool.varsion}</version>
+            </dependency>
+            <!-- Sa-Token 权限认证，在线文档：https://sa-token.cc -->
+            <dependency>
+                <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-spring-boot-starter</artifactId>
+                <version>${satoken.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
