@@ -7,6 +7,6 @@ ENV TZ="Asia/Shanghai"
 
 WORKDIR /app
 
-COPY ./backend/core-0.0.1-SNAPSHOT.jar /app
+COPY core-0.0.1-SNAPSHOT.jar /app
 
 ENTRYPOINT ["java", "-jar", "core-0.0.1-SNAPSHOT.jar", "--server.port=${PORT}", "-Duser.timezone=GMT+08"]
