@@ -2,6 +2,7 @@ package com.seciii.prism063.core.pojo.po;
 
 
 import com.baomidou.mybatisplus.annotation.*;
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -13,6 +14,7 @@ import java.time.LocalDate;
  * @date 2024.02.29
  */
 @Data
+@Builder
 @TableName(schema="prism063",value="t_news")
 public class NewsPO {
     /**
@@ -58,7 +60,7 @@ public class NewsPO {
     /**
      * 新闻创建时间戳
      */
-    @TableField(value="create_time",fill= FieldFill.INSERT)
+    @TableField(value="create_time",fill=FieldFill.INSERT)
     private LocalDate createTime;
     /**
      * 新闻更新时间戳

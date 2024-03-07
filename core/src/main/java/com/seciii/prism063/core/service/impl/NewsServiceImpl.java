@@ -1,17 +1,20 @@
 package com.seciii.prism063.core.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seciii.prism063.common.enums.ErrorType;
 import com.seciii.prism063.common.exception.NewsException;
 import com.seciii.prism063.core.mapper.NewsMapper;
 import com.seciii.prism063.core.pojo.po.NewsPO;
+import com.seciii.prism063.core.pojo.vo.news.NewNews;
 import com.seciii.prism063.core.pojo.vo.news.NewsItemVO;
 import com.seciii.prism063.core.pojo.vo.news.NewsVO;
 import com.seciii.prism063.core.service.NewsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -23,15 +26,22 @@ import java.util.List;
 @Service
 public class NewsServiceImpl extends ServiceImpl<NewsMapper,NewsPO> implements NewsService {
     @Autowired
-    NewsMapper newsMapper;
+    private NewsMapper newsMapper;
+
 
     @Override
     public List<NewsItemVO> getNewsList() throws NewsException {
-        List<NewsPO> newsList=newsMapper.selectList(null);
+        QueryWrapper<NewsPO> newsQueryWrapper=new QueryWrapper<>();
+        newsQueryWrapper.select("*");
+        List<NewsPO> newsList=newsMapper.selectList(newsQueryWrapper);
         if(newsList==null||newsList.isEmpty()){
             throw new NewsException(ErrorType.NEWS_LIST_EMPTY);
         }
         return toNewsVO(newsList);
+    }
+    @Override
+    public void addNews(NewNews newNews){
+        newsMapper.insert(toNewsPO(newNews));
     }
 
     @Override
@@ -84,6 +94,31 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper,NewsPO> implements N
             throw new NewsException(ErrorType.NEWS_NOT_FOUND);
         }
     }
+    @Override
+    public List<NewsItemVO> filterNewsPaged(int pageNo, int pageSize, List<String> category, LocalDate startTime, LocalDate endTime){
+        QueryWrapper<NewsPO> filterQueryWrapper=new QueryWrapper<>();
+        filterQueryWrapper.select("*");
+        if(!category.isEmpty()){
+            filterQueryWrapper.in("category",category);
+        }
+        if(startTime!=null&&endTime!=null){
+            filterQueryWrapper.between("source_time",startTime,endTime);
+        }else if(startTime!=null){
+            filterQueryWrapper.ge("source_time",startTime);
+        }else if(endTime!=null){
+            filterQueryWrapper.le("source_time",endTime);
+        }
+        Page<NewsPO> page= newsMapper.selectPage(new Page<>(pageNo,pageSize),filterQueryWrapper);
+        return toNewsVO(page.getRecords());
+    }
+    @Override
+    public List<NewsItemVO> searchNewsByTitle(String title){
+        QueryWrapper<NewsPO> searchQueryWrapper=new QueryWrapper<>();
+        searchQueryWrapper.select("*");
+        searchQueryWrapper.like("title",title);
+        List<NewsPO> newsList=newsMapper.selectList(searchQueryWrapper);
+        return toNewsVO(newsList);
+    }
 
     /**
      * 将新闻PO列表转换为新闻条目VO列表
@@ -119,6 +154,22 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper,NewsPO> implements N
                 .category(newsPO.getCategory())
                 .createTime(newsPO.getCreateTime())
                 .updateTime(newsPO.getUpdateTime())
+                .build();
+    }
+    /**
+     * 将新闻NewNews对象转换为新闻PO
+     * @param newNews 新闻NewNews对象
+     * @return 新闻PO
+     */
+    private NewsPO toNewsPO(NewNews newNews){
+        return NewsPO.builder()
+                .title(newNews.getTitle())
+                .content(newNews.getContent())
+                .originSource(newNews.getOriginSource())
+                .sourceTime(newNews.getSourceTime())
+                .link(newNews.getLink())
+                .sourceLink(newNews.getSourceLink())
+                .category(newNews.getCategory())
                 .build();
     }
 }
