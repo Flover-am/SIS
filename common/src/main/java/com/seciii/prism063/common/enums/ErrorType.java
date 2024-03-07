@@ -12,10 +12,9 @@ public enum ErrorType {
     /**
      * 新闻获取相关错误
      */
-    NEWS_NOT_FOUND(2001, "新闻不存在", 404),
-    NEWS_PAGE_NUMBER_OVERFLOW(2002, "页码超出范围", 400),
-    NEWS_PAGE_SIZE_OVERFLOW(2003, "页大小超出范围", 400),
-    NEWS_LIST_EMPTY(2004, "新闻列表为空", 404),
+    NEWS_UNKNOWN_ERROR(300000, "未知错误", 500),
+    NEWS_NOT_FOUND(300001, "新闻不存在", 404),
+    NEWS_PAGE_OVERFLOW(300002, "新闻页数超限", 400),
     ;
     /**
      * 状态码
