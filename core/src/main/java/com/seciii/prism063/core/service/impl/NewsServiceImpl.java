@@ -73,7 +73,7 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper,NewsPO> implements N
         if(newsPO==null){
             throw new NewsException(ErrorType.NEWS_NOT_FOUND);
         }
-        newsPO.setSource(source);
+        newsPO.setOriginSource(source);
         newsMapper.updateById(newsPO);
     }
     @Override
@@ -93,11 +93,12 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper,NewsPO> implements N
     private List<NewsItemVO> toNewsVO(List<NewsPO> newsPOList) {
         return newsPOList.stream().map(
                 newsPO -> NewsItemVO.builder()
-                       .id(newsPO.getId())
-                       .title(newsPO.getTitle())
-                       .source(newsPO.getSource())
-                       .time(newsPO.getTime())
-                       .build()
+                        .id(newsPO.getId())
+                        .title(newsPO.getTitle())
+                        .origin_source(newsPO.getOriginSource())
+                        .source_time(newsPO.getSourceTime())
+                        .category(newsPO.getCategory())
+                        .build()
         ).toList();
     }
 
@@ -111,8 +112,11 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper,NewsPO> implements N
                 .id(newsPO.getId())
                 .title(newsPO.getTitle())
                 .content(newsPO.getContent())
-                .source(newsPO.getSource())
-                .time(newsPO.getTime())
+                .origin_source(newsPO.getOriginSource())
+                .source_time(newsPO.getSourceTime())
+                .link(newsPO.getLink())
+                .source_link(newsPO.getSourceLink())
+                .category(newsPO.getCategory())
                 .createTime(newsPO.getCreateTime())
                 .updateTime(newsPO.getUpdateTime())
                 .build();

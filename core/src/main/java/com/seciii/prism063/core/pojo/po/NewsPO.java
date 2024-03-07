@@ -18,32 +18,42 @@ public class NewsPO {
     /**
      * 新闻id
      */
-    @TableId(value="pk_news_id",type=IdType.ASSIGN_ID)
+    @TableId(value="id",type=IdType.ASSIGN_ID)
     private Long id;
     /**
      * 新闻标题
      */
-    @TableField("news_title")
+    @TableField("title")
     private String title;
     /**
      * 新闻内容
      */
-    @TableField("news_content")
+    @TableField("content")
     private String content;
     /**
      * 新闻来源
      */
-    @TableField("news_source")
-    private String source;
+    @TableField("origin_source")
+    private String originSource;
     /**
      * 新闻时间
      */
-    @TableField("news_time")
-    private LocalDate time;
+    @TableField("source_time")
+    private LocalDate sourceTime;
+    /**
+     * 新闻链接
+     */
+    @TableField("link")
+    private String link;
+    /**
+     * 新闻源链接
+     */
+    @TableField("source_link")
+    private String sourceLink;
     /**
      * 新闻分类(暂未使用)
      */
-    @TableField("news_category")
+    @TableField("category")
     private String category;    //TODO:加入新闻分类具体实现
     /**
      * 新闻创建时间戳

@@ -36,12 +36,21 @@ public class NewsVO {
      * 新闻来源
      */
     @NotNull
-    private String source;
+    private String origin_source;
     /**
      * 新闻时间
      */
     @NotNull
-    private LocalDate time;
+    private LocalDate source_time;
+    /**
+     * 新闻链接
+     */
+    @NotNull
+    private String link;
+    /**
+     * 新闻源链接
+     */
+    private String source_link;
     /**
      * 新闻分类
      */
