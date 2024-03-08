@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.annotation.*;
 import lombok.Builder;
 import lombok.Data;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * 新闻PO类
@@ -41,7 +41,7 @@ public class NewsPO {
      * 新闻时间
      */
     @TableField("source_time")
-    private LocalDate sourceTime;
+    private LocalDateTime sourceTime;
     /**
      * 新闻链接
      */
@@ -56,16 +56,16 @@ public class NewsPO {
      * 新闻分类(暂未使用)
      */
     @TableField("category")
-    private String category;    //TODO:加入新闻分类具体实现
+    private Integer category;    //TODO:加入新闻分类具体实现
     /**
      * 新闻创建时间戳
      */
     @TableField(value="create_time",fill=FieldFill.INSERT)
-    private LocalDate createTime;
+    private LocalDateTime createTime;
     /**
      * 新闻更新时间戳
      */
     @TableField(value="update_time",fill=FieldFill.INSERT_UPDATE)
-    private LocalDate updateTime;
+    private LocalDateTime updateTime;
 
 }

@@ -3,6 +3,7 @@ package com.seciii.prism063.core.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.seciii.prism063.common.enums.CategoryType;
 import com.seciii.prism063.common.enums.ErrorType;
 import com.seciii.prism063.common.exception.NewsException;
 import com.seciii.prism063.core.mapper.NewsMapper;
@@ -14,7 +15,7 @@ import com.seciii.prism063.core.service.NewsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -34,9 +35,7 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper,NewsPO> implements N
         QueryWrapper<NewsPO> newsQueryWrapper=new QueryWrapper<>();
         newsQueryWrapper.select("*");
         List<NewsPO> newsList=newsMapper.selectList(newsQueryWrapper);
-        if(newsList==null||newsList.isEmpty()){
-            throw new NewsException(ErrorType.NEWS_LIST_EMPTY);
-        }
+
         return toNewsVO(newsList);
     }
     @Override
@@ -95,7 +94,7 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper,NewsPO> implements N
         }
     }
     @Override
-    public List<NewsItemVO> filterNewsPaged(int pageNo, int pageSize, List<String> category, LocalDate startTime, LocalDate endTime){
+    public List<NewsItemVO> filterNewsPaged(int pageNo, int pageSize, List<String> category, LocalDateTime startTime, LocalDateTime endTime){
         QueryWrapper<NewsPO> filterQueryWrapper=new QueryWrapper<>();
         filterQueryWrapper.select("*");
         if(!category.isEmpty()){
@@ -132,7 +131,7 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper,NewsPO> implements N
                         .title(newsPO.getTitle())
                         .origin_source(newsPO.getOriginSource())
                         .source_time(newsPO.getSourceTime())
-                        .category(newsPO.getCategory())
+                        .category(CategoryType.getCategoryType(newsPO.getCategory()).getCategoryEN())
                         .build()
         ).toList();
     }
@@ -151,7 +150,7 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper,NewsPO> implements N
                 .source_time(newsPO.getSourceTime())
                 .link(newsPO.getLink())
                 .source_link(newsPO.getSourceLink())
-                .category(newsPO.getCategory())
+                .category(CategoryType.getCategoryType(newsPO.getCategory()).getCategoryEN())
                 .createTime(newsPO.getCreateTime())
                 .updateTime(newsPO.getUpdateTime())
                 .build();
@@ -169,7 +168,7 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper,NewsPO> implements N
                 .sourceTime(newNews.getSourceTime())
                 .link(newNews.getLink())
                 .sourceLink(newNews.getSourceLink())
-                .category(newNews.getCategory())
+                .category(CategoryType.getCategoryType(newNews.getCategory()).toInt())
                 .build();
     }
 }

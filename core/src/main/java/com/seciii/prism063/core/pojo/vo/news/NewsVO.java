@@ -3,9 +3,10 @@ package com.seciii.prism063.core.pojo.vo.news;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
 
-import javax.validation.constraints.NotNull;
-import java.time.LocalDate;
+
+import java.time.LocalDateTime;
 
 /**
  * 新闻VO类
@@ -41,7 +42,7 @@ public class NewsVO {
      * 新闻时间
      */
     @NotNull
-    private LocalDate source_time;
+    private LocalDateTime source_time;
     /**
      * 新闻链接
      */
@@ -59,10 +60,10 @@ public class NewsVO {
      * 新闻创建时间戳
      */
     @NotNull
-    private LocalDate createTime;
+    private LocalDateTime createTime;
     /**
      * 新闻更新时间戳
      */
     @NotNull
-    private LocalDate updateTime;
+    private LocalDateTime updateTime;
 }
