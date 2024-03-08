@@ -3,11 +3,11 @@ package com.seciii.prism063.core.pojo.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
 public class DateRange{
-    LocalDate start;
-    LocalDate end;
+    LocalDateTime start;
+    LocalDateTime end;
 }

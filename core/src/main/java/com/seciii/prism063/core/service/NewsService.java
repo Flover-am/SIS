@@ -5,7 +5,7 @@ import com.seciii.prism063.core.pojo.vo.news.NewNews;
 import com.seciii.prism063.core.pojo.vo.news.NewsItemVO;
 import com.seciii.prism063.core.pojo.vo.news.NewsVO;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -77,7 +77,7 @@ public interface NewsService {
      * @param endTime 结束时间
      * @return 过滤后的新闻列表
      */
-    List<NewsItemVO> filterNewsPaged(int pageNo, int pageSize, List<String> category, LocalDate startTime,LocalDate endTime);
+    List<NewsItemVO> filterNewsPaged(int pageNo, int pageSize, List<String> category, LocalDateTime startTime,LocalDateTime endTime);
 
     /**
      * 按标题模糊搜索新闻

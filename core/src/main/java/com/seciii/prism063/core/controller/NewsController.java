@@ -128,6 +128,12 @@ public class NewsController {
         );
         return Result.success(newsList);
     }
+
+    /**
+     * 按标题模糊搜索新闻
+     * @param titleString 搜索字符串
+     * @return 新闻条目VO列表
+     */
     @GetMapping("/news/search")
     public Result<List<NewsItemVO>> searchNewsByTitle(@RequestParam String titleString){
         List<NewsItemVO> newsList = newsService.searchNewsByTitle(titleString);
