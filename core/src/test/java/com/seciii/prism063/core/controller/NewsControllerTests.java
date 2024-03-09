@@ -52,6 +52,8 @@ public class NewsControllerTests {
                 .link("www.test.com")
                 .source_link("www.testsource.com")
                 .category("testcat")
+                .createTime(LocalDateTime.now())
+                .updateTime(LocalDateTime.now())
                 .build();
     }
     @Test
