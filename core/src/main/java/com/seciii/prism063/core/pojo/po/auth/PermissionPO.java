@@ -23,6 +23,12 @@ public class PermissionPO {
     private Long id;
 
     /**
+     * 权限名
+     */
+    @TableField("permission_name")
+    private String permissionName;
+
+    /**
      * 权限描述
      */
     @TableField("description")
@@ -31,12 +37,12 @@ public class PermissionPO {
     /**
      * 创建时间
      */
-    @TableField(fill = FieldFill.INSERT)
+    @TableField(value = "create_time", fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
     /**
      * 更新时间
      */
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
 }

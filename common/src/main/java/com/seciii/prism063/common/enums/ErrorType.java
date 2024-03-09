@@ -27,8 +27,20 @@ public enum ErrorType {
 
     NOT_FOUND(100005, "Not Found", 404),/* 服务端无法找到客户端请求的资源 */
 
-    SERVER_ERROR(100006, "Server error", 400); /* 服务器内部错误 */
+    SERVER_ERROR(100006, "Server error", 400), /* 服务器内部错误 */
 
+    /**
+     * 用户模块错误码
+     */
+    USER_ALREADY_EXISTS(200000, "User already exists", 400), /* 用户已存在 */
+
+    USER_NOT_EXISTS(200001, "User not exists", 400), /* 用户不存在 */
+
+    PASSWORD_ERROR(200002, "Password error", 400), /* 密码错误 */
+
+    USERNAME_OR_PASSWORD_ERROR(200003, "Username or password error", 400), /* 用户或密码错误 */
+
+    USER_ROLE_NOT_EXISTS(200004, "User role not exists", 500); /* 用户身份不存在 */
     /**
      * 状态码
      */

@@ -3,8 +3,20 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.seciii.prism063.core.mapper.auth.UserMapper">
     <select id="existsUser" parameterType="String" resultType="int">
-        select exists (SELECT username
-                       from `t_auth_user`
-                       where username = #{username});
+        SELECT EXISTS (SELECT username
+                       FROM `t_auth_user`
+                       WHERE username = #{username});
+    </select>
+    
+    <resultMap id="UserDTO" type="com.seciii.prism063.core.pojo.dto.UserDTO">
+        <result column="id" jdbcType="BIGINT" property="id"/>
+        <result column="username" jdbcType="VARCHAR" property="username"/>
+        <result column="password" jdbcType="VARCHAR" property="password"/>
+    </resultMap>
+    
+    <select id="getUserByUsername" parameterType="String" resultMap="UserDTO">
+        SELECT id, username, password
+        FROM `t_auth_user`
+        WHERE username = #{username};
     </select>
 </mapper>

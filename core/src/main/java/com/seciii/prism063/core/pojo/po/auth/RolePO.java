@@ -23,6 +23,12 @@ public class RolePO {
     private Long id;
 
     /**
+     * 角色名
+     */
+    @TableField("role_name")
+    private String roleName;
+
+    /**
      * 角色描述
      */
     @TableField("description")
@@ -31,12 +37,12 @@ public class RolePO {
     /**
      * 创建时间
      */
-    @TableField(fill = FieldFill.INSERT)
+    @TableField(value = "create_time", fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
     /**
      * 更新时间
      */
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
 }
