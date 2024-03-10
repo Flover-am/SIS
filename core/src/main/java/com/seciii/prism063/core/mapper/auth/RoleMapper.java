@@ -21,4 +21,6 @@ public interface RoleMapper extends BaseMapper<RolePO> {
      * @return 用户角色名
      */
     List<RolePO> getUserRole(Long userId);
+
+    Long getRoleIdByName(String roleName);
 }
