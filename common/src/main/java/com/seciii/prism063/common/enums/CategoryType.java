@@ -37,6 +37,12 @@ public enum CategoryType {
     public boolean equals(int ord){
         return this.ordinal()==ord;
     }
+    public boolean equals(String category){
+        return this.categoryCN.equals(category)||this.categoryEN.equals(category);
+    }
+    public String toString(){
+        return this.categoryEN;
+    }
     public static CategoryType getCategoryType(String category){
         for(CategoryType categoryType:CategoryType.values()){
             if(categoryType.getCategoryCN().equals(category)||categoryType.getCategoryEN().equals(category)){
