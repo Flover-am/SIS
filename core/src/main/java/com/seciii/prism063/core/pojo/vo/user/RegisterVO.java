@@ -27,7 +27,7 @@ public class RegisterVO {
      * 用户密码
      */
     @NotNull
-    @Pattern(regexp = "^(\\s*|[0-9A-Za-z]*)$", message = "密码必须同时包含数字和字母")
+    @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*\\d).*$", message = "密码必须同时包含数字和字母")
     @Size(min = 6, max = 20, message = "密码长度必须在6-20位")
     private String password;
 }

@@ -8,7 +8,6 @@ import com.seciii.prism063.core.enums.RoleType;
 import com.seciii.prism063.core.mapper.auth.RoleMapper;
 import com.seciii.prism063.core.mapper.auth.UserMapper;
 import com.seciii.prism063.core.mapper.auth.UserRoleMapper;
-import com.seciii.prism063.core.pojo.dto.UserDTO;
 import com.seciii.prism063.core.pojo.po.auth.UserPO;
 import com.seciii.prism063.core.pojo.po.auth.UserRolePO;
 import com.seciii.prism063.core.service.UserService;
@@ -62,7 +61,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void login(String username, String password) {
-        UserDTO user = userMapper.getUserByUsername(username);
+        UserPO user = userMapper.getUserByUsername(username);
         // 若用户不存在，抛出异常
         if (user == null) {
             log.error(String.format("User: %s not exist.", username));
@@ -87,12 +86,12 @@ public class UserServiceImpl implements UserService {
             throw new UserException(ErrorType.USER_NOT_EXISTS, "User not exists");
         }
         // 若旧密码不正确，抛出异常
-        if (!user.getPassword().equals(oldPassword)) {
+        if (!BCrypt.checkpw(oldPassword, user.getPassword())) {
             log.error("Password error.");
             throw new UserException(ErrorType.PASSWORD_ERROR, "Password error");
         }
-        user.setPassword(newPassword);
-        int result = userMapper.insert(user);
+        user.setPassword(BCrypt.hashpw(newPassword, BCrypt.gensalt()));
+        int result = userMapper.updateById(user);
         if (result <= 0) {
             log.error(String.format("Insert error while changing user password: %d.", id));
             throw new UserException(ErrorType.UNKNOWN_ERROR, "Update error");

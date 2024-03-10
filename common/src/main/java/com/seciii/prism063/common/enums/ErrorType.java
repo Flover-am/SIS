@@ -27,7 +27,7 @@ public enum ErrorType {
 
     NOT_FOUND(100005, "Not Found", 404),/* 服务端无法找到客户端请求的资源 */
 
-    SERVER_ERROR(100006, "Server error", 400), /* 服务器内部错误 */
+    SERVER_ERROR(100006, "Server error", 500), /* 服务器内部错误 */
 
     /**
      * 用户模块错误码

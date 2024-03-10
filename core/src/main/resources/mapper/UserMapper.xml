@@ -8,14 +8,8 @@
                        WHERE username = #{username});
     </select>
     
-    <resultMap id="UserDTO" type="com.seciii.prism063.core.pojo.dto.UserDTO">
-        <result column="id" jdbcType="BIGINT" property="id"/>
-        <result column="username" jdbcType="VARCHAR" property="username"/>
-        <result column="password" jdbcType="VARCHAR" property="password"/>
-    </resultMap>
-    
-    <select id="getUserByUsername" parameterType="String" resultMap="UserDTO">
-        SELECT id, username, password
+    <select id="getUserByUsername" parameterType="String" resultType="com.seciii.prism063.core.pojo.po.auth.UserPO">
+        SELECT *
         FROM `t_auth_user`
         WHERE username = #{username};
     </select>

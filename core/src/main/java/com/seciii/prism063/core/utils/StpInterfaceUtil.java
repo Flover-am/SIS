@@ -30,7 +30,7 @@ public class StpInterfaceUtil implements StpInterface {
      */
     @Override
     public List<String> getPermissionList(Object o, String s) {
-        List<PermissionPO> permission = permissionMapper.getUserPermission((Long) o);
+        List<PermissionPO> permission = permissionMapper.getUserPermission(Long.valueOf(String.valueOf(o)));
         return permission.stream().map(PermissionPO::getPermissionName).toList();
     }
 
@@ -39,7 +39,7 @@ public class StpInterfaceUtil implements StpInterface {
      */
     @Override
     public List<String> getRoleList(Object o, String s) {
-        List<RolePO> role = roleMapper.getUserRole((Long) o);
-         return role.stream().map(RolePO::getRoleName).toList();
+        List<RolePO> role = roleMapper.getUserRole(Long.valueOf(String.valueOf(o)));
+        return role.stream().map(RolePO::getRoleName).toList();
     }
 }

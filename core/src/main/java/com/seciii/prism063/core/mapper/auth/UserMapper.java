@@ -1,7 +1,6 @@
 package com.seciii.prism063.core.mapper.auth;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.seciii.prism063.core.pojo.dto.UserDTO;
 import com.seciii.prism063.core.pojo.po.auth.UserPO;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -27,5 +26,5 @@ public interface UserMapper extends BaseMapper<UserPO> {
      * @param username 用户名
      * @return 用户数据
      */
-    UserDTO getUserByUsername(String username);
+    UserPO getUserByUsername(String username);
 }

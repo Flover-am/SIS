@@ -6,7 +6,6 @@ import com.seciii.prism063.common.enums.ErrorType;
 import com.seciii.prism063.common.exception.user.UserException;
 import com.seciii.prism063.core.mapper.auth.RoleMapper;
 import com.seciii.prism063.core.mapper.auth.UserMapper;
-import com.seciii.prism063.core.pojo.dto.UserDTO;
 import com.seciii.prism063.core.pojo.po.auth.RolePO;
 import com.seciii.prism063.core.pojo.po.auth.UserPO;
 import com.seciii.prism063.core.service.AdminService;
@@ -34,7 +33,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public void login(String username, String password) {
-        UserDTO user = userMapper.getUserByUsername(username);
+        UserPO user = userMapper.getUserByUsername(username);
         // 若用户不存在，抛出异常
         if (user == null) {
             log.error(String.format("User: %s not exist.", username));
