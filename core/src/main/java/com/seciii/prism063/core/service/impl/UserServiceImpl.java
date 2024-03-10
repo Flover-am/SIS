@@ -39,14 +39,14 @@ public class UserServiceImpl implements UserService {
         // 如果已存在username，则抛出异常
         if (userMapper.existsUser(username) > 0) {
             log.error(String.format("Username: %s already exists.", username));
-            throw new UserException(ErrorType.USER_ALREADY_EXISTS, "User already exists");
+            throw new UserException(ErrorType.USER_ALREADY_EXISTS, "用户已存在");
         }
         UserPO user = UserPO.builder().username(username).password(BCrypt.hashpw(password, BCrypt.gensalt())).build();
         int result = userMapper.insert(user);
         // 如果数据库添加数据失败，则抛出异常
         if (result <= 0) {
             log.error(String.format("Insert error while adding user: %s.", username));
-            throw new UserException(ErrorType.UNKNOWN_ERROR, "Insert error");
+            throw new UserException(ErrorType.UNKNOWN_ERROR, "数据库添加数据失败");
         }
         // 为用户设定角色：普通用户
         Long roleId = roleMapper.getRoleIdByName(RoleType.USER.getRoleName());
@@ -55,7 +55,7 @@ public class UserServiceImpl implements UserService {
         // 如果数据库添加数据失败，则抛出异常
         if (result <= 0) {
             log.error(String.format("Insert error while adding user: %s.", username));
-            throw new UserException(ErrorType.UNKNOWN_ERROR, "Insert error");
+            throw new UserException(ErrorType.UNKNOWN_ERROR, "数据库添加数据失败");
         }
     }
 
@@ -65,13 +65,13 @@ public class UserServiceImpl implements UserService {
         // 若用户不存在，抛出异常
         if (user == null) {
             log.error(String.format("User: %s not exist.", username));
-            throw new UserException(ErrorType.USER_NOT_EXISTS, "User not exists");
+            throw new UserException(ErrorType.USER_NOT_EXISTS, "用户不存在");
         }
 
         // 若密码不匹配，抛出异常
         if (!BCrypt.checkpw(password, user.getPassword())) {
             log.error("Password error.");
-            throw new UserException(ErrorType.PASSWORD_ERROR, "Password error");
+            throw new UserException(ErrorType.PASSWORD_ERROR, "密码错误");
         }
 
         StpUtil.login(user.getId());
@@ -83,18 +83,18 @@ public class UserServiceImpl implements UserService {
         UserPO user = userMapper.selectById(id);
         if (user == null) {
             log.error(String.format("User id: %d not exist.", id));
-            throw new UserException(ErrorType.USER_NOT_EXISTS, "User not exists");
+            throw new UserException(ErrorType.USER_NOT_EXISTS, "用户不存在");
         }
         // 若旧密码不正确，抛出异常
         if (!BCrypt.checkpw(oldPassword, user.getPassword())) {
             log.error("Password error.");
-            throw new UserException(ErrorType.PASSWORD_ERROR, "Password error");
+            throw new UserException(ErrorType.PASSWORD_ERROR, "密码错误");
         }
         user.setPassword(BCrypt.hashpw(newPassword, BCrypt.gensalt()));
         int result = userMapper.updateById(user);
         if (result <= 0) {
             log.error(String.format("Insert error while changing user password: %d.", id));
-            throw new UserException(ErrorType.UNKNOWN_ERROR, "Update error");
+            throw new UserException(ErrorType.UNKNOWN_ERROR, "数据库更新数据失败");
         }
     }
 }

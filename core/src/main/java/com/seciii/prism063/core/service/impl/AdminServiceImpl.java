@@ -37,26 +37,26 @@ public class AdminServiceImpl implements AdminService {
         // 若用户不存在，抛出异常
         if (user == null) {
             log.error(String.format("User: %s not exist.", username));
-            throw new UserException(ErrorType.USER_NOT_EXISTS, "User not exists");
+            throw new UserException(ErrorType.USER_NOT_EXISTS, "用户不存在");
         }
 
         // 若密码不匹配，抛出异常
         if (!BCrypt.checkpw(password, user.getPassword())) {
             log.error("Password error.");
-            throw new UserException(ErrorType.PASSWORD_ERROR, "Username or password error");
+            throw new UserException(ErrorType.PASSWORD_ERROR, "用户名或密码错误");
         }
 
         // 若用户不存在角色，则抛出异常
         List<RolePO> role = roleMapper.getUserRole(user.getId());
         if (role.isEmpty()) {
             log.error(String.format("User: %s role not exist.", username));
-            throw new UserException(ErrorType.USER_ROLE_NOT_EXISTS, "User role not exists");
+            throw new UserException(ErrorType.USER_ROLE_NOT_EXISTS, "用户角色不存在");
         }
 
         // 若用户角色为普通用户，则抛出异常
         if ("user".equals(role.get(0).getRoleName())) {
             log.error("Admin try to login through user system.");
-            throw new UserException(ErrorType.USERNAME_OR_PASSWORD_ERROR, "User or password error");
+            throw new UserException(ErrorType.USERNAME_OR_PASSWORD_ERROR, "用户名或密码错误");
         }
 
         StpUtil.login(user.getId());

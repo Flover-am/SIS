@@ -81,6 +81,6 @@ public class GlobalExceptionHandler {
     public Result<Void> handleException(Exception e) {
         log.error(e.getMessage());
         e.printStackTrace();
-        return Result.error(ErrorType.SERVER_ERROR.getCode(), e.getMessage());
+        return Result.error(ErrorType.SERVER_ERROR.getCode(), "未知错误");
     }
 }

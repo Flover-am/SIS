@@ -51,7 +51,7 @@ public class SaTokenConfigure {
                     e.printStackTrace();
                     // 设置响应头
                     SaHolder.getResponse().setHeader("Content-Type", "application/json;charset=UTF-8");
-                    return JSONUtil.toJsonStr(Result.error(ErrorType.UNAUTHORIZED.getCode(), e.getMessage()), SaJSONConfig.getJsonConfig());
+                    return JSONUtil.toJsonStr(Result.error(ErrorType.UNAUTHORIZED.getCode(), "token验证失败，请重新登陆"), SaJSONConfig.getJsonConfig());
                 });
     }
 }
