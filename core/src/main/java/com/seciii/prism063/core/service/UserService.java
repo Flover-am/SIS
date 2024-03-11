@@ -23,5 +23,11 @@ public interface UserService {
      */
     void login(String username, String password);
 
+    /**
+     * 用户修改密码
+     *
+     * @param oldPassword 旧密码
+     * @param newPassword 新密码
+     */
     void modifyPassword(String oldPassword, String newPassword);
 }
