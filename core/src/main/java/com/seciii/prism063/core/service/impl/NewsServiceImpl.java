@@ -45,8 +45,8 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper,NewsPO> implements N
 
     @Override
     public List<NewsItemVO> getNewsListByPage(Integer pageNo,Integer pageSize)throws NewsException {
-        Page<NewsPO> page= newsMapper.selectPage(new Page<>(pageNo,pageSize),null);
-        //TODO: 分页查询异常处理
+        QueryWrapper<NewsPO> newsQueryWrapper=new QueryWrapper<NewsPO>().select("*");
+        Page<NewsPO> page= newsMapper.selectPage(new Page<>(pageNo,pageSize),newsQueryWrapper);
         return toNewsVO(page.getRecords());
     }
 
@@ -88,8 +88,7 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper,NewsPO> implements N
     @Override
     public void deleteNews(Long id)throws NewsException {
         int result=newsMapper.deleteById(id);
-        //TODO: 确定删除接口的返回值
-        if(result==0){
+        if(result==-1){
             throw new NewsException(ErrorType.NEWS_NOT_FOUND);
         }
     }
@@ -97,8 +96,11 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper,NewsPO> implements N
     public List<NewsItemVO> filterNewsPaged(int pageNo, int pageSize, List<String> category, LocalDateTime startTime, LocalDateTime endTime){
         QueryWrapper<NewsPO> filterQueryWrapper=new QueryWrapper<>();
         filterQueryWrapper.select("*");
-        if(!category.isEmpty()){
-            filterQueryWrapper.in("category",category);
+        if(category!=null&&!category.isEmpty()){
+            List<Integer> categoryTypeList=category.stream().map(x->{
+                return CategoryType.getCategoryType(x).toInt();
+            }).toList();
+            filterQueryWrapper.in("category",categoryTypeList);
         }
         if(startTime!=null&&endTime!=null){
             filterQueryWrapper.between("source_time",startTime,endTime);

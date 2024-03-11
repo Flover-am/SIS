@@ -2,6 +2,8 @@ package com.seciii.prism063.core.controller;
 
 
 import com.seciii.prism063.common.Result;
+import com.seciii.prism063.core.pojo.dto.DateRange;
+import com.seciii.prism063.core.pojo.dto.Filter;
 import com.seciii.prism063.core.pojo.vo.news.NewsItemVO;
 import com.seciii.prism063.core.pojo.vo.news.NewsVO;
 import com.seciii.prism063.core.service.NewsService;
@@ -18,7 +20,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -31,7 +32,7 @@ public class NewsControllerTests {
     private List<NewsItemVO> fakeNewsList;
     private NewsVO fakeNewsVO;
     @Before
-    public void before(){
+    public void initTestObjecets(){
         fakeNewsList=new ArrayList<>();
         for(int i=0;i<10;i++){
             fakeNewsList.add(NewsItemVO.builder()
@@ -52,6 +53,8 @@ public class NewsControllerTests {
                 .link("www.test.com")
                 .source_link("www.testsource.com")
                 .category("testcat")
+                .createTime(LocalDateTime.now())
+                .updateTime(LocalDateTime.now())
                 .build();
     }
     @Test
@@ -84,7 +87,45 @@ public class NewsControllerTests {
         Assert.assertEquals("success",result.getMsg());
         Assert.assertEquals(fakeNewsVO,result.getData());
     }
-
-
+    @Test
+    public void modifyNewsTitleMockTest(){
+        Result<Void> result = newsController.modifyNewsTitle(0L,"test");
+        Assert.assertEquals((Integer)0,result.getCode());
+        Assert.assertEquals("success",result.getMsg());
+    }
+    @Test
+    public void modifyNewsContentMockTest(){
+        Result<Void> result = newsController.modifyNewsContent(0L,"test");
+        Assert.assertEquals((Integer)0,result.getCode());
+        Assert.assertEquals("success",result.getMsg());
+    }
+    @Test
+    public void modifyNewsSourceMockTest(){
+        Result<Void> result = newsController.modifyNewsSource(0L,"test");
+        Assert.assertEquals((Integer)0,result.getCode());
+        Assert.assertEquals("success",result.getMsg());
+    }
+    @Test
+    public void deleteNewsTest(){
+        Result<Void> result = newsController.deleteNews(0L);
+        Assert.assertEquals((Integer)0,result.getCode());
+        Assert.assertEquals("success",result.getMsg());
+    }
+    @Test
+    public void filterNewsPagedTest(){
+        Mockito.when(newsServiceMock.filterNewsPaged(1,5,null,null,null)).thenReturn(fakeNewsList.subList(0,5));
+        Result<List<NewsItemVO>> result = newsController.filterNewsPaged(1,5,new Filter(null,new DateRange(null,null)));
+        Assert.assertEquals((Integer)0,result.getCode());
+        Assert.assertEquals("success",result.getMsg());
+        Assert.assertArrayEquals(fakeNewsList.subList(0,5).toArray(),result.getData().toArray());
+    }
+    @Test
+    public void searchNewsByTitleTest(){
+        Mockito.when(newsServiceMock.searchNewsByTitle("test")).thenReturn(fakeNewsList);
+        Result<List<NewsItemVO>> result = newsController.searchNewsByTitle("test");
+        Assert.assertEquals((Integer)0,result.getCode());
+        Assert.assertEquals("success",result.getMsg());
+        Assert.assertArrayEquals(fakeNewsList.toArray(),result.getData().toArray());
+    }
 
 }
