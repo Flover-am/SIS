@@ -26,9 +26,12 @@ import java.util.List;
  */
 @Service
 public class NewsServiceImpl extends ServiceImpl<NewsMapper,NewsPO> implements NewsService {
-    @Autowired
-    private NewsMapper newsMapper;
 
+    private final NewsMapper newsMapper;
+
+    public NewsServiceImpl(NewsMapper newsMapper) {
+        this.newsMapper = newsMapper;
+    }
 
     @Override
     public List<NewsItemVO> getNewsList() throws NewsException {

@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @RunWith(MockitoJUnitRunner.class)
 @SpringBootTest
-public class NewsServiceImplTests {
+public class NewsServiceImplTest {
     @Mock
     private NewsMapper newsMapperMock;
     @InjectMocks

@@ -13,7 +13,7 @@ import java.util.List;
 
 @MybatisPlusTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class NewsMapperTests {
+public class NewsMapperTest {
     @Autowired
     private NewsMapper newsMapper;
     @Test

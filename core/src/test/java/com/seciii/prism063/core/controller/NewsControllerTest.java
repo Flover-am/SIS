@@ -24,7 +24,7 @@ import java.util.List;
 
 @RunWith(MockitoJUnitRunner.class)
 @SpringBootTest
-public class NewsControllerTests {
+public class NewsControllerTest {
     @Mock
     private NewsService newsServiceMock;
     @InjectMocks

@@ -4,7 +4,7 @@ import com.seciii.prism063.common.enums.ErrorType;
 import lombok.Getter;
 
 @Getter
-public class NewsException extends RuntimeException{
+public class NewsException extends RuntimeException {
     /**
      * 状态码
      */
