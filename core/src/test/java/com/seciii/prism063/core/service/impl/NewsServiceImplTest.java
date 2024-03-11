@@ -1,7 +1,7 @@
 package com.seciii.prism063.core.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.seciii.prism063.common.enums.CategoryType;
+import com.seciii.prism063.core.enums.CategoryType;
 import com.seciii.prism063.core.mapper.NewsMapper;
 import com.seciii.prism063.core.pojo.po.NewsPO;
 import com.seciii.prism063.core.pojo.vo.news.NewNews;

@@ -1,4 +1,4 @@
-package com.seciii.prism063.common.enums;
+package com.seciii.prism063.common.exception.error;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

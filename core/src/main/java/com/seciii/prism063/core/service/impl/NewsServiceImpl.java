@@ -3,8 +3,8 @@ package com.seciii.prism063.core.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.seciii.prism063.common.enums.CategoryType;
-import com.seciii.prism063.common.enums.ErrorType;
+import com.seciii.prism063.core.enums.CategoryType;
+import com.seciii.prism063.common.exception.error.ErrorType;
 import com.seciii.prism063.common.exception.NewsException;
 import com.seciii.prism063.core.mapper.NewsMapper;
 import com.seciii.prism063.core.pojo.po.NewsPO;
@@ -12,7 +12,6 @@ import com.seciii.prism063.core.pojo.vo.news.NewNews;
 import com.seciii.prism063.core.pojo.vo.news.NewsItemVO;
 import com.seciii.prism063.core.pojo.vo.news.NewsVO;
 import com.seciii.prism063.core.service.NewsService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;

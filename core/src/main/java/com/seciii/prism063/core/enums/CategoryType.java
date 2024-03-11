@@ -1,12 +1,10 @@
-package com.seciii.prism063.common.enums;
+package com.seciii.prism063.core.enums;
 
-import lombok.Getter;
 
 /**
  * 类型枚举类，迭代二将根据需求重构
  * @author wangmingsong
  */
-@Getter
 public enum CategoryType {
     /**
      * 新闻分类
@@ -30,7 +28,12 @@ public enum CategoryType {
         this.categoryCN=categoryCN;
         this.categoryEN=categoryEN;
     }
-
+    public String getCategoryCN(){
+        return this.categoryCN;
+    }
+    public String getCategoryEN(){
+        return this.categoryEN;
+    }
     public int toInt(){
         return this.ordinal();
     }
