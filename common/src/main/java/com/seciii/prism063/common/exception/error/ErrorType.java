@@ -1,4 +1,4 @@
-package com.seciii.prism063.common.enums;
+package com.seciii.prism063.common.exception.error;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -40,7 +40,17 @@ public enum ErrorType {
 
     USERNAME_OR_PASSWORD_ERROR(200003, "Username or password error", 400), /* 用户或密码错误 */
 
-    USER_ROLE_NOT_EXISTS(200004, "User role not exists", 500); /* 用户身份不存在 */
+    USER_ROLE_NOT_EXISTS(200004, "User role not exists", 500), /* 用户身份不存在 */
+
+    /**
+     * 新闻获取相关错误
+     */
+    NEWS_UNKNOWN_ERROR(300000, "未知错误", 500),
+
+    NEWS_NOT_FOUND(300001, "新闻不存在", 404),
+
+    NEWS_PAGE_OVERFLOW(300002, "新闻页数超限", 400);
+
     /**
      * 状态码
      */

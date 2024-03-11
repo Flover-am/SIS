@@ -2,7 +2,7 @@ package com.seciii.prism063.common.handler;
 
 import cn.dev33.satoken.exception.SaTokenException;
 import com.seciii.prism063.common.Result;
-import com.seciii.prism063.common.enums.ErrorType;
+import com.seciii.prism063.common.exception.error.ErrorType;
 import com.seciii.prism063.common.exception.UserException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindException;

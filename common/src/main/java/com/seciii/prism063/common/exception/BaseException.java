@@ -1,6 +1,6 @@
 package com.seciii.prism063.common.exception;
 
-import com.seciii.prism063.common.enums.ErrorType;
+import com.seciii.prism063.common.exception.error.ErrorType;
 import lombok.Getter;
 
 /**

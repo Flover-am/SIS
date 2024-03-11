@@ -34,7 +34,7 @@ import java.util.List;
  */
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest
-public class UserServiceImplTest {
+class UserServiceImplTest {
     @MockBean
     private UserMapper userMapper;
     @MockBean

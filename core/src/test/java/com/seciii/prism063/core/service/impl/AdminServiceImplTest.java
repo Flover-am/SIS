@@ -33,7 +33,7 @@ import java.util.List;
  */
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest
-public class AdminServiceImplTest {
+class AdminServiceImplTest {
     @MockBean
     private UserMapper userMapper;
     @MockBean

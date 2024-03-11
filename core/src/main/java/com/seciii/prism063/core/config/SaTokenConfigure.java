@@ -7,15 +7,12 @@ import cn.dev33.satoken.router.SaHttpMethod;
 import cn.dev33.satoken.router.SaRouter;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.util.SaResult;
-import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.seciii.prism063.common.Result;
-import com.seciii.prism063.common.enums.ErrorType;
+import com.seciii.prism063.common.exception.error.ErrorType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
  * SaToken路由拦截器注册
