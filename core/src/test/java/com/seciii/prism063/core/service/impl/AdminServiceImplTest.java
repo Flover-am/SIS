@@ -2,7 +2,7 @@ package com.seciii.prism063.core.service.impl;
 
 import cn.dev33.satoken.secure.BCrypt;
 import cn.dev33.satoken.stp.StpUtil;
-import com.seciii.prism063.common.exception.user.UserException;
+import com.seciii.prism063.common.exception.UserException;
 import com.seciii.prism063.core.enums.RoleType;
 import com.seciii.prism063.core.mapper.auth.PermissionMapper;
 import com.seciii.prism063.core.mapper.auth.RoleMapper;

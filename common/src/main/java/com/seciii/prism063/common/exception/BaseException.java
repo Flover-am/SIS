@@ -1,4 +1,4 @@
-package com.seciii.prism063.common.exception.base;
+package com.seciii.prism063.common.exception;
 
 import com.seciii.prism063.common.enums.ErrorType;
 import lombok.Getter;
@@ -10,7 +10,7 @@ import lombok.Getter;
  * @date 2024.03.05
  */
 @Getter
-public class BaseException extends RuntimeException{
+public abstract class BaseException extends RuntimeException{
     /**
      * 状态码
      */
@@ -28,18 +28,17 @@ public class BaseException extends RuntimeException{
      */
     private final ErrorType errorType;
 
-    public BaseException(ErrorType type) {
+     BaseException(ErrorType type) {
         this.errorType = type;
         this.code = type.getCode();
         this.message = type.getMessage();
         this.httpStatus = type.getHttpStatus();
     }
 
-    public BaseException(ErrorType type, String message) {
+    BaseException(ErrorType type, String message) {
         this.errorType = type;
         this.code = type.getCode();
         this.message = message;
         this.httpStatus = type.getHttpStatus();
     }
-
 }
