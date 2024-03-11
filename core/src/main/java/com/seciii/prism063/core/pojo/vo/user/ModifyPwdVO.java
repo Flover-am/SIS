@@ -8,26 +8,26 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 /**
- * 注册VO类
+ * 用户修改密码VO类
  *
  * @author xueruichen
- * @date 2024.02.29
+ * @date 2024.03.10
  */
 @Data
 @Builder
-public class RegisterVO {
+public class ModifyPwdVO {
     /**
-     * 用户名
+     * 旧密码
      */
     @NotNull
-    @Size(min = 1, max = 20, message = "用户名不能长于20位")
-    private String username;
+    @Size(min = 6, max = 20, message = "请输入正确格式的密码")
+    private String oldPassword;
 
     /**
-     * 用户密码
+     * 新密码
      */
     @NotNull
-    @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*\\d).*$", message = "密码必须同时包含数字和字母")
+    @Pattern(regexp = "^(\\s*|[0-9A-Za-z]*)$", message = "密码必须同时包含数字和字母")
     @Size(min = 6, max = 20, message = "密码长度必须在6-20位")
-    private String password;
+    private String newPassword;
 }

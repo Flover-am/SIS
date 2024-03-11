@@ -23,6 +23,8 @@
         <common.version>0.0.1-SNAPSHOT</common.version>
         <!-- 外部依赖-->
         <mybatis-plus.version>3.5.3.1</mybatis-plus.version>
+        <hutool.varsion>5.8.20</hutool.varsion>
+        <satoken.version>1.37.0</satoken.version>
     </properties>
 
     <dependencyManagement>
@@ -36,6 +38,17 @@
                 <groupId>com.seciii</groupId>
                 <artifactId>common</artifactId>
                 <version>${common.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-all</artifactId>
+                <version>${hutool.varsion}</version>
+            </dependency>
+            <!-- Sa-Token 权限认证，在线文档：https://sa-token.cc -->
+            <dependency>
+                <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-spring-boot-starter</artifactId>
+                <version>${satoken.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -64,7 +77,9 @@
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
         </dependency>
+        <dependency>
+            <groupId>cn.dev33</groupId>
+            <artifactId>sa-token-spring-boot-starter</artifactId>
+        </dependency>
     </dependencies>
-
-
 </project>
