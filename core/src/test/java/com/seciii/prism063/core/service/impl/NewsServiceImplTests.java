@@ -1,6 +1,5 @@
 package com.seciii.prism063.core.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seciii.prism063.common.enums.CategoryType;
 import com.seciii.prism063.core.mapper.NewsMapper;
@@ -48,8 +47,8 @@ public class NewsServiceImplTests {
             fakeNewsItemList.add(NewsItemVO.builder()
                     .id((long)i)
                     .title("test"+i)
-                    .origin_source("test"+i+"source")
-                    .source_time(LocalDateTime.parse("2020-03-01 00:01:0"+i, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                    .originSource("test"+i+"source")
+                    .sourceTime(LocalDateTime.parse("2020-03-01 00:01:0"+i, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
                     .category(CategoryType.getCategoryType(i).toString())
                     .build()
             );
@@ -86,9 +85,9 @@ public class NewsServiceImplTests {
                 .title("singularTest")
                 .content("singularTestContent")
                 .link("www.singulartest.com")
-                .source_link("www.singulartestsource.com")
-                .origin_source("singularTestSource")
-                .source_time(LocalDateTime.parse("2024-01-01 12:34:56", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                .sourceLink("www.singulartestsource.com")
+                .originSource("singularTestSource")
+                .sourceTime(LocalDateTime.parse("2024-01-01 12:34:56", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
                 .category(CategoryType.getCategoryType(1).toString())
                 .createTime(currentTime)
                 .updateTime(currentTime)
@@ -107,18 +106,18 @@ public class NewsServiceImplTests {
     private boolean newsItemVOsEqual(NewsItemVO a,NewsItemVO b){
         return a.getId().equals(b.getId())
                 &&a.getTitle().equals(b.getTitle())
-                &&a.getOrigin_source().equals(b.getOrigin_source())
-                &&a.getSource_time().equals(b.getSource_time())
+                &&a.getOriginSource().equals(b.getOriginSource())
+                &&a.getSourceTime().equals(b.getSourceTime())
                 &&a.getCategory().equals(b.getCategory());
     }
     private boolean newsVOsEqual(NewsVO a,NewsVO b){
         return a.getId().equals(b.getId())
                 &&a.getTitle().equals(b.getTitle())
                 &&a.getContent().equals(b.getContent())
-                &&a.getOrigin_source().equals(b.getOrigin_source())
-                &&a.getSource_time().equals(b.getSource_time())
+                &&a.getOriginSource().equals(b.getOriginSource())
+                &&a.getSourceTime().equals(b.getSourceTime())
                 &&a.getLink().equals(b.getLink())
-                &&a.getSource_link().equals(b.getSource_link())
+                &&a.getSourceLink().equals(b.getSourceLink())
                 &&a.getCategory().equals(b.getCategory())
                 &&a.getCreateTime().equals(b.getCreateTime())
                 &&a.getUpdateTime().equals(b.getUpdateTime());

@@ -44,13 +44,13 @@ public class NewsController {
 
     /**
      * 按页数和页大小获取新闻列表
-     * @param pageNo 页码下标
+     * @param current 页码下标
      * @param pageSize 页大小
      * @return 对应页数新闻条目VO列表
      */
     @GetMapping("/news/page")
-    public Result<List<NewsItemVO>> getNewsListByPage(@RequestParam Integer pageNo,@RequestParam Integer pageSize){
-        List<NewsItemVO> newsList = newsService.getNewsListByPage(pageNo,pageSize);
+    public Result<List<NewsItemVO>> getNewsListByPage(@RequestParam Integer current, @RequestParam Integer pageSize){
+        List<NewsItemVO> newsList = newsService.getNewsListByPage(current,pageSize);
         return Result.success(newsList);
     }
 

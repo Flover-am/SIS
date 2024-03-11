@@ -31,12 +31,12 @@ public class NewsItemVO {
      * 新闻来源
      */
     @NotNull
-    private String origin_source;
+    private String originSource;
     /**
      * 新闻时间
      */
     @NotNull
-    private LocalDateTime source_time;
+    private LocalDateTime sourceTime;
     /**
      * 新闻分类
      */
