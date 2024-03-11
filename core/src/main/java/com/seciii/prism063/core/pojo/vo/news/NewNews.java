@@ -3,9 +3,8 @@ package com.seciii.prism063.core.pojo.vo.news;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import org.jetbrains.annotations.NotNull;
 
-
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 @Getter
 @Setter
