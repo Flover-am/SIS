@@ -7,6 +7,7 @@ import com.seciii.prism063.common.exception.error.ErrorType;
 import com.seciii.prism063.core.enums.CategoryType;
 import com.seciii.prism063.common.exception.NewsException;
 import com.seciii.prism063.core.mapper.NewsMapper;
+import com.seciii.prism063.core.pojo.dto.PagedNews;
 import com.seciii.prism063.core.pojo.po.NewsPO;
 import com.seciii.prism063.core.pojo.vo.news.NewNews;
 import com.seciii.prism063.core.pojo.vo.news.NewsItemVO;
@@ -33,12 +34,11 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper, NewsPO> implements 
     }
 
     @Override
-    public List<NewsItemVO> getNewsList() throws NewsException {
+    public PagedNews getNewsList() throws NewsException {
         QueryWrapper<NewsPO> newsQueryWrapper = new QueryWrapper<>();
         newsQueryWrapper.select("*");
         List<NewsPO> newsList = newsMapper.selectList(newsQueryWrapper);
-
-        return toNewsVO(newsList);
+        return new PagedNews(newsMapper.selectCount(newsQueryWrapper),toNewsVO(newsList));
     }
 
     @Override
@@ -47,10 +47,10 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper, NewsPO> implements 
     }
 
     @Override
-    public List<NewsItemVO> getNewsListByPage(Integer pageNo, Integer pageSize) throws NewsException {
+    public PagedNews getNewsListByPage(Integer pageNo, Integer pageSize) throws NewsException {
         QueryWrapper<NewsPO> newsQueryWrapper = new QueryWrapper<NewsPO>().select("*");
         Page<NewsPO> page = newsMapper.selectPage(new Page<>(pageNo, pageSize), newsQueryWrapper);
-        return toNewsVO(page.getRecords());
+        return new PagedNews(newsMapper.selectCount(newsQueryWrapper),toNewsVO(page.getRecords()));
     }
 
     @Override
@@ -101,31 +101,43 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper, NewsPO> implements 
     }
 
     @Override
-    public List<NewsItemVO> filterNewsPaged(int pageNo, int pageSize, List<String> category, LocalDateTime startTime, LocalDateTime endTime) {
-        QueryWrapper<NewsPO> filterQueryWrapper = new QueryWrapper<>();
-        filterQueryWrapper.select("*");
-        if (category != null && !category.isEmpty()) {
-            List<Integer> categoryTypeList = category.stream().map(x -> CategoryType.getCategoryType(x).toInt()).toList();
-            filterQueryWrapper.in("category", categoryTypeList);
-        }
-        if (startTime != null && endTime != null) {
-            filterQueryWrapper.between("source_time", startTime, endTime);
-        } else if (startTime != null) {
-            filterQueryWrapper.ge("source_time", startTime);
-        } else if (endTime != null) {
-            filterQueryWrapper.le("source_time", endTime);
-        }
+    public PagedNews filterNewsPaged(
+            int pageNo,
+            int pageSize,
+            List<String> category,
+            LocalDateTime startTime,
+            LocalDateTime endTime
+    ) {
+        QueryWrapper<NewsPO> filterQueryWrapper = getFilterQueryWrapper(category, startTime, endTime);
+
         Page<NewsPO> page = newsMapper.selectPage(new Page<>(pageNo, pageSize), filterQueryWrapper);
-        return toNewsVO(page.getRecords());
+        return new PagedNews(newsMapper.selectCount(filterQueryWrapper),toNewsVO(page.getRecords()));
     }
 
     @Override
-    public List<NewsItemVO> searchNewsByTitle(String title) {
+    public PagedNews searchNewsByTitle(String title) {
         QueryWrapper<NewsPO> searchQueryWrapper = new QueryWrapper<>();
         searchQueryWrapper.select("*");
         searchQueryWrapper.like("title", title);
         List<NewsPO> newsList = newsMapper.selectList(searchQueryWrapper);
-        return toNewsVO(newsList);
+        return new PagedNews(newsMapper.selectCount(searchQueryWrapper),toNewsVO(newsList));
+    }
+
+    @Override
+    public PagedNews searchNewsByTitleFiltered(
+            int pageNo,
+            int pageSize,
+            String title,
+            List<String> category,
+            LocalDateTime startTime,
+            LocalDateTime endTime
+    ) {
+        QueryWrapper<NewsPO> filterSearchWrapper = getFilterQueryWrapper(category, startTime, endTime);
+        filterSearchWrapper.select("*");
+        filterSearchWrapper.like("title", title);
+
+        Page<NewsPO> page = newsMapper.selectPage(new Page<>(pageNo, pageSize), filterSearchWrapper);
+        return new PagedNews(newsMapper.selectCount(filterSearchWrapper),toNewsVO(page.getRecords()));
     }
 
     /**
@@ -183,5 +195,31 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper, NewsPO> implements 
                 .sourceLink(newNews.getSourceLink())
                 .category(CategoryType.getCategoryType(newNews.getCategory()).toInt())
                 .build();
+    }
+
+    /**
+     * 获取过滤查询条件
+     * @param category 分类数组
+     * @param startTime 开始时间
+     * @param endTime 结束时间
+     * @return 查询条件QueryWrapper对象
+     */
+    private QueryWrapper<NewsPO> getFilterQueryWrapper(List<String> category,
+                                                       LocalDateTime startTime,
+                                                       LocalDateTime endTime) {
+        QueryWrapper<NewsPO> filterQueryWrapper = new QueryWrapper<>();
+        filterQueryWrapper.select("*");
+        if (category != null && !category.isEmpty()) {
+            List<Integer> categoryTypeList = category.stream().map(x -> CategoryType.getCategoryType(x).toInt()).toList();
+            filterQueryWrapper.in("category", categoryTypeList);
+        }
+        if (startTime != null && endTime != null) {
+            filterQueryWrapper.between("source_time", startTime, endTime);
+        } else if (startTime != null) {
+            filterQueryWrapper.ge("source_time", startTime);
+        } else if (endTime != null) {
+            filterQueryWrapper.le("source_time", endTime);
+        }
+        return filterQueryWrapper;
     }
 }

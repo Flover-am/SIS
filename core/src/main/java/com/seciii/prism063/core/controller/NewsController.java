@@ -1,11 +1,13 @@
 package com.seciii.prism063.core.controller;
 
 import com.seciii.prism063.common.Result;
-import com.seciii.prism063.core.pojo.dto.Filter;
+import com.seciii.prism063.core.pojo.dto.PagedNews;
+import com.seciii.prism063.core.pojo.vo.news.Filter;
 import com.seciii.prism063.core.pojo.vo.news.NewNews;
 import com.seciii.prism063.core.pojo.vo.news.NewsItemVO;
 import com.seciii.prism063.core.pojo.vo.news.NewsVO;
 import com.seciii.prism063.core.service.NewsService;
+import com.seciii.prism063.core.utils.DateTimeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,17 +22,22 @@ import java.util.List;
 @RestController
 @RequestMapping("/v1")
 public class NewsController {
-    @Autowired
-    private NewsService newsService;
+
+    private final NewsService newsService;
+
+    public NewsController(NewsService newsService) {
+        this.newsService = newsService;
+    }
 
     /**
      * 获取新闻列表
      * @return 新闻条目VO列表
      */
     @GetMapping("/news")
-    public Result<List<NewsItemVO>> getNewsList(){
-        List<NewsItemVO> newsList = newsService.getNewsList();
-        return Result.success(newsList);
+    @Deprecated
+    public Result<PagedNews> getNewsList(){
+        PagedNews pagedNews = newsService.getNewsList();
+        return Result.success(pagedNews);
     }
 
     /**
@@ -49,9 +56,10 @@ public class NewsController {
      * @return 对应页数新闻条目VO列表
      */
     @GetMapping("/news/page")
-    public Result<List<NewsItemVO>> getNewsListByPage(@RequestParam Integer current, @RequestParam Integer pageSize){
-        List<NewsItemVO> newsList = newsService.getNewsListByPage(current,pageSize);
-        return Result.success(newsList);
+    @Deprecated
+    public Result<PagedNews> getNewsListByPage(@RequestParam Integer current, @RequestParam Integer pageSize){
+        PagedNews pagedNews = newsService.getNewsListByPage(current,pageSize);
+        return Result.success(pagedNews);
     }
 
     /**
@@ -117,26 +125,39 @@ public class NewsController {
      * @return 对应页数新闻条目VO列表
      */
     @GetMapping("/news/filter")
-    public Result<List<NewsItemVO>> filterNewsPaged(
+    public Result<PagedNews> filterNewsPaged(
             @RequestParam int current,
             @RequestParam int pageSize,
             @RequestBody Filter filter){
-        List<NewsItemVO> newsList = newsService.filterNewsPaged(current,pageSize,
+         PagedNews pagedNews = newsService.filterNewsPaged(current,pageSize,
                 filter.getCategory(),
-                filter.getDateRange().getStart(),
-                filter.getDateRange().getEnd()
+                DateTimeUtil.defaultParse(filter.getStartDate()),
+                DateTimeUtil.defaultParse(filter.getEndDate())
         );
-        return Result.success(newsList);
+        return Result.success(pagedNews);
     }
 
     /**
-     * 按标题模糊搜索新闻
-     * @param titleString 搜索字符串
+     * 按标题模糊搜索新闻并按过滤器过滤，以分页方式返回
+     * @param current 当前页码
+     * @param pageSize 页大小
+     * @param query 搜索关键词
+     * @param filter 筛选条件
      * @return 新闻条目VO列表
      */
     @GetMapping("/news/search")
-    public Result<List<NewsItemVO>> searchNewsByTitle(@RequestParam String titleString){
-        List<NewsItemVO> newsList = newsService.searchNewsByTitle(titleString);
-        return Result.success(newsList);
+    public Result<PagedNews> searchNewsByTitle(
+            @RequestParam int current,
+            @RequestParam int pageSize,
+            @RequestParam String query,
+            @RequestBody Filter filter
+
+    ){
+        PagedNews pagedNews = newsService.searchNewsByTitleFiltered(current,pageSize,query,
+                filter.getCategory(),
+                DateTimeUtil.defaultParse(filter.getStartDate()),
+                DateTimeUtil.defaultParse(filter.getEndDate())
+        );
+        return Result.success(pagedNews);
     }
 }
