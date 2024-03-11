@@ -3,6 +3,7 @@ package com.seciii.prism063.core.config;
 import cn.dev33.satoken.context.SaHolder;
 import cn.dev33.satoken.filter.SaServletFilter;
 import cn.dev33.satoken.interceptor.SaInterceptor;
+import cn.dev33.satoken.router.SaHttpMethod;
 import cn.dev33.satoken.router.SaRouter;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.util.SaResult;
@@ -52,6 +53,25 @@ public class SaTokenConfigure {
                     // 设置响应头
                     SaHolder.getResponse().setHeader("Content-Type", "application/json;charset=UTF-8");
                     return JSONUtil.toJsonStr(Result.error(ErrorType.UNAUTHORIZED.getCode(), "token验证失败，请重新登陆"), SaJSONConfig.getJsonConfig());
+                })
+                // 前置函数：在每次认证函数之前执行
+                .setBeforeAuth(obj -> {
+                    SaHolder.getResponse()
+                            // ---------- 设置跨域响应头 ----------
+                            // 允许指定域访问跨域资源
+                            .setHeader("Access-Control-Allow-Origin", "*")
+                            // 允许所有请求方式
+                            .setHeader("Access-Control-Allow-Methods", "*")
+                            // 允许的header参数
+                            .setHeader("Access-Control-Allow-Headers", "*")
+                            // 有效时间
+                            .setHeader("Access-Control-Max-Age", "3600")
+                    ;
+                    // 如果是预检请求，则立即返回到前端
+                    SaRouter.match(SaHttpMethod.OPTIONS)
+                            .free(r -> log.info("--------OPTIONS预检请求，不做处理"))
+                            .back();
                 });
+
     }
 }
