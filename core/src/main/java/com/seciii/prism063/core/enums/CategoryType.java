@@ -4,21 +4,21 @@ package com.seciii.prism063.core.enums;
 /**
  * 类型枚举类，迭代二将根据需求重构
  * @author wangmingsong
+ * @date 2024.03.01
  */
 public enum CategoryType {
     /**
      * 新闻分类
      */
-    POLITICAL("政治","politics"),
-    ECONOMY("经济","economy"),
-    STOCKING("股票","stocking"),
-    MILITARY("军事","military"),
-    EDUCATION("教育","education"),
-    TECHNOLOGY("科技","technology"),
-    CULTURE("文化","culture"),
+    DOMESTIC("国内","domestic"),
+    INTERNATIONAL("国际","international"),
+    SOCIETY("社会","society"),
     SPORTS("体育","sports"),
     ENTERTAINMENT("娱乐","entertainment"),
-    HEALTH("健康","health"),
+    TECHNOLOGY("科技","technology"),
+    FINANCE("财经","finance"),
+    STOCK("股票","stock"),
+    AMERICAN_STOCK("美股","american stock"),
     OTHER("其他","other");
 
     private final String categoryCN;
