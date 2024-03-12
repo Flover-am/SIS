@@ -38,7 +38,7 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper, NewsPO> implements 
         QueryWrapper<NewsPO> newsQueryWrapper = new QueryWrapper<>();
         newsQueryWrapper.select("*");
         List<NewsPO> newsList = newsMapper.selectList(newsQueryWrapper);
-        return new PagedNews(newsMapper.selectCount(newsQueryWrapper),toNewsVO(newsList));
+        return new PagedNews(newsMapper.selectCount(newsQueryWrapper), toNewsVO(newsList));
     }
 
     @Override
@@ -50,7 +50,7 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper, NewsPO> implements 
     public PagedNews getNewsListByPage(Integer pageNo, Integer pageSize) throws NewsException {
         QueryWrapper<NewsPO> newsQueryWrapper = new QueryWrapper<NewsPO>().select("*");
         Page<NewsPO> page = newsMapper.selectPage(new Page<>(pageNo, pageSize), newsQueryWrapper);
-        return new PagedNews(newsMapper.selectCount(newsQueryWrapper),toNewsVO(page.getRecords()));
+        return new PagedNews(newsMapper.selectCount(newsQueryWrapper), toNewsVO(page.getRecords()));
     }
 
     @Override
@@ -109,9 +109,8 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper, NewsPO> implements 
             LocalDateTime endTime
     ) {
         QueryWrapper<NewsPO> filterQueryWrapper = getFilterQueryWrapper(category, startTime, endTime);
-
         Page<NewsPO> page = newsMapper.selectPage(new Page<>(pageNo, pageSize), filterQueryWrapper);
-        return new PagedNews(newsMapper.selectCount(filterQueryWrapper),toNewsVO(page.getRecords()));
+        return new PagedNews(newsMapper.selectCount(filterQueryWrapper), toNewsVO(page.getRecords()));
     }
 
     @Override
@@ -120,7 +119,7 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper, NewsPO> implements 
         searchQueryWrapper.select("*");
         searchQueryWrapper.like("title", title);
         List<NewsPO> newsList = newsMapper.selectList(searchQueryWrapper);
-        return new PagedNews(newsMapper.selectCount(searchQueryWrapper),toNewsVO(newsList));
+        return new PagedNews(newsMapper.selectCount(searchQueryWrapper), toNewsVO(newsList));
     }
 
     @Override
@@ -137,7 +136,7 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper, NewsPO> implements 
         filterSearchWrapper.like("title", title);
 
         Page<NewsPO> page = newsMapper.selectPage(new Page<>(pageNo, pageSize), filterSearchWrapper);
-        return new PagedNews(newsMapper.selectCount(filterSearchWrapper),toNewsVO(page.getRecords()));
+        return new PagedNews(newsMapper.selectCount(filterSearchWrapper), toNewsVO(page.getRecords()));
     }
 
     /**
@@ -199,9 +198,10 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper, NewsPO> implements 
 
     /**
      * 获取过滤查询条件
-     * @param category 分类数组
+     *
+     * @param category  分类数组
      * @param startTime 开始时间
-     * @param endTime 结束时间
+     * @param endTime   结束时间
      * @return 查询条件QueryWrapper对象
      */
     private QueryWrapper<NewsPO> getFilterQueryWrapper(List<String> category,
