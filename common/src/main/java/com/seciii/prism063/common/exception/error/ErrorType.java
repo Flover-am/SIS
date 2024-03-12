@@ -45,11 +45,9 @@ public enum ErrorType {
     /**
      * 新闻获取相关错误
      */
-    NEWS_UNKNOWN_ERROR(300000, "未知错误", 500),
 
-    NEWS_NOT_FOUND(300001, "新闻不存在", 404),
+    NEWS_NOT_FOUND(300000, "新闻不存在", 404);/* 查找的新闻不存在 */
 
-    NEWS_PAGE_OVERFLOW(300002, "新闻页数超限", 400);
 
     /**
      * 状态码
