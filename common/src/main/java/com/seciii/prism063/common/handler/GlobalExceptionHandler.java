@@ -2,6 +2,7 @@ package com.seciii.prism063.common.handler;
 
 import cn.dev33.satoken.exception.SaTokenException;
 import com.seciii.prism063.common.Result;
+import com.seciii.prism063.common.exception.NewsException;
 import com.seciii.prism063.common.exception.error.ErrorType;
 import com.seciii.prism063.common.exception.UserException;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +48,18 @@ public class GlobalExceptionHandler {
         e.printStackTrace();
         return Result.error(ErrorType.UNAUTHORIZED.getCode(), e.getMessage());
     }
+    /**
+     * 处理新闻异常
+     * @param e 新闻异常
+     * @return 响应结果
+     */
+    @ExceptionHandler(NewsException.class)
+    public Result<Void> handleNewsException(NewsException e) {
+        log.error(e.getMessage());
+        e.printStackTrace();
+        return Result.error(e.getErrorType().getCode(), e.getMessage());
+    }
+
 
     /**
      * 处理数据格式异常
