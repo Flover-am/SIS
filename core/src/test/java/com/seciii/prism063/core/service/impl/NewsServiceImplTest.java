@@ -226,6 +226,23 @@ class NewsServiceImplTest {
             assertTrue(newsItemVOsEqual(result.get(i), fakeNewsItemList.get(i)));
         }
     }
+    @Test
+    void searchNewsByTitleFilteredTest(){
+        Mockito.when(newsMapperMock.selectPage(Mockito.any(),Mockito.any()))
+                .thenReturn(new Page(1,5).setRecords(fakeNewsPOList.stream().map(
+                        x -> {
+                            if (x.getTitle().contains("test")) {
+                                return x;
+                            }
+                            return null;
+                        }
+                ).toList()));
+        Mockito.when(newsMapperMock.selectCount(Mockito.any())).thenReturn((long) fakeNewsPOList.size());
+        List<NewsItemVO> result = newsService.searchNewsByTitleFiltered(1, 5, "test", null, null, null).getNewsList();
+        for (int i = 0; i < result.size(); i++) {
+            assertTrue(newsItemVOsEqual(result.get(i), fakeNewsItemList.get(i)));
+        }
+    }
 
 
 }
