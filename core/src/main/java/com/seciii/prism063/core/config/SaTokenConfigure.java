@@ -2,11 +2,9 @@ package com.seciii.prism063.core.config;
 
 import cn.dev33.satoken.context.SaHolder;
 import cn.dev33.satoken.filter.SaServletFilter;
-import cn.dev33.satoken.interceptor.SaInterceptor;
 import cn.dev33.satoken.router.SaHttpMethod;
 import cn.dev33.satoken.router.SaRouter;
 import cn.dev33.satoken.stp.StpUtil;
-import cn.dev33.satoken.util.SaResult;
 import cn.hutool.json.JSONUtil;
 import com.seciii.prism063.common.Result;
 import com.seciii.prism063.common.exception.error.ErrorType;
@@ -42,6 +40,12 @@ public class SaTokenConfigure {
                             .notMatch("/**/admin/login")
                             .check(StpUtil::checkLogin)
                             .check(() -> StpUtil.checkRoleOr("super-admin", "news-admin"));
+                    SaRouter.match("/**/news/**")
+                            .matchMethod("GET")
+                            .check(StpUtil::checkLogin);
+                    SaRouter.match("/**/news/**")
+                            .notMatchMethod("GET")
+                            .check(() -> StpUtil.checkRoleOr("super-admin", "news-admin"));
                 })
                 // 返回异常结果
                 .setError(e -> {
@@ -56,13 +60,16 @@ public class SaTokenConfigure {
                     SaHolder.getResponse()
                             // ---------- 设置跨域响应头 ----------
                             // 允许指定域访问跨域资源
-                            .setHeader("Access-Control-Allow-Origin", "*")
+                            .setHeader("Access-Control-Allow-Origin", SaHolder.getRequest().getHeader("Origin"))
                             // 允许所有请求方式
-                            .setHeader("Access-Control-Allow-Methods", "*")
+                            .setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS")
                             // 允许的header参数
-                            .setHeader("Access-Control-Allow-Headers", "*")
+                            .setHeader("Access-Control-Allow-Headers", "Content-Type,x-requested-with,satoken")
+                            // 允许跨域携带cookies
+                            .setHeader("Access-Control-Allow-Credentials", "true")
                             // 有效时间
                             .setHeader("Access-Control-Max-Age", "3600")
+                            
                     ;
                     // 如果是预检请求，则立即返回到前端
                     SaRouter.match(SaHttpMethod.OPTIONS)

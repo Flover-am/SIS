@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
 @Getter
 @Setter
 @AllArgsConstructor
@@ -29,7 +28,7 @@ public class NewNews {
      * 新闻时间
      */
     @NotNull
-    private LocalDateTime sourceTime;
+    private String sourceTime;
     /**
      * 新闻链接
      */

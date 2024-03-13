@@ -2,7 +2,6 @@ package com.seciii.prism063.core.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.seciii.prism063.common.exception.error.ErrorType;
 import com.seciii.prism063.core.enums.CategoryType;
 import com.seciii.prism063.common.exception.NewsException;
@@ -13,6 +12,7 @@ import com.seciii.prism063.core.pojo.vo.news.NewNews;
 import com.seciii.prism063.core.pojo.vo.news.NewsItemVO;
 import com.seciii.prism063.core.pojo.vo.news.NewsVO;
 import com.seciii.prism063.core.service.NewsService;
+import com.seciii.prism063.core.utils.DateTimeUtil;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -25,7 +25,7 @@ import java.util.List;
  * @date 2024.02.29
  */
 @Service
-public class NewsServiceImpl extends ServiceImpl<NewsMapper, NewsPO> implements NewsService {
+public class NewsServiceImpl implements NewsService {
 
     private final NewsMapper newsMapper;
 
@@ -89,7 +89,9 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper, NewsPO> implements 
             throw new NewsException(ErrorType.NEWS_NOT_FOUND);
         }
         newsPO.setOriginSource(source);
-        newsMapper.updateById(newsPO);
+        int result = newsMapper.updateById(newsPO);
+        System.out.println(result
+        );
     }
 
     @Override
@@ -113,9 +115,15 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper, NewsPO> implements 
             LocalDateTime startTime,
             LocalDateTime endTime
     ) {
-        QueryWrapper<NewsPO> filterQueryWrapper = getFilterQueryWrapper(category, startTime, endTime);
-        Page<NewsPO> page = newsMapper.selectPage(new Page<>(pageNo, pageSize), filterQueryWrapper);
-        return new PagedNews(newsMapper.selectCount(filterQueryWrapper), toNewsVO(page.getRecords()));
+//        QueryWrapper<NewsPO> filterQueryWrapper = getFilterQueryWrapper(category, startTime, endTime);
+//        Page<NewsPO> page = new Page<>(pageNo, pageSize);
+////        page.setMaxLimit((long)pageSize);
+//        page = newsMapper.selectPage(page, filterQueryWrapper);
+        List<Integer> categoryId=category.stream().map(
+                x->CategoryType.getCategoryType(x).toInt()
+        ).toList();
+        List<NewsPO> result = newsMapper.getPage(pageNo, pageSize, categoryId, startTime, endTime);
+        return new PagedNews(newsMapper.getNewsCount(categoryId, startTime, endTime), toNewsVO(result));
     }
 
     @Override
@@ -136,12 +144,11 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper, NewsPO> implements 
             LocalDateTime startTime,
             LocalDateTime endTime
     ) {
-        QueryWrapper<NewsPO> filterSearchWrapper = getFilterQueryWrapper(category, startTime, endTime);
-        filterSearchWrapper.select("*");
-        filterSearchWrapper.like("title", title);
-
-        Page<NewsPO> page = newsMapper.selectPage(new Page<>(pageNo, pageSize), filterSearchWrapper);
-        return new PagedNews(newsMapper.selectCount(filterSearchWrapper), toNewsVO(page.getRecords()));
+        List<Integer> categoryId=category.stream().map(
+                x->CategoryType.getCategoryType(x).toInt()
+        ).toList();
+        List<NewsPO> result = newsMapper.searchNewsByTitle(pageNo, pageSize, title, categoryId, startTime, endTime);
+        return new PagedNews(newsMapper.getSearchResultCount(title, categoryId, startTime, endTime), toNewsVO(result));
     }
 
     /**
@@ -194,7 +201,7 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper, NewsPO> implements 
                 .title(newNews.getTitle())
                 .content(newNews.getContent())
                 .originSource(newNews.getOriginSource())
-                .sourceTime(newNews.getSourceTime())
+                .sourceTime(DateTimeUtil.defaultParse(newNews.getSourceTime()))
                 .link(newNews.getLink())
                 .sourceLink(newNews.getSourceLink())
                 .category(CategoryType.getCategoryType(newNews.getCategory()).toInt())
@@ -213,17 +220,17 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper, NewsPO> implements 
                                                        LocalDateTime startTime,
                                                        LocalDateTime endTime) {
         QueryWrapper<NewsPO> filterQueryWrapper = new QueryWrapper<>();
-        filterQueryWrapper.select("*");
+        filterQueryWrapper = filterQueryWrapper.select("*");
         if (category != null && !category.isEmpty()) {
             List<Integer> categoryTypeList = category.stream().map(x -> CategoryType.getCategoryType(x).toInt()).toList();
-            filterQueryWrapper.in("category", categoryTypeList);
+            filterQueryWrapper = filterQueryWrapper.in("category", categoryTypeList);
         }
         if (startTime != null && endTime != null) {
-            filterQueryWrapper.between("source_time", startTime, endTime);
+            filterQueryWrapper = filterQueryWrapper.between("source_time", startTime, endTime);
         } else if (startTime != null) {
-            filterQueryWrapper.ge("source_time", startTime);
+            filterQueryWrapper = filterQueryWrapper.ge("source_time", startTime);
         } else if (endTime != null) {
-            filterQueryWrapper.le("source_time", endTime);
+            filterQueryWrapper = filterQueryWrapper.le("source_time", endTime);
         }
         return filterQueryWrapper;
     }

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seciii.prism063.core.mapper.NewsMapper">
+    <select id="getNewsCount" resultType="Integer">
+        SELECT COUNT(id)
+        FROM prism063.t_news
+        <where>
+            <if test="category != null and category.size() > 0">
+                AND category IN
+                <foreach collection="category" item="cat" open="(" separator="," close=")">
+                    #{cat}
+                </foreach>
+            </if>
+            <if test="startTime != null">
+                AND source_time >= #{startTime}
+            </if>
+            <if test="endTime != null">
+                AND #{endTime} >= source_time
+            </if>
+        </where>
+    </select>
+
+    <select id="getPage" resultType="com.seciii.prism063.core.pojo.po.NewsPO">
+        SELECT *
+        FROM prism063.t_news
+        <where>
+            <if test="category != null and category.size() > 0">
+                AND category IN
+                <foreach collection="category" item="cat" open="(" separator="," close=")">
+                    #{cat}
+                </foreach>
+            </if>
+            <if test="startTime != null">
+                AND source_time >= #{startTime}
+            </if>
+            <if test="endTime != null">
+                AND #{endTime} >= source_time
+            </if>
+        </where>
+        ORDER BY id
+        LIMIT #{pageSize}
+        OFFSET #{pageNo}
+    </select>
+
+    <select id="searchNewsByTitle" resultType="com.seciii.prism063.core.pojo.po.NewsPO">
+        SELECT *
+        FROM prism063.t_news
+        <where>
+            <if test="category != null and category.size() > 0">
+                AND category IN
+                <foreach collection="category" item="cat" open="(" separator="," close=")">
+                    #{cat}
+                </foreach>
+            </if>
+            <if test="startTime != null">
+                AND source_time >= #{startTime}
+            </if>
+            <if test="endTime != null">
+                AND #{endTime} >= source_time
+            </if>
+            <if test="title != null and title != ''">
+                AND title LIKE CONCAT('%', #{title}, '%')
+            </if>
+        </where>
+        ORDER BY id
+        LIMIT #{pageSize}
+        OFFSET #{pageNo}
+    </select>
+
+    <select id="getSearchResultCount" resultType="Long">
+        SELECT COUNT(id)
+        FROM prism063.t_news
+        <where>
+            <if test="category != null and category.size() > 0">
+                AND category IN
+                <foreach collection="category" item="cat" open="(" separator="," close=")">
+                    #{cat}
+                </foreach>
+            </if>
+            <if test="startTime != null">
+                AND source_time >= #{startTime}
+            </if>
+            <if test="endTime != null">
+                AND #{endTime} >= source_time
+            </if>
+            <if test="title != null and title != ''">
+                AND title LIKE CONCAT('%', #{title}, '%')
+            </if>
+        </where>
+    </select>
+</mapper>

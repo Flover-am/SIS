@@ -20,7 +20,7 @@ public class NewsPO {
     /**
      * 新闻id
      */
-    @TableId(value="id",type=IdType.ASSIGN_ID)
+    @TableId(value="id",type=IdType.AUTO)
     private Long id;
     /**
      * 新闻标题

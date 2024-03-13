@@ -56,7 +56,7 @@ public class NewsController {
      * @param pageSize 页大小
      * @return 对应页数新闻条目VO列表
      */
-    @GetMapping("/news/page")
+    @GetMapping("/news/f")
     @Deprecated
     public Result<PagedNews> getNewsListByPage(@RequestParam Integer current, @RequestParam Integer pageSize) {
         PagedNews pagedNews = newsService.getNewsListByPage(current, pageSize);
@@ -134,15 +134,17 @@ public class NewsController {
      * @param filter   筛选条件
      * @return 对应页数新闻条目VO列表
      */
-    @GetMapping("/news/filter")
+    @PostMapping("/news/filter")
     public Result<PagedNews> filterNewsPaged(
             @RequestParam int current,
             @RequestParam int pageSize,
-            @RequestBody Filter filter) {
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate,
+            @RequestBody(required = false) List<String> category) {
         PagedNews pagedNews = newsService.filterNewsPaged(current, pageSize,
-                filter.getCategory(),
-                DateTimeUtil.defaultParse(filter.getStartDate()),
-                DateTimeUtil.defaultParse(filter.getEndDate())
+                category,
+                DateTimeUtil.parseBeginOfDay(startDate),
+                DateTimeUtil.parseEndOfDay(endDate)
         );
         return Result.success(pagedNews);
     }
@@ -156,18 +158,18 @@ public class NewsController {
      * @param filter   筛选条件
      * @return 新闻条目VO列表
      */
-    @GetMapping("/news/search")
+    @PostMapping("/news/search")
     public Result<PagedNews> searchNewsByTitle(
             @RequestParam int current,
             @RequestParam int pageSize,
             @RequestParam String query,
-            @RequestBody Filter filter
-
-    ) {
+            @RequestParam(required = false) String startDate,
+            @RequestParam(required = false) String endDate,
+            @RequestBody(required = false) List<String> category) {
         PagedNews pagedNews = newsService.searchNewsByTitleFiltered(current, pageSize, query,
-                filter.getCategory(),
-                DateTimeUtil.defaultParse(filter.getStartDate()),
-                DateTimeUtil.defaultParse(filter.getEndDate())
+                category,
+                DateTimeUtil.parseBeginOfDay(startDate),
+                DateTimeUtil.parseEndOfDay(endDate)
         );
         return Result.success(pagedNews);
     }
@@ -180,9 +182,9 @@ public class NewsController {
     @PostMapping("/news/modify/{id}")
     public Result<Void> modifyNews(
             @PathVariable Long id,
-            @RequestParam String newTitle,
-            @RequestParam String newContent,
-            @RequestParam String newOriginSource
+            @RequestParam(required = false) String newTitle,
+            @RequestParam(required = false) String newContent,
+            @RequestParam(required = false) String newOriginSource
     ) {
         if (newTitle != null && !newTitle.isEmpty()) {
             newsService.modifyNewsTitle(id, newTitle);
