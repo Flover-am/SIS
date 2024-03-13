@@ -21,6 +21,7 @@ public interface NewsService {
      *
      * @return 新闻条目VO列表
      */
+    @Deprecated
     PagedNews getNewsList();
 
     /**
@@ -29,6 +30,7 @@ public interface NewsService {
      * @param pageNo 页数
      * @return 对应页数新闻条目VO列表
      */
+    @Deprecated
     PagedNews getNewsListByPage(Integer pageNo, Integer pageSize);
 
     /**

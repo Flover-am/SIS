@@ -5,6 +5,13 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
+
+/**
+ * 添加新闻VO类
+ *
+ * @author wangmingsong
+ * @date 2024.03.04
+ */
 @Getter
 @Setter
 @AllArgsConstructor

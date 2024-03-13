@@ -2,7 +2,6 @@ package com.seciii.prism063.core.controller;
 
 import com.seciii.prism063.common.Result;
 import com.seciii.prism063.core.pojo.dto.PagedNews;
-import com.seciii.prism063.core.pojo.vo.news.Filter;
 import com.seciii.prism063.core.pojo.vo.news.NewNews;
 import com.seciii.prism063.core.pojo.vo.news.NewsVO;
 import com.seciii.prism063.core.service.NewsService;
@@ -56,7 +55,7 @@ public class NewsController {
      * @param pageSize 页大小
      * @return 对应页数新闻条目VO列表
      */
-    @GetMapping("/news/f")
+    @GetMapping("/news/all")
     @Deprecated
     public Result<PagedNews> getNewsListByPage(@RequestParam Integer current, @RequestParam Integer pageSize) {
         PagedNews pagedNews = newsService.getNewsListByPage(current, pageSize);
@@ -129,9 +128,11 @@ public class NewsController {
     /**
      * 分页筛选新闻
      *
-     * @param current  当前页码
-     * @param pageSize 页大小
-     * @param filter   筛选条件
+     * @param current   当前页码
+     * @param pageSize  页大小
+     * @param startDate 开始时间
+     * @param endDate   结束时间
+     * @param category  分类
      * @return 对应页数新闻条目VO列表
      */
     @PostMapping("/news/filter")
@@ -152,10 +153,12 @@ public class NewsController {
     /**
      * 按标题模糊搜索新闻并按过滤器过滤，以分页方式返回
      *
-     * @param current  当前页码
-     * @param pageSize 页大小
-     * @param query    搜索关键词
-     * @param filter   筛选条件
+     * @param current   当前页码
+     * @param pageSize  页大小
+     * @param query     搜索关键词
+     * @param startDate 开始时间
+     * @param endDate   结束时间
+     * @param category  分类
      * @return 新闻条目VO列表
      */
     @PostMapping("/news/search")

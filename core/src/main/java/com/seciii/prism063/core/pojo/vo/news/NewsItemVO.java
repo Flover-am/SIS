@@ -10,8 +10,8 @@ import java.time.LocalDateTime;
 /**
  * 新闻条目VO类
  *
+ * @author wangmingsong
  * @date 2024.03.04
- * @auther wangmingsong
  */
 @Getter
 @Setter
@@ -36,9 +36,9 @@ public class NewsItemVO {
      * 新闻时间
      */
     @NotNull
-    private LocalDateTime sourceTime;
+    private String sourceTime;
     /**
      * 新闻分类
      */
-    private String category; //TODO:新闻分类具体实现
+    private String category;
 }

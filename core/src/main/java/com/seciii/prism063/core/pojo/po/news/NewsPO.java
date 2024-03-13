@@ -1,4 +1,4 @@
-package com.seciii.prism063.core.pojo.po;
+package com.seciii.prism063.core.pojo.po.news;
 
 
 import com.baomidou.mybatisplus.annotation.*;
@@ -56,7 +56,7 @@ public class NewsPO {
      * 新闻分类(暂未使用)
      */
     @TableField("category")
-    private Integer category;    //TODO:加入新闻分类具体实现
+    private Integer category;
     /**
      * 新闻创建时间戳
      */
