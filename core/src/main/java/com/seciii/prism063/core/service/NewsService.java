@@ -71,6 +71,13 @@ public interface NewsService {
     void deleteNews(Long id);
 
     /**
+     * 批量删除新闻
+     *
+     * @param idList 新闻id列表
+     */
+    void deleteMultipleNews(List<Long> idList);
+
+    /**
      * 新增新闻
      *
      * @param newNews 新增的新闻对象

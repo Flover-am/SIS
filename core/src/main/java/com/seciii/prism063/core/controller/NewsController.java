@@ -9,6 +9,8 @@ import com.seciii.prism063.core.service.NewsService;
 import com.seciii.prism063.core.utils.DateTimeUtil;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 /**
  * 新闻控制器
@@ -191,6 +193,18 @@ public class NewsController {
         if (newOriginSource != null && !newOriginSource.isEmpty()) {
             newsService.modifyNewsSource(id, newOriginSource);
         }
+        return Result.success();
+    }
+
+    /**
+     * 批量删除新闻
+     *
+     * @param idList 新闻id列表
+     * @return 删除结果，成功则message为"success"
+     */
+    @DeleteMapping("/news/delete-multiple")
+    public Result<Void> deleteMultiple(@RequestBody List<Long> idList) {
+        newsService.deleteMultipleNews(idList);
         return Result.success();
     }
 }

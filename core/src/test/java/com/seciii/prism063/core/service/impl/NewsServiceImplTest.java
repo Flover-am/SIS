@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(MockitoExtension.class)
@@ -131,7 +133,7 @@ class NewsServiceImplTest {
     @Test
     void getNewsListTest() {
         Mockito.when(newsMapperMock.selectList(Mockito.any())).thenReturn(fakeNewsPOList);
-        Mockito.when(newsMapperMock.selectCount(Mockito.any())).thenReturn((long)fakeNewsPOList.size());
+        Mockito.when(newsMapperMock.selectCount(Mockito.any())).thenReturn((long) fakeNewsPOList.size());
         List<NewsItemVO> result = newsService.getNewsList().getNewsList();
         for (int i = 0; i < result.size(); i++) {
             assertTrue(newsItemVOsEqual(result.get(i), fakeNewsItemList.get(i)));
@@ -148,7 +150,7 @@ class NewsServiceImplTest {
     void getNewsListByPageTest() {
         Mockito.when(newsMapperMock.selectPage(Mockito.any(), Mockito.any()))
                 .thenReturn(new Page<NewsPO>(1, 5).setRecords(fakeNewsPOList.subList(0, 5)));
-        Mockito.when(newsMapperMock.selectCount(Mockito.any())).thenReturn((long)fakeNewsPOList.size());
+        Mockito.when(newsMapperMock.selectCount(Mockito.any())).thenReturn((long) fakeNewsPOList.size());
         List<NewsItemVO> result = newsService.getNewsListByPage(1, 5).getNewsList();
         for (int i = 0; i < result.size(); i++) {
             assertTrue(newsItemVOsEqual(result.get(i), fakeNewsItemList.get(i)));
@@ -190,10 +192,17 @@ class NewsServiceImplTest {
     }
 
     @Test
+    void deleteMultipleNewsTest() {
+        Mockito.when(newsMapperMock.deleteBatchIds(Mockito.anyList())).thenReturn(0);
+        newsService.deleteMultipleNews(List.of(1L, 2L, 3L));
+
+    }
+
+    @Test
     void filterNewsPagedTest() {
         Mockito.when(newsMapperMock.selectPage(Mockito.any(), Mockito.any()))
                 .thenReturn(new Page<NewsPO>(1, 5).setRecords(fakeNewsPOList));
-        Mockito.when(newsMapperMock.selectCount(Mockito.any())).thenReturn((long)fakeNewsPOList.size());
+        Mockito.when(newsMapperMock.selectCount(Mockito.any())).thenReturn((long) fakeNewsPOList.size());
         List<NewsItemVO> result = newsService.filterNewsPaged(1, 5, null, null, null).getNewsList();
         for (int i = 0; i < result.size(); i++) {
             assertTrue(newsItemVOsEqual(result.get(i), fakeNewsItemList.get(i)));
@@ -211,7 +220,7 @@ class NewsServiceImplTest {
                             return null;
                         }
                 ).toList());
-        Mockito.when(newsMapperMock.selectCount(Mockito.any())).thenReturn((long)fakeNewsPOList.size());
+        Mockito.when(newsMapperMock.selectCount(Mockito.any())).thenReturn((long) fakeNewsPOList.size());
         List<NewsItemVO> result = newsService.searchNewsByTitle("test").getNewsList();
         for (int i = 0; i < result.size(); i++) {
             assertTrue(newsItemVOsEqual(result.get(i), fakeNewsItemList.get(i)));
