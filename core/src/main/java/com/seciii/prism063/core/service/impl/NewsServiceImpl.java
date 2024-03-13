@@ -101,6 +101,11 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper, NewsPO> implements 
     }
 
     @Override
+    public void deleteMultipleNews(List<Long> idList) {
+        newsMapper.deleteBatchIds(idList);
+    }
+
+    @Override
     public PagedNews filterNewsPaged(
             int pageNo,
             int pageSize,
