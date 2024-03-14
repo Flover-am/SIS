@@ -2,6 +2,7 @@ package com.seciii.prism063.core.controller;
 
 import com.seciii.prism063.common.Result;
 import com.seciii.prism063.core.pojo.dto.PagedNews;
+import com.seciii.prism063.core.pojo.vo.news.Filter;
 import com.seciii.prism063.core.pojo.vo.news.NewNews;
 import com.seciii.prism063.core.pojo.vo.news.NewsVO;
 import com.seciii.prism063.core.service.NewsService;
@@ -139,13 +140,11 @@ public class NewsController {
     public Result<PagedNews> filterNewsPaged(
             @RequestParam int current,
             @RequestParam int pageSize,
-            @RequestParam(required = false) String startDate,
-            @RequestParam(required = false) String endDate,
-            @RequestBody(required = false) List<String> category) {
+            @RequestBody(required = false) Filter filter) {
         PagedNews pagedNews = newsService.filterNewsPaged(current, pageSize,
-                category,
-                DateTimeUtil.parseBeginOfDay(startDate),
-                DateTimeUtil.parseEndOfDay(endDate)
+                filter.getCategory(),
+                DateTimeUtil.parseBeginOfDay(filter.getStartDate()),
+                DateTimeUtil.parseEndOfDay(filter.getEndDate())
         );
         return Result.success(pagedNews);
     }
@@ -200,6 +199,28 @@ public class NewsController {
         }
         return Result.success();
     }
+
+    /**
+     * 按来源搜索新闻
+     *
+     * @param
+     * @return
+     */
+//    @PostMapping("/news/searchSource")
+//    public Result<PagedNews> searchNewsBySource(@RequestParam int current,
+//                                                @RequestParam int pageSize,
+//                                                @RequestParam String query,
+//                                                @RequestParam(required = false) String startDate,
+//                                                @RequestParam(required = false) String endDate,
+//                                                @RequestBody(required = false) List<String> category){
+//        PagedNews pagedNews = newsService.searchNewsBySourceFiltered(current, pageSize, query,
+//                category,
+//                DateTimeUtil.parseBeginOfDay(startDate),
+//                DateTimeUtil.parseEndOfDay(endDate)
+//        );
+//        return Result.success(pagedNews);
+//    }
+
 
     /**
      * 批量删除新闻

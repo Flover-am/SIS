@@ -11,4 +11,5 @@ public class Filter {
     List<String> category;
     String startDate;
     String endDate;
+    String originSource;
 }

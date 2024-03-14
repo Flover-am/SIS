@@ -7,10 +7,7 @@
     <sql id="byPage">
         <where>
             <if test="pageSize > 0 and pageOffset >= 0">
-                LIMIT #{pageSize}
-            </if>
-            <if test="pageOffset >= 0">
-                OFFSET #{pageOffset}
+                LIMIT #{pageSize} OFFSET #{pageOffset}
             </if>
         </where>
     </sql>
@@ -44,7 +41,7 @@
     <!--END:定义可重用的筛选条件sql语句-->
 
     <!--Mapper方法定义-->
-    <select id="getNewsCount" resultType="Integer">
+    <select id="getFilteredNewsCount" resultType="Long">
         SELECT COUNT(id)
         FROM prism063.t_news
         <where>
@@ -54,7 +51,7 @@
         </where>
     </select>
 
-    <select id="getPage" resultType="com.seciii.prism063.core.pojo.po.news.NewsPO">
+    <select id="getFilteredNewsByPage" resultType="com.seciii.prism063.core.pojo.po.news.NewsPO">
         SELECT *
         FROM prism063.t_news
         <where>
@@ -66,7 +63,7 @@
         <include refid="byPage"></include>
     </select>
 
-    <select id="searchNewsByTitle" resultType="com.seciii.prism063.core.pojo.po.news.NewsPO">
+    <select id="searchFilteredNewsByPage" resultType="com.seciii.prism063.core.pojo.po.news.NewsPO">
         SELECT *
         FROM prism063.t_news
         <where>
@@ -79,7 +76,7 @@
         <include refid="byPage"></include>
     </select>
 
-    <select id="getSearchResultCount" resultType="Long">
+    <select id="getSearchedFilteredNewsCount" resultType="Long">
         SELECT COUNT(id)
         FROM prism063.t_news
         <where>
