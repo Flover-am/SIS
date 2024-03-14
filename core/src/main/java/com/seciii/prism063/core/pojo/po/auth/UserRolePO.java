@@ -1,9 +1,6 @@
 package com.seciii.prism063.core.pojo.po.auth;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Builder;
 import lombok.Data;
 
@@ -22,7 +19,7 @@ public class UserRolePO {
     /**
      * 用户角色关系id
      */
-    @TableId("id")
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**

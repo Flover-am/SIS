@@ -1,4 +1,4 @@
-create table prism063.t_auth_permission
+create table prism030.t_auth_permission
 (
     id              bigint unsigned auto_increment comment '权限id'
         primary key,

@@ -1,4 +1,4 @@
-create table prism063.t_auth_user_role
+create table prism030.t_auth_user_role
 (
     id          bigint unsigned auto_increment comment '用户-角色关系id'
         primary key,

@@ -15,6 +15,7 @@ import com.seciii.prism063.core.utils.DateTimeUtil;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -124,9 +125,13 @@ public class NewsServiceImpl implements NewsService {
         originSource = splitString(originSource);
         List<Integer> categoryIdList = getCategoryTypeList(category);
         long count = newsMapper.getFilteredNewsCount(categoryIdList, startTime, endTime, originSource);
+        if (count == 0) {
+            return new PagedNews(0, Collections.emptyList());
+        }
         long offset = (long) (pageNo - 1) * pageSize;
+
         if (offset >= count) {
-            throw new NewsException(ErrorType.NEWS_PAGE_OVERFLOW);
+            throw new NewsException(ErrorType.NEWS_PAGE_OVERFLOW, "新闻页获取错误");
         }
         List<NewsPO> result = newsMapper.getFilteredNewsByPage(pageSize, (int) offset, categoryIdList, startTime, endTime, originSource);
         return new PagedNews(count, toNewsVO(result));
@@ -154,9 +159,12 @@ public class NewsServiceImpl implements NewsService {
         title = splitString(title);
         List<Integer> categoryIdList = getCategoryTypeList(category);
         long count = newsMapper.getSearchedFilteredNewsCount(title, categoryIdList, startTime, endTime, originSource);
+        if (count == 0) {
+            return new PagedNews(0, Collections.emptyList());
+        }
         long offset = (long) (pageNo - 1) * pageSize;
         if (offset >= count) {
-            throw new NewsException(ErrorType.NEWS_PAGE_OVERFLOW);
+            throw new NewsException(ErrorType.NEWS_PAGE_OVERFLOW, "新闻页获取错误");
         }
         List<NewsPO> result = newsMapper.searchFilteredNewsByPage(pageSize, (int) offset, title, categoryIdList, startTime, endTime, originSource);
         return new PagedNews(count, toNewsVO(result));
@@ -169,6 +177,9 @@ public class NewsServiceImpl implements NewsService {
      * @return 拆分后的字符串
      */
     private String splitString(String s) {
+        if (s == null) {
+            return null;
+        }
         String[] split = s.split("");
         return String.join("%", split);
     }
