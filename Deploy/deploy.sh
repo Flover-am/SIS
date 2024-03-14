@@ -1,6 +1,12 @@
 # 版本号
+
+url=$1
+username=$2
+password=$3
+
 version=1.0.0
-docker build -t prism030-backend:$version .
+# shellcheck disable=SC2086
+docker build --build-arg MYSQL_URL="$url" --build-arg MYSQL_USER="$username" --build-arg MYSQL_PASSWORD="$password" -t prism030-backend:$version .
 echo "prism030-backend:$version is built successfully!"
 pwd
 whoami
