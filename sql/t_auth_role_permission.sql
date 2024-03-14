@@ -1,4 +1,4 @@
-create table prism063.t_auth_role_permission
+create table prism030.t_auth_role_permission
 (
     id            bigint unsigned auto_increment comment '角色-权限关系id'
         primary key,

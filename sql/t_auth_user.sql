@@ -1,4 +1,4 @@
-create table prism063.t_auth_user
+create table prism030.t_auth_user
 (
     id          bigint unsigned auto_increment comment '用户id'
         primary key,
