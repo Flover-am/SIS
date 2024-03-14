@@ -5,11 +5,9 @@
     <!--定义可重用的筛选条件sql语句-->
     <!--以分页形式返回-->
     <sql id="byPage">
-        <where>
-            <if test="pageSize > 0 and pageOffset >= 0">
-                LIMIT #{pageSize} OFFSET #{pageOffset}
-            </if>
-        </where>
+        <if test="pageSize > 0 and pageOffset >= 0">
+            LIMIT #{pageOffset}, #{pageSize}
+        </if>
     </sql>
     <!--按类别列表筛选-->
     <sql id="filterCategory">

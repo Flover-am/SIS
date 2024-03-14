@@ -131,9 +131,7 @@ public class NewsController {
      *
      * @param current   当前页码
      * @param pageSize  页大小
-     * @param startDate 开始时间
-     * @param endDate   结束时间
-     * @param category  分类
+     * @param filter 过滤器
      * @return 对应页数新闻条目VO列表
      */
     @PostMapping("/news/filter")
