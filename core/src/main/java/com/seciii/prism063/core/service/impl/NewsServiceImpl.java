@@ -49,8 +49,8 @@ public class NewsServiceImpl implements NewsService {
     @Override
     @Deprecated
     public PagedNews getNewsListByPage(Integer pageNo, Integer pageSize) throws NewsException {
-        long count = newsMapper.getFilteredNewsCount(null, null, null);
-        List<NewsPO> newsList = newsMapper.getFilteredNewsByPage(pageNo, pageSize, null, null, null);
+        long count = newsMapper.getFilteredNewsCount(null, null, null, null);
+        List<NewsPO> newsList = newsMapper.getFilteredNewsByPage(pageNo, pageSize, null, null, null, null);
         return new PagedNews(count, toNewsVO(newsList));
     }
 
@@ -118,23 +118,25 @@ public class NewsServiceImpl implements NewsService {
             int pageSize,
             List<String> category,
             LocalDateTime startTime,
-            LocalDateTime endTime
+            LocalDateTime endTime,
+            String originSource
     ) {
+        originSource = splitString(originSource);
         List<Integer> categoryIdList = getCategoryTypeList(category);
-        long count = newsMapper.getFilteredNewsCount(categoryIdList, startTime, endTime);
+        long count = newsMapper.getFilteredNewsCount(categoryIdList, startTime, endTime, originSource);
         long offset = (long) (pageNo - 1) * pageSize;
         if (offset >= count) {
             throw new NewsException(ErrorType.NEWS_PAGE_OVERFLOW);
         }
-        List<NewsPO> result = newsMapper.getFilteredNewsByPage(pageSize, (int) offset, categoryIdList, startTime, endTime);
+        List<NewsPO> result = newsMapper.getFilteredNewsByPage(pageSize, (int) offset, categoryIdList, startTime, endTime, originSource);
         return new PagedNews(count, toNewsVO(result));
     }
 
     @Override
     @Deprecated
     public PagedNews searchNewsByTitle(String title) {
-        long count = newsMapper.getSearchedFilteredNewsCount(title, null, null, null);
-        List<NewsPO> result = newsMapper.searchFilteredNewsByPage(0, 0, title, null, null, null);
+        long count = newsMapper.getSearchedFilteredNewsCount(title, null, null, null, null);
+        List<NewsPO> result = newsMapper.searchFilteredNewsByPage(0, 0, title, null, null, null, null);
         return new PagedNews(count, toNewsVO(result));
     }
 
@@ -145,16 +147,30 @@ public class NewsServiceImpl implements NewsService {
             String title,
             List<String> category,
             LocalDateTime startTime,
-            LocalDateTime endTime
+            LocalDateTime endTime,
+            String originSource
     ) {
+        originSource = splitString(originSource);
+        title = splitString(title);
         List<Integer> categoryIdList = getCategoryTypeList(category);
-        long count = newsMapper.getSearchedFilteredNewsCount(title, categoryIdList, startTime, endTime);
+        long count = newsMapper.getSearchedFilteredNewsCount(title, categoryIdList, startTime, endTime, originSource);
         long offset = (long) (pageNo - 1) * pageSize;
         if (offset >= count) {
             throw new NewsException(ErrorType.NEWS_PAGE_OVERFLOW);
         }
-        List<NewsPO> result = newsMapper.searchFilteredNewsByPage(pageSize, (int) offset, title, categoryIdList, startTime, endTime);
+        List<NewsPO> result = newsMapper.searchFilteredNewsByPage(pageSize, (int) offset, title, categoryIdList, startTime, endTime, originSource);
         return new PagedNews(count, toNewsVO(result));
+    }
+
+    /**
+     * 将字符串拆分为单字
+     *
+     * @param s 待拆分的字符串
+     * @return 拆分后的字符串
+     */
+    private String splitString(String s) {
+        String[] split = s.split("");
+        return String.join("%", split);
     }
 
     /**

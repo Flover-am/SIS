@@ -40,12 +40,12 @@ public class SaTokenConfigure {
                             .notMatch("/**/admin/login")
                             .check(StpUtil::checkLogin)
                             .check(() -> StpUtil.checkRoleOr("super-admin", "news-admin"));
-//                    SaRouter.match("/**/news/**")
-//                            .matchMethod("GET")
-//                            .check(StpUtil::checkLogin);
-//                    SaRouter.match("/**/news/**")
-//                            .notMatchMethod("GET")
-//                            .check(() -> StpUtil.checkRoleOr("super-admin", "news-admin"));
+                    SaRouter.match("/**/news/**")
+                            .matchMethod("GET")
+                            .check(StpUtil::checkLogin);
+                    SaRouter.match("/**/news/**")
+                            .notMatchMethod("GET")
+                            .check(() -> StpUtil.checkRoleOr("super-admin", "news-admin"));
                 })
                 // 返回异常结果
                 .setError(e -> {

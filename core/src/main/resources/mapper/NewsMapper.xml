@@ -36,6 +36,11 @@
             AND title LIKE CONCAT('%', #{title}, '%')
         </if>
     </sql>
+    <sql id="likeSource">
+        <if test="originSource != null and originSource != ''">
+            AND origin_source LIKE CONCAT('%', #{originSource}, '%')
+        </if>
+    </sql>
     <!--END:定义可重用的筛选条件sql语句-->
 
     <!--Mapper方法定义-->
@@ -46,6 +51,7 @@
             <include refid="filterCategory"></include>
             <include refid="filterStartTime"></include>
             <include refid="filterEndTime"></include>
+            <include refid="likeSource"></include>
         </where>
     </select>
 
@@ -56,6 +62,7 @@
             <include refid="filterCategory"></include>
             <include refid="filterStartTime"></include>
             <include refid="filterEndTime"></include>
+            <include refid="likeSource"></include>
         </where>
         ORDER BY id ASC
         <include refid="byPage"></include>
@@ -68,6 +75,7 @@
             <include refid="filterCategory"></include>
             <include refid="filterStartTime"></include>
             <include refid="filterEndTime"></include>
+            <include refid="likeSource"></include>
             <include refid="likeTitle"></include>
         </where>
         ORDER BY id ASC
@@ -81,6 +89,7 @@
             <include refid="filterCategory"></include>
             <include refid="filterStartTime"></include>
             <include refid="filterEndTime"></include>
+            <include refid="likeSource"></include>
             <include refid="likeTitle"></include>
         </where>
     </select>

@@ -89,14 +89,15 @@ public interface NewsService {
     /**
      * 分页获取过滤后的新闻列表
      *
-     * @param pageNo    页数
-     * @param pageSize  页大小
-     * @param category  新闻分类
-     * @param startTime 开始时间
-     * @param endTime   结束时间
+     * @param pageNo       页数
+     * @param pageSize     页大小
+     * @param category     新闻分类
+     * @param startTime    开始时间
+     * @param endTime      结束时间
+     * @param originSource 新闻来源
      * @return 过滤后的新闻列表
      */
-    PagedNews filterNewsPaged(int pageNo, int pageSize, List<String> category, LocalDateTime startTime, LocalDateTime endTime);
+    PagedNews filterNewsPaged(int pageNo, int pageSize, List<String> category, LocalDateTime startTime, LocalDateTime endTime, String originSource);
 
     /**
      * 按标题模糊搜索新闻
@@ -110,13 +111,14 @@ public interface NewsService {
     /**
      * 按标题模糊搜索新闻并过滤,分页返回
      *
-     * @param pageNo    页数
-     * @param pageSize  页大小
-     * @param title     新闻标题
-     * @param category  新闻分类
-     * @param startTime 开始时间
-     * @param endTime   结束时间
+     * @param pageNo       页数
+     * @param pageSize     页大小
+     * @param title        新闻标题
+     * @param category     新闻分类
+     * @param startTime    开始时间
+     * @param endTime      结束时间
+     * @param originSource 新闻来源
      * @return 搜索结果新闻列表
      */
-    PagedNews searchNewsByTitleFiltered(int pageNo, int pageSize, String title, List<String> category, LocalDateTime startTime, LocalDateTime endTime);
+    PagedNews searchNewsByTitleFiltered(int pageNo, int pageSize, String title, List<String> category, LocalDateTime startTime, LocalDateTime endTime, String originSource);
 }

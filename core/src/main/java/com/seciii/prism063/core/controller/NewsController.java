@@ -129,9 +129,9 @@ public class NewsController {
     /**
      * 分页筛选新闻
      *
-     * @param current   当前页码
-     * @param pageSize  页大小
-     * @param filter 过滤器
+     * @param current  当前页码
+     * @param pageSize 页大小
+     * @param filter   过滤器
      * @return 对应页数新闻条目VO列表
      */
     @PostMapping("/news/filter")
@@ -142,7 +142,8 @@ public class NewsController {
         PagedNews pagedNews = newsService.filterNewsPaged(current, pageSize,
                 filter.getCategory(),
                 DateTimeUtil.parseBeginOfDay(filter.getStartDate()),
-                DateTimeUtil.parseEndOfDay(filter.getEndDate())
+                DateTimeUtil.parseEndOfDay(filter.getEndDate()),
+                filter.getOriginSource()
         );
         return Result.success(pagedNews);
     }
@@ -150,12 +151,10 @@ public class NewsController {
     /**
      * 按标题模糊搜索新闻并按过滤器过滤，以分页方式返回
      *
-     * @param current   当前页码
-     * @param pageSize  页大小
-     * @param query     搜索关键词
-     * @param startDate 开始时间
-     * @param endDate   结束时间
-     * @param category  分类
+     * @param current  当前页码
+     * @param pageSize 页大小
+     * @param query    搜索关键词
+     * @param filter   筛选条件
      * @return 新闻条目VO列表
      */
     @PostMapping("/news/search")
@@ -163,13 +162,12 @@ public class NewsController {
             @RequestParam int current,
             @RequestParam int pageSize,
             @RequestParam String query,
-            @RequestParam(required = false) String startDate,
-            @RequestParam(required = false) String endDate,
-            @RequestBody(required = false) List<String> category) {
+            @RequestBody(required = false) Filter filter) {
         PagedNews pagedNews = newsService.searchNewsByTitleFiltered(current, pageSize, query,
-                category,
-                DateTimeUtil.parseBeginOfDay(startDate),
-                DateTimeUtil.parseEndOfDay(endDate)
+                filter.getCategory(),
+                DateTimeUtil.parseBeginOfDay(filter.getStartDate()),
+                DateTimeUtil.parseEndOfDay(filter.getEndDate()),
+                filter.getOriginSource()
         );
         return Result.success(pagedNews);
     }
@@ -197,27 +195,6 @@ public class NewsController {
         }
         return Result.success();
     }
-
-    /**
-     * 按来源搜索新闻
-     *
-     * @param
-     * @return
-     */
-//    @PostMapping("/news/searchSource")
-//    public Result<PagedNews> searchNewsBySource(@RequestParam int current,
-//                                                @RequestParam int pageSize,
-//                                                @RequestParam String query,
-//                                                @RequestParam(required = false) String startDate,
-//                                                @RequestParam(required = false) String endDate,
-//                                                @RequestBody(required = false) List<String> category){
-//        PagedNews pagedNews = newsService.searchNewsBySourceFiltered(current, pageSize, query,
-//                category,
-//                DateTimeUtil.parseBeginOfDay(startDate),
-//                DateTimeUtil.parseEndOfDay(endDate)
-//        );
-//        return Result.success(pagedNews);
-//    }
 
 
     /**
