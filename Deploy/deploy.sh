@@ -1,13 +1,13 @@
 # 版本号
 version=1.0.0
-docker build -t prism036-backend:$version .
-echo "prism036-backend:$version is built successfully!"
+docker build -t prism030-backend:$version .
+echo "prism030-backend:$version is built successfully!"
 pwd
 whoami
 tree
-# 允许prism036-backend不存在而报错
-docker stop prism036-backend || true
-docker rm prism036-backend || true
-echo "prism036-backend is stopped and removed successfully!"
-docker run --name=prism036-backend -itd -p 8080:8080 --restart=on-failure:3 prism036-backend:$version
-echo "prism036-backend is running successfully!"
+# 允许prism030-backend不存在而报错
+docker stop prism030-backend || true
+docker rm prism030-backend || true
+echo "prism030-backend is stopped and removed successfully!"
+docker run --name=prism030-backend -itd -p 8080:8080 --restart=on-failure:3 prism030-backend:$version
+echo "prism030-backend is running successfully!"

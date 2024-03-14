@@ -1,4 +1,4 @@
-create table t_news
+create table prism030.t_news
 (
     id            bigint auto_increment comment '新闻id'
         primary key,
@@ -11,4 +11,5 @@ create table t_news
     category      int          null comment '新闻类别',
     create_time   datetime     not null comment '当前字段创建时间',
     update_time   datetime     not null comment '当前字段最近更新时间'
-);
+)
+    comment '新闻表';
