@@ -42,7 +42,7 @@ public class NewsVO {
      * 新闻时间
      */
     @NotNull
-    private LocalDateTime sourceTime;
+    private String sourceTime;
     /**
      * 新闻链接
      */
@@ -55,7 +55,7 @@ public class NewsVO {
     /**
      * 新闻分类
      */
-    private String category;    //TODO:新闻分类具体实现
+    private String category;
     /**
      * 新闻创建时间戳
      */

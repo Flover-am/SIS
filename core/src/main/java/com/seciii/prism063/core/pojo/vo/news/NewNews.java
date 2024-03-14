@@ -5,7 +5,13 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
+
+/**
+ * 添加新闻VO类
+ *
+ * @author wangmingsong
+ * @date 2024.03.04
+ */
 @Getter
 @Setter
 @AllArgsConstructor
@@ -29,7 +35,7 @@ public class NewNews {
      * 新闻时间
      */
     @NotNull
-    private LocalDateTime sourceTime;
+    private String sourceTime;
     /**
      * 新闻链接
      */

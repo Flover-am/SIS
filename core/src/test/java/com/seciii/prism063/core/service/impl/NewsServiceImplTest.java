@@ -2,8 +2,8 @@ package com.seciii.prism063.core.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.seciii.prism063.core.enums.CategoryType;
-import com.seciii.prism063.core.mapper.NewsMapper;
-import com.seciii.prism063.core.pojo.po.NewsPO;
+import com.seciii.prism063.core.mapper.news.NewsMapper;
+import com.seciii.prism063.core.pojo.po.news.NewsPO;
 import com.seciii.prism063.core.pojo.vo.news.NewNews;
 import com.seciii.prism063.core.pojo.vo.news.NewsItemVO;
 import com.seciii.prism063.core.pojo.vo.news.NewsVO;
@@ -11,7 +11,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +52,7 @@ class NewsServiceImplTest {
                     .id((long) i)
                     .title("test" + i)
                     .originSource("test" + i + "source")
-                    .sourceTime(LocalDateTime.parse("2020-03-01 00:01:0" + i, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                    .sourceTime("2020-03-01 00:01:0" + i)
                     .category(CategoryType.getCategoryType(i).toString())
                     .build()
             );
@@ -92,7 +91,7 @@ class NewsServiceImplTest {
                 .link("www.singulartest.com")
                 .sourceLink("www.singulartestsource.com")
                 .originSource("singularTestSource")
-                .sourceTime(LocalDateTime.parse("2024-01-01 12:34:56", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                .sourceTime("2024-01-01 12:34:56")
                 .category(CategoryType.getCategoryType(1).toString())
                 .createTime(currentTime)
                 .updateTime(currentTime)
@@ -101,7 +100,7 @@ class NewsServiceImplTest {
                 "singularTest",
                 "singularTestContent",
                 "singularTestSource",
-                LocalDateTime.parse("2024-01-01 12:34:56", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                "2024-01-01 12:34:56",
                 "www.singulartest.com",
                 "www.singulartestsource.com",
                 CategoryType.getCategoryType(1).toString()
@@ -187,7 +186,7 @@ class NewsServiceImplTest {
 
     @Test
     void deleteNewsTest() {
-        Mockito.when(newsMapperMock.deleteById(512L)).thenReturn(0);
+        Mockito.when(newsMapperMock.deleteById(512L)).thenReturn(1);
         newsService.deleteNews(512L);
     }
 
@@ -200,10 +199,16 @@ class NewsServiceImplTest {
 
     @Test
     void filterNewsPagedTest() {
-        Mockito.when(newsMapperMock.selectPage(Mockito.any(), Mockito.any()))
-                .thenReturn(new Page<NewsPO>(1, 5).setRecords(fakeNewsPOList));
-        Mockito.when(newsMapperMock.selectCount(Mockito.any())).thenReturn((long) fakeNewsPOList.size());
-        List<NewsItemVO> result = newsService.filterNewsPaged(1, 5, null, null, null).getNewsList();
+        Mockito.when(newsMapperMock.getFilteredNewsCount(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).thenReturn((long) fakeNewsPOList.size());
+        Mockito.when(newsMapperMock.getFilteredNewsByPage(Mockito.anyInt(), Mockito.anyInt(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(fakeNewsPOList.stream().map(
+                x -> {
+                    if (x.getTitle().contains("test")) {
+                        return x;
+                    }
+                    return null;
+                }
+        ).toList());
+        List<NewsItemVO> result = newsService.filterNewsPaged(1, 5, null, null, null, null).getNewsList();
         for (int i = 0; i < result.size(); i++) {
             assertTrue(newsItemVOsEqual(result.get(i), fakeNewsItemList.get(i)));
         }
@@ -211,7 +216,7 @@ class NewsServiceImplTest {
 
     @Test
     void searchNewsByTitleTest() {
-        Mockito.when(newsMapperMock.selectList(Mockito.any()))
+        Mockito.when(newsMapperMock.searchFilteredNewsByPage(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
                 .thenReturn(fakeNewsPOList.stream().map(
                         x -> {
                             if (x.getTitle().contains("test")) {
@@ -220,29 +225,29 @@ class NewsServiceImplTest {
                             return null;
                         }
                 ).toList());
-        Mockito.when(newsMapperMock.selectCount(Mockito.any())).thenReturn((long) fakeNewsPOList.size());
+        Mockito.when(newsMapperMock.getSearchedFilteredNewsCount(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).thenReturn((long) fakeNewsPOList.size());
         List<NewsItemVO> result = newsService.searchNewsByTitle("test").getNewsList();
         for (int i = 0; i < result.size(); i++) {
             assertTrue(newsItemVOsEqual(result.get(i), fakeNewsItemList.get(i)));
         }
     }
+
     @Test
-    void searchNewsByTitleFilteredTest(){
-        Mockito.when(newsMapperMock.selectPage(Mockito.any(),Mockito.any()))
-                .thenReturn(new Page(1,5).setRecords(fakeNewsPOList.stream().map(
+    void searchNewsByTitleFilteredTest() {
+        Mockito.when(newsMapperMock.searchFilteredNewsByPage(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+                .thenReturn(fakeNewsPOList.stream().map(
                         x -> {
                             if (x.getTitle().contains("test")) {
                                 return x;
                             }
                             return null;
                         }
-                ).toList()));
-        Mockito.when(newsMapperMock.selectCount(Mockito.any())).thenReturn((long) fakeNewsPOList.size());
-        List<NewsItemVO> result = newsService.searchNewsByTitleFiltered(1, 5, "test", null, null, null).getNewsList();
+                ).toList());
+        Mockito.when(newsMapperMock.getSearchedFilteredNewsCount(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).thenReturn((long) fakeNewsPOList.size());
+        List<NewsItemVO> result = newsService.searchNewsByTitleFiltered(1, 5, "test", null, null, null, null).getNewsList();
         for (int i = 0; i < result.size(); i++) {
             assertTrue(newsItemVOsEqual(result.get(i), fakeNewsItemList.get(i)));
         }
     }
-
 
 }

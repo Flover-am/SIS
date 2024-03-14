@@ -1,5 +1,6 @@
 package com.seciii.prism063.core.controller;
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.seciii.prism063.common.Result;
 import com.seciii.prism063.core.pojo.vo.user.LoginVO;
 import com.seciii.prism063.core.pojo.vo.user.ModifyPwdVO;
@@ -32,12 +33,12 @@ public class AdminController {
      * 管理员登陆
      *
      * @param loginVO 用户登陆VO
-     * @return 响应结果
+     * @return 用户token
      */
     @GetMapping("/admin/login")
-    public Result<Void> login(@Validated LoginVO loginVO) {
+    public Result<String> login(@Validated LoginVO loginVO) {
         adminService.login(loginVO.getUsername(), loginVO.getPassword());
-        return Result.success();
+        return Result.success(StpUtil.getTokenInfo().tokenValue);
     }
 
     /**

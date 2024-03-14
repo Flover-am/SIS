@@ -45,8 +45,9 @@ public enum ErrorType {
     /**
      * 新闻获取相关错误
      */
+    NEWS_NOT_FOUND(300000, "News does not exist", 404), /* 查找的新闻不存在 */
 
-    NEWS_NOT_FOUND(300000, "新闻不存在", 404);/* 查找的新闻不存在 */
+    NEWS_PAGE_OVERFLOW(300001, "News page overflow", 400); /* 新闻页码溢出 */
 
 
     /**
