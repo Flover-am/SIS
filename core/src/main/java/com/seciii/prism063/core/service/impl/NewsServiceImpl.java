@@ -34,25 +34,8 @@ public class NewsServiceImpl implements NewsService {
     }
 
     @Override
-    @Deprecated
-    public PagedNews getNewsList() throws NewsException {
-        QueryWrapper<NewsPO> newsQueryWrapper = new QueryWrapper<>();
-        newsQueryWrapper.select("*");
-        List<NewsPO> newsList = newsMapper.selectList(newsQueryWrapper);
-        return new PagedNews(newsMapper.selectCount(newsQueryWrapper), toNewsVO(newsList));
-    }
-
-    @Override
     public void addNews(NewNews newNews) {
         newsMapper.insert(toNewsPO(newNews));
-    }
-
-    @Override
-    @Deprecated
-    public PagedNews getNewsListByPage(Integer pageNo, Integer pageSize) throws NewsException {
-        long count = newsMapper.getFilteredNewsCount(null, null, null, null);
-        List<NewsPO> newsList = newsMapper.getFilteredNewsByPage(pageNo, pageSize, null, null, null, null);
-        return new PagedNews(count, toNewsVO(newsList));
     }
 
     @Override
@@ -134,14 +117,6 @@ public class NewsServiceImpl implements NewsService {
             throw new NewsException(ErrorType.NEWS_PAGE_OVERFLOW, "新闻页获取错误");
         }
         List<NewsPO> result = newsMapper.getFilteredNewsByPage(pageSize, (int) offset, categoryIdList, startTime, endTime, originSource);
-        return new PagedNews(count, toNewsVO(result));
-    }
-
-    @Override
-    @Deprecated
-    public PagedNews searchNewsByTitle(String title) {
-        long count = newsMapper.getSearchedFilteredNewsCount(title, null, null, null, null);
-        List<NewsPO> result = newsMapper.searchFilteredNewsByPage(0, 0, title, null, null, null, null);
         return new PagedNews(count, toNewsVO(result));
     }
 
@@ -254,33 +229,5 @@ public class NewsServiceImpl implements NewsService {
                 .sourceLink(newNews.getSourceLink())
                 .category(CategoryType.getCategoryType(newNews.getCategory()).toInt())
                 .build();
-    }
-
-    /**
-     * 获取过滤查询条件
-     *
-     * @param category  分类数组
-     * @param startTime 开始时间
-     * @param endTime   结束时间
-     * @return 查询条件QueryWrapper对象
-     */
-    @Deprecated
-    private QueryWrapper<NewsPO> getFilterQueryWrapper(List<String> category,
-                                                       LocalDateTime startTime,
-                                                       LocalDateTime endTime) {
-        QueryWrapper<NewsPO> filterQueryWrapper = new QueryWrapper<>();
-        filterQueryWrapper = filterQueryWrapper.select("*");
-        if (category != null && !category.isEmpty()) {
-            List<Integer> categoryTypeList = category.stream().map(x -> CategoryType.getCategoryType(x).toInt()).toList();
-            filterQueryWrapper = filterQueryWrapper.in("category", categoryTypeList);
-        }
-        if (startTime != null && endTime != null) {
-            filterQueryWrapper = filterQueryWrapper.between("source_time", startTime, endTime);
-        } else if (startTime != null) {
-            filterQueryWrapper = filterQueryWrapper.ge("source_time", startTime);
-        } else if (endTime != null) {
-            filterQueryWrapper = filterQueryWrapper.le("source_time", endTime);
-        }
-        return filterQueryWrapper;
     }
 }

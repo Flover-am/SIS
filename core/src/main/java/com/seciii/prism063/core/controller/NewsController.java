@@ -13,7 +13,7 @@ import java.util.List;
 
 
 /**
- * 新闻控制器
+ * 新闻控制器.
  *
  * @author xueruichen
  * @date 2024.02.29
@@ -21,23 +21,10 @@ import java.util.List;
 @RestController
 @RequestMapping("/v1")
 public class NewsController {
-
     private final NewsService newsService;
 
     public NewsController(NewsService newsService) {
         this.newsService = newsService;
-    }
-
-    /**
-     * 获取新闻列表
-     *
-     * @return 新闻条目VO列表
-     */
-    @GetMapping("/news")
-    @Deprecated
-    public Result<PagedNews> getNewsList() {
-        PagedNews pagedNews = newsService.getNewsList();
-        return Result.success(pagedNews);
     }
 
     /**
@@ -47,20 +34,6 @@ public class NewsController {
     public Result<Void> addNews(@RequestBody NewNews newNews) {
         newsService.addNews(newNews);
         return Result.success();
-    }
-
-    /**
-     * 按页数和页大小获取新闻列表
-     *
-     * @param current  页码下标
-     * @param pageSize 页大小
-     * @return 对应页数新闻条目VO列表
-     */
-    @GetMapping("/news/all")
-    @Deprecated
-    public Result<PagedNews> getNewsListByPage(@RequestParam Integer current, @RequestParam Integer pageSize) {
-        PagedNews pagedNews = newsService.getNewsListByPage(current, pageSize);
-        return Result.success(pagedNews);
     }
 
     /**
@@ -135,10 +108,8 @@ public class NewsController {
      * @return 对应页数新闻条目VO列表
      */
     @PostMapping("/news/filter")
-    public Result<PagedNews> filterNewsPaged(
-            @RequestParam int current,
-            @RequestParam int pageSize,
-            @RequestBody(required = false) Filter filter) {
+    public Result<PagedNews> filterNewsPaged(@RequestParam int current, @RequestParam int pageSize,
+                                             @RequestBody(required = false) Filter filter) {
         PagedNews pagedNews = newsService.filterNewsPaged(current, pageSize,
                 filter.getCategory(),
                 DateTimeUtil.parseBeginOfDay(filter.getStartDate()),

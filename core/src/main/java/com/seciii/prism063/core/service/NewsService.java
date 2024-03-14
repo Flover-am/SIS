@@ -17,23 +17,6 @@ import java.util.List;
  */
 public interface NewsService {
     /**
-     * 获取新闻列表
-     *
-     * @return 新闻条目VO列表
-     */
-    @Deprecated
-    PagedNews getNewsList();
-
-    /**
-     * 按页数和页大小获取新闻列表
-     *
-     * @param pageNo 页数
-     * @return 对应页数新闻条目VO列表
-     */
-    @Deprecated
-    PagedNews getNewsListByPage(Integer pageNo, Integer pageSize);
-
-    /**
      * 获取新闻详情
      *
      * @param id 新闻id
@@ -98,15 +81,6 @@ public interface NewsService {
      * @return 过滤后的新闻列表
      */
     PagedNews filterNewsPaged(int pageNo, int pageSize, List<String> category, LocalDateTime startTime, LocalDateTime endTime, String originSource);
-
-    /**
-     * 按标题模糊搜索新闻
-     *
-     * @param title 新闻标题
-     * @return 搜索结果新闻列表
-     */
-    @Deprecated
-    PagedNews searchNewsByTitle(String title);
 
     /**
      * 按标题模糊搜索新闻并过滤,分页返回
