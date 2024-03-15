@@ -52,6 +52,8 @@ class NewsServiceImplTest {
                     .title("test" + i)
                     .originSource("test" + i + "source")
                     .sourceTime("2020-03-01 00:01:0" + i)
+                    .updateTime("2022-03-01 00:01:01")
+                    .link("selearning.nju.edu.cn")
                     .category(CategoryType.getCategoryType(i).toString())
                     .build()
             );
