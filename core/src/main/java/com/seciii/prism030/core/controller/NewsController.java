@@ -42,7 +42,7 @@ public class NewsController {
      * @param id 新闻id
      * @return 新闻VO
      */
-    @GetMapping("/news/{id}")
+    @PostMapping("/news/{id}")
     public Result<NewsVO> getNewsDetail(@PathVariable Long id) {
         NewsVO newsVO = newsService.getNewsDetail(id);
         return Result.success(newsVO);
