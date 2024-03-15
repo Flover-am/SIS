@@ -42,7 +42,7 @@ public class UserController {
      * @param loginVO 用户登陆VO
      * @return 返回token
      */
-    @GetMapping("/user/login")
+    @PostMapping("/user/login")
     public Result<String> login(@Validated LoginVO loginVO) {
         userService.login(loginVO.getUsername(), loginVO.getPassword());
         return Result.success(StpUtil.getTokenInfo().tokenValue);
