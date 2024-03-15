@@ -7,10 +7,7 @@ import com.seciii.prism030.core.pojo.vo.user.ModifyPwdVO;
 import com.seciii.prism030.core.service.AdminService;
 import com.seciii.prism030.core.service.UserService;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * B端管理控制器类
@@ -35,7 +32,7 @@ public class AdminController {
      * @param loginVO 用户登陆VO
      * @return 用户token
      */
-    @GetMapping("/admin/login")
+    @PostMapping("/admin/login")
     public Result<String> login(@Validated LoginVO loginVO) {
         adminService.login(loginVO.getUsername(), loginVO.getPassword());
         return Result.success(StpUtil.getTokenInfo().tokenValue);
