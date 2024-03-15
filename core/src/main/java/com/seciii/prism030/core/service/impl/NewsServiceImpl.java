@@ -187,6 +187,8 @@ public class NewsServiceImpl implements NewsService {
                         .originSource(newsPO.getOriginSource())
                         .sourceTime(DateTimeUtil.defaultFormat(newsPO.getSourceTime()))
                         .category(CategoryType.getCategoryType(newsPO.getCategory()).getCategoryEN())
+                        .link(newsPO.getLink())
+                        .updateTime(DateTimeUtil.defaultFormat(newsPO.getUpdateTime()))
                         .build()
         ).toList();
     }

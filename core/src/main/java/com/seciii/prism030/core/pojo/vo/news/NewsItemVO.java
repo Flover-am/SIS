@@ -41,4 +41,13 @@ public class NewsItemVO {
      * 新闻分类
      */
     private String category;
+    /**
+     * 新闻更新时间
+     */
+    @NotNull
+    private String updateTime;
+    /**
+     * 新闻链接
+     */
+    private String link;
 }
