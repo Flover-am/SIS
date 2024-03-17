@@ -6,7 +6,7 @@ password=$3
 
 version=1.0.0
 # shellcheck disable=SC2086
-docker build --build-arg MYSQL_URL="$url" --build-arg MYSQL_USER="$username" --build-arg MYSQL_PASSWORD="$password" -t prism030-backend:$version .
+docker build --build-arg MYSQL_URL=$url --build-arg MYSQL_USER=$username --build-arg MYSQL_PASSWORD=$password -t prism030-backend:$version .
 echo "prism030-backend:$version is built successfully!"
 pwd
 whoami
@@ -15,5 +15,5 @@ tree
 docker stop prism030-backend || true
 docker rm prism030-backend || true
 echo "prism030-backend is stopped and removed successfully!"
-docker run --name=prism030-backend -itd -p 8080:8080 --restart=on-failure:3 prism030-backend:$version
+docker run --name=prism030-backend -itd -p 8080:8080 -e MYSQL_URL=$url -e MYSQL_USER=$username -e MYSQL_PASSWORD=$password --restart=on-failure:3 prism030-backend:$version
 echo "prism030-backend is running successfully!"
