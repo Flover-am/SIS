@@ -60,12 +60,12 @@ public class NewsPO {
     /**
      * 新闻创建时间戳
      */
-    @TableField(value="create_time",fill=FieldFill.INSERT)
+    @TableField(value = "create_time", fill = FieldFill.INSERT)
     private LocalDateTime createTime;
     /**
      * 新闻更新时间戳
      */
-    @TableField(value="update_time",fill=FieldFill.INSERT_UPDATE)
+    @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE, update = "now()")
     private LocalDateTime updateTime;
 
 }
