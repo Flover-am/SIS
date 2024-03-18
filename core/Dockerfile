@@ -1,0 +1,15 @@
+FROM openjdk:17-jdk-alpine
+
+LABEL authors="LiDongSheng"
+
+ENV PORT=8080 \
+    TZ="Asia/Shanghai" \
+    MYSQL_URL="" \
+    MYSQL_USER="" \
+    MYSQL_PASSWORD=""
+WORKDIR /app
+RUN echo "MYSQL_URL is: $MYSQL_URL"
+COPY core-0.0.1-SNAPSHOT.jar /app
+ENTRYPOINT ["sh", "-c", "java -jar core-0.0.1-SNAPSHOT.jar --server.port=${PORT} --spring.datasource.url=${MYSQL_URL} --spring.datasource.username=${MYSQL_USER} --spring.datasource.password=${MYSQL_PASSWORD} -Duser.timezone=GMT+08"]
+
+#ENTRYPOINT ["java", "-jar", "core-0.0.1-SNAPSHOT.jar", "--server.port=${PORT}","--spring.datasource.url=$MYSQL_URL","--spring.datasource.username=$MYSQL_USER","--spring.datasource.password=$MYSQL_PASSWORD", "-Duser.timezone=GMT+08"]
