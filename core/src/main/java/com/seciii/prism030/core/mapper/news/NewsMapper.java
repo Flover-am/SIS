@@ -22,10 +22,10 @@ public interface NewsMapper {
      * @param originSource 新闻来源
      * @return 新闻条目数
      */
-    Long getFilteredNewsCount(@Param("category") List<Integer> category,
-                              @Param("startTime") LocalDateTime startTime,
-                              @Param("endTime") LocalDateTime endTime,
-                              @Param("originSource") String originSource);
+    Long getFilteredNewsCount(List<Integer> category,
+                              LocalDateTime startTime,
+                              LocalDateTime endTime,
+                              String originSource);
 
     /**
      * 获取筛选后的新闻列表
@@ -38,12 +38,12 @@ public interface NewsMapper {
      * @param originSource 新闻来源
      * @return 新闻PO列表
      */
-    List<NewsPO> getFilteredNewsByPage(@Param("pageSize") int pageSize,
-                                       @Param("pageOffset") int pageOffset,
-                                       @Param("category") List<Integer> category,
-                                       @Param("startTime") LocalDateTime startTime,
-                                       @Param("endTime") LocalDateTime endTime,
-                                       @Param("originSource") String originSource);
+    List<NewsPO> getFilteredNewsByPage(int pageSize,
+                                       int pageOffset,
+                                       List<Integer> category,
+                                       LocalDateTime startTime,
+                                       LocalDateTime endTime,
+                                       String originSource);
 
     /**
      * 按标题模糊搜索并筛选后的新闻条目
@@ -57,13 +57,13 @@ public interface NewsMapper {
      * @param originSource 新闻来源
      * @return 新闻PO列表
      */
-    List<NewsPO> searchFilteredNewsByPage(@Param("pageSize") int pageSize,
-                                          @Param("pageOffset") int pageOffset,
-                                          @Param("title") String title,
-                                          @Param("category") List<Integer> category,
-                                          @Param("startTime") LocalDateTime startTime,
-                                          @Param("endTime") LocalDateTime endTime,
-                                          @Param("originSource") String originSource);
+    List<NewsPO> searchFilteredNewsByPage(int pageSize,
+                                          int pageOffset,
+                                          String title,
+                                          List<Integer> category,
+                                          LocalDateTime startTime,
+                                          LocalDateTime endTime,
+                                          String originSource);
 
     /**
      * 按标题模糊搜索并筛选后的新闻条目数
@@ -75,9 +75,9 @@ public interface NewsMapper {
      * @param originSource 新闻来源
      * @return 新闻条目数
      */
-    Long getSearchedFilteredNewsCount(@Param("title") String title,
-                                      @Param("category") List<Integer> category,
-                                      @Param("startTime") LocalDateTime startTime,
-                                      @Param("endTime") LocalDateTime endTime,
-                                      @Param("originSource") String originSource);
+    Long getSearchedFilteredNewsCount(String title,
+                                      List<Integer> category,
+                                      LocalDateTime startTime,
+                                      LocalDateTime endTime,
+                                      String originSource);
 }

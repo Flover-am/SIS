@@ -23,14 +23,32 @@ public interface NewsDAOMongo extends NewsMapper {
 
     /**
      * 插入新闻
+     *
      * @param newsPO 新闻PO
      * @return 插入成功返回新闻PO，否则返回null
      */
     NewsPO insert(NewsPO newsPO);
 
     /**
-     * 修改新闻标题
+     * 删除新闻
+     *
+     * @param newsPO 新闻PO
+     * @return 删除成功返回0，否则返回-1
+     */
+    int delete(NewsPO newsPO);
+
+    /**
+     * 根据id删除新闻
+     *
      * @param id 新闻id
+     * @return 删除成功返回0，否则返回-1
+     */
+    int deleteById(Long id);
+
+    /**
+     * 修改新闻标题
+     *
+     * @param id    新闻id
      * @param title 新标题
      * @return 修改成功返回0，否则返回-1
      */
@@ -38,7 +56,8 @@ public interface NewsDAOMongo extends NewsMapper {
 
     /**
      * 修改新闻内容
-     * @param id 新闻id
+     *
+     * @param id      新闻id
      * @param content 新内容
      * @return 修改成功返回0，否则返回-1
      */
@@ -46,7 +65,8 @@ public interface NewsDAOMongo extends NewsMapper {
 
     /**
      * 修改新闻来源
-     * @param id 新闻id
+     *
+     * @param id     新闻id
      * @param source 新来源
      * @return 修改成功返回0，否则返回-1
      */

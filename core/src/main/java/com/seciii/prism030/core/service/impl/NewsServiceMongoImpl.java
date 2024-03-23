@@ -18,6 +18,7 @@ import java.util.List;
 
 /**
  * 新闻服务类的MongoDB实现
+ *
  * @author wang mingsong
  * @date 2024.03.23
  */
@@ -25,6 +26,7 @@ import java.util.List;
 @Service
 public class NewsServiceMongoImpl implements NewsService {
     private NewsDAOMongo newsDAOMongo;
+
     @Autowired
     public void setNewsDAOMongo(NewsDAOMongo newsDAOMongo) {
         this.newsDAOMongo = newsDAOMongo;
@@ -40,8 +42,8 @@ public class NewsServiceMongoImpl implements NewsService {
     @Override
     public NewsVO getNewsDetail(Long id) {
         NewsPO newsPO = newsDAOMongo.getNewsById(id);
-        if(newsPO==null){
-            log.error(String.format("News with id [%d] not found", id));
+        if (newsPO == null) {
+            log.error(String.format("News with id %d not found", id));
             throw new NewsException(ErrorType.NEWS_NOT_FOUND);
         }
         return NewsUtil.toNewsVO(newsPO);
@@ -55,7 +57,11 @@ public class NewsServiceMongoImpl implements NewsService {
      */
     @Override
     public void modifyNewsTitle(Long id, String title) {
-        //TODO: Finish implementation at 2024.03.23
+        int result = newsDAOMongo.updateNewsTitle(id, title);
+        if (result == -1) {
+            log.error(String.format("News with id %d not found", id));
+            throw new NewsException(ErrorType.NEWS_NOT_FOUND);
+        }
     }
 
     /**
@@ -66,7 +72,11 @@ public class NewsServiceMongoImpl implements NewsService {
      */
     @Override
     public void modifyNewsContent(Long id, String content) {
-//TODO: Finish implementation at 2024.03.23
+        int result = newsDAOMongo.updateNewsContent(id, content);
+        if (result == -1) {
+            log.error(String.format("News with id %d not found", id));
+            throw new NewsException(ErrorType.NEWS_NOT_FOUND);
+        }
     }
 
     /**
@@ -77,7 +87,11 @@ public class NewsServiceMongoImpl implements NewsService {
      */
     @Override
     public void modifyNewsSource(Long id, String source) {
-//TODO: Finish implementation at 2024.03.23
+        int result = newsDAOMongo.updateNewsSource(id, source);
+        if (result == -1) {
+            log.error(String.format("News with id %d not found", id));
+            throw new NewsException(ErrorType.NEWS_NOT_FOUND);
+        }
     }
 
     /**
@@ -87,7 +101,11 @@ public class NewsServiceMongoImpl implements NewsService {
      */
     @Override
     public void deleteNews(Long id) {
-//TODO: Finish implementation at 2024.03.23
+        int result = newsDAOMongo.deleteById(id);
+        if (result == -1) {
+            log.error(String.format("News with id %d not found", id));
+            throw new NewsException(ErrorType.NEWS_NOT_FOUND);
+        }
     }
 
     /**
@@ -97,7 +115,7 @@ public class NewsServiceMongoImpl implements NewsService {
      */
     @Override
     public void deleteMultipleNews(List<Long> idList) {
-//TODO: Finish implementation at 2024.03.23
+        newsDAOMongo.batchDeleteNews(idList);
     }
 
     /**
@@ -107,7 +125,7 @@ public class NewsServiceMongoImpl implements NewsService {
      */
     @Override
     public void addNews(NewNews newNews) {
-//TODO: Finish implementation at 2024.03.23
+        newsDAOMongo.insert(NewsUtil.toNewsPO(newNews));
     }
 
     /**
@@ -123,8 +141,27 @@ public class NewsServiceMongoImpl implements NewsService {
      */
     @Override
     public PagedNews filterNewsPaged(int pageNo, int pageSize, List<String> category, LocalDateTime startTime, LocalDateTime endTime, String originSource) {
-        //TODO: Finish implementation at 2024.03.23
-        return null;
+        int pageOffset = pageSize * (pageNo - 1);
+        Long total = newsDAOMongo.getFilteredNewsCount(
+                NewsUtil.getCategoryTypeList(category),
+                startTime,
+                endTime,
+                originSource
+        );
+        if (total < pageOffset) {
+            log.error(String.format("Page overflow: total %d records with PageNo:%d and PageSize: %d (Offset: %d)",
+                    total, pageNo, pageSize, pageOffset));
+            throw new NewsException(ErrorType.NEWS_PAGE_OVERFLOW);
+        }
+        List<NewsPO> newsPOList = newsDAOMongo.getFilteredNewsByPage(
+                pageSize,
+                pageOffset,
+                NewsUtil.getCategoryTypeList(category),
+                startTime,
+                endTime,
+                originSource
+        );
+        return new PagedNews(total, NewsUtil.toNewsVO(newsPOList));
     }
 
     /**
@@ -141,7 +178,28 @@ public class NewsServiceMongoImpl implements NewsService {
      */
     @Override
     public PagedNews searchNewsByTitleFiltered(int pageNo, int pageSize, String title, List<String> category, LocalDateTime startTime, LocalDateTime endTime, String originSource) {
-        //TODO: Finish implementation at 2024.03.23
-        return null;
+        int pageOffset = pageSize * (pageNo - 1);
+        Long total = newsDAOMongo.getSearchedFilteredNewsCount(
+                title,
+                NewsUtil.getCategoryTypeList(category),
+                startTime,
+                endTime,
+                originSource
+        );
+        if (total < pageOffset) {
+            log.error(String.format("Page overflow: total %d records with PageNo:%d and PageSize: %d (Offset: %d)",
+                    total, pageNo, pageSize, pageOffset));
+            throw new NewsException(ErrorType.NEWS_PAGE_OVERFLOW);
+        }
+        List<NewsPO> newsPOList = newsDAOMongo.searchFilteredNewsByPage(
+                pageSize,
+                pageOffset,
+                title,
+                NewsUtil.getCategoryTypeList(category),
+                startTime,
+                endTime,
+                originSource
+        );
+        return new PagedNews(total, NewsUtil.toNewsVO(newsPOList));
     }
 }

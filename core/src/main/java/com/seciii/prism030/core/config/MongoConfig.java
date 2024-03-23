@@ -10,17 +10,19 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 /**
  * MongoDB配置类
  * 声明所需的Bean
+ *
  * @author wang mingsong
  * @date 2024.03.22
  */
 @Configuration
 public class MongoConfig {
     @Bean
-    public MongoTemplate mongoTemplate(MongoDatabaseFactory mongoDatabaseFactory){
+    public MongoTemplate mongoTemplate(MongoDatabaseFactory mongoDatabaseFactory) {
         return new MongoTemplate(mongoDatabaseFactory);
     }
+
     @Bean
-    public NewsDAOMongo newsDAOMongo(){
+    public NewsDAOMongo newsDAOMongo() {
         return new NewsDAOMongoImpl();
     }
 }

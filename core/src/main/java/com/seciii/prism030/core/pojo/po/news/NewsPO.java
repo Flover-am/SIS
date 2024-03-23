@@ -74,7 +74,7 @@ public class NewsPO implements Serializable {
     private LocalDateTime updateTime;
 
     @Override
-    public String toString(){
+    public String toString() {
         return "{" +
                 "id=" + id +
                 ", title='" + title + '\'' +

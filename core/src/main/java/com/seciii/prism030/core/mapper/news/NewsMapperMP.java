@@ -11,5 +11,5 @@ import org.apache.ibatis.annotations.Mapper;
  * @date 2024.02.29
  */
 @Mapper
-public interface NewsMapperMP extends BaseMapper<NewsPO>,NewsMapper {
+public interface NewsMapperMP extends BaseMapper<NewsPO>, NewsMapper {
 }

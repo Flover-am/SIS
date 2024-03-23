@@ -3,7 +3,9 @@ package com.seciii.prism030.core.dao.news.impl;
 
 import com.seciii.prism030.core.dao.news.NewsDAOMongo;
 import com.seciii.prism030.core.pojo.po.news.NewsPO;
+
 import static com.seciii.prism030.core.utils.NewsUtil.*;
+
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,9 +34,6 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
 
     private final static String COLLECTION_NAME = "news";
 
-    //新闻字段相关常量
-
-
     private MongoTemplate mongoTemplate;
 
     @Autowired
@@ -53,7 +52,7 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
     public NewsPO getNewsById(Long id) {
         Query query = new Query();
         query.addCriteria(Criteria.where(ID).is(id));
-        return mongoTemplate.findOne(query, NewsPO.class,COLLECTION_NAME);
+        return mongoTemplate.findOne(query, NewsPO.class, COLLECTION_NAME);
     }
 
     /**
@@ -64,7 +63,31 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
      */
     @Override
     public NewsPO insert(NewsPO newsPO) {
-        return mongoTemplate.insert(newsPO,COLLECTION_NAME);
+        return mongoTemplate.insert(newsPO, COLLECTION_NAME);
+    }
+
+    /**
+     * 删除新闻
+     *
+     * @param newsPO 新闻PO
+     * @return 删除成功返回0，否则返回-1
+     */
+    @Override
+    public int delete(NewsPO newsPO) {
+        long deleteCount = mongoTemplate.remove(newsPO, COLLECTION_NAME).getDeletedCount();
+        return deleteCount > 0 ? 0 : -1;
+    }
+
+    /**
+     * 根据id删除新闻
+     *
+     * @param id 新闻id
+     * @return 删除成功返回0，否则返回-1
+     */
+    @Override
+    public int deleteById(Long id) {
+        long deleteCount = mongoTemplate.remove(Query.query(Criteria.where(ID).is(id)), NewsPO.class, COLLECTION_NAME).getDeletedCount();
+        return deleteCount > 0 ? 0 : -1;
     }
 
     /**
@@ -76,7 +99,7 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
      */
     @Override
     public int updateNewsTitle(Long id, String title) {
-        return modifyById(id,Update.update(TITLE,title));
+        return modifyById(id, Update.update(TITLE, title));
     }
 
     /**
@@ -88,7 +111,7 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
      */
     @Override
     public int updateNewsContent(Long id, String content) {
-        return modifyById(id,Update.update(CONTENT,content));
+        return modifyById(id, Update.update(CONTENT, content));
     }
 
     /**
@@ -100,7 +123,7 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
      */
     @Override
     public int updateNewsSource(Long id, String source) {
-        return modifyById(id,Update.update(SOURCE,source));
+        return modifyById(id, Update.update(SOURCE, source));
     }
 
 
@@ -112,7 +135,7 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
      */
     @Override
     public Long batchDeleteNews(List<Long> ids) {
-        Query query=Query.query(Criteria.where("id").in(ids));
+        Query query = Query.query(Criteria.where("id").in(ids));
         return mongoTemplate.remove(query, NewsPO.class).getDeletedCount();
     }
 
@@ -127,7 +150,7 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
      */
     @Override
     public Long getFilteredNewsCount(List<Integer> category, LocalDateTime startTime, LocalDateTime endTime, String originSource) {
-        Query query = getQuery(-1,0,null,category,startTime,endTime,originSource);
+        Query query = getQuery(-1, 0, null, category, startTime, endTime, originSource);
         return getCountByQuery(query);
     }
 
@@ -144,7 +167,7 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
      */
     @Override
     public List<NewsPO> getFilteredNewsByPage(int pageSize, int pageOffset, List<Integer> category, LocalDateTime startTime, LocalDateTime endTime, String originSource) {
-        Query query = getQuery(pageSize,pageOffset,null,category,startTime,endTime,originSource);
+        Query query = getQuery(pageSize, pageOffset, null, category, startTime, endTime, originSource);
         return getItemsByQuery(query);
     }
 
@@ -162,7 +185,7 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
      */
     @Override
     public List<NewsPO> searchFilteredNewsByPage(int pageSize, int pageOffset, String title, List<Integer> category, LocalDateTime startTime, LocalDateTime endTime, String originSource) {
-        Query query = getQuery(pageSize,pageOffset,title,category,startTime,endTime,originSource);
+        Query query = getQuery(pageSize, pageOffset, title, category, startTime, endTime, originSource);
         return getItemsByQuery(query);
     }
 
@@ -178,10 +201,9 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
      */
     @Override
     public Long getSearchedFilteredNewsCount(String title, List<Integer> category, LocalDateTime startTime, LocalDateTime endTime, String originSource) {
-        Query query = getQuery(-1,0,title,category,startTime,endTime,originSource);
+        Query query = getQuery(-1, 0, title, category, startTime, endTime, originSource);
         return getCountByQuery(query);
     }
-
 
 
     /**
@@ -195,7 +217,7 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
         Aggregation aggregation = Aggregation.newAggregation(groupMaxId);
         MaxId result = mongoTemplate.aggregate(aggregation, COLLECTION_NAME, MaxId.class).getUniqueMappedResult();
 
-        if (result==null){
+        if (result == null) {
             return 0L;
         }
         return result.getMaxId() + 1L;
@@ -203,24 +225,26 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
 
     /**
      * 按id查找并由update修改新闻
-     * @param id 新闻id
+     *
+     * @param id     新闻id
      * @param update 修改操作
      * @return 修改成功返回0，否则返回-1
      */
-    private int modifyById(Long id,Update update){
-        update.set(UPDATE_TIME,LocalDateTime.now());
-        NewsPO newsPO=mongoTemplate.findAndModify(Query.query(Criteria.where(ID).is(id)),update,NewsPO.class,COLLECTION_NAME);
-        return newsPO==null?-1:0;
+    private int modifyById(Long id, Update update) {
+        update.set(UPDATE_TIME, LocalDateTime.now());
+        NewsPO newsPO = mongoTemplate.findAndModify(Query.query(Criteria.where(ID).is(id)), update, NewsPO.class, COLLECTION_NAME);
+        return newsPO == null ? -1 : 0;
     }
 
     /**
      * 根据查询条件获取查询对象
-     * @param pageSize 页码大小
-     * @param pageOffset 页码偏移
-     * @param title 新闻标题
-     * @param category  新闻类别
-     * @param startTime 开始时间
-     * @param endTime 结束时间
+     *
+     * @param pageSize     页码大小
+     * @param pageOffset   页码偏移
+     * @param title        新闻标题
+     * @param category     新闻类别
+     * @param startTime    开始时间
+     * @param endTime      结束时间
      * @param originSource 新闻来源
      * @return 查询对象
      */
@@ -232,47 +256,50 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
             LocalDateTime startTime,
             LocalDateTime endTime,
             String originSource
-    ){
-        Query query=new Query().with(Sort.by(Sort.Direction.DESC,SOURCE_TIME));
-        if(title!=null&&!title.isEmpty()){
+    ) {
+        Query query = new Query().with(Sort.by(Sort.Direction.DESC, SOURCE_TIME));
+        if (title != null && !title.isEmpty()) {
             query.addCriteria(Criteria.where(TITLE).regex(getRegex(title)));
         }
-        if(category!=null&&!category.isEmpty()){
+        if (category != null && !category.isEmpty()) {
             query.addCriteria(Criteria.where(CATEGORY).in(category));
         }
-        if(startTime!=null){
+        if (startTime != null) {
             query.addCriteria(Criteria.where(SOURCE_TIME).gte(startTime));
         }
-        if(endTime!=null){
+        if (endTime != null) {
             query.addCriteria(Criteria.where(SOURCE_TIME).lte(endTime));
         }
-        if(originSource!=null&&!originSource.isEmpty()){
+        if (originSource != null && !originSource.isEmpty()) {
             query.addCriteria(Criteria.where(SOURCE).regex(getRegex(originSource)));
         }
-        if(pageSize>0){
-            if(pageOffset<0)pageOffset=0;
-            query.skip((long) pageSize *pageOffset).limit(pageSize);
+        if (pageSize > 0) {
+            if (pageOffset < 0) pageOffset = 0;
+            query.skip(pageOffset).limit(pageSize);
         }
         return query;
     }
 
     /**
      * 根据查询条件获取新闻数量
+     *
      * @param query 查询条件
      * @return 新闻数量
      */
-    private Long getCountByQuery(Query query){
-        return mongoTemplate.count(query,NewsPO.class);
+    private Long getCountByQuery(Query query) {
+        return mongoTemplate.count(query, NewsPO.class);
     }
 
     /**
      * 根据查询条件获取新闻列表
+     *
      * @param query 查询条件
      * @return 新闻列表
      */
-    private List<NewsPO> getItemsByQuery(Query query){
-        return mongoTemplate.find(query,NewsPO.class);
+    private List<NewsPO> getItemsByQuery(Query query) {
+        return mongoTemplate.find(query, NewsPO.class);
     }
+
     /**
      * 包装后的新闻最大id类
      */
@@ -284,14 +311,15 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
 
     /**
      * 简单的正则表达式，在任意位置匹配任意字一次或零次
+     *
      * @param s 待转换字符串
      * @return 转换后的正则表达式
      */
-    private Pattern getRegex(String s){
-        if(s==null||s.isEmpty()){
+    private Pattern getRegex(String s) {
+        if (s == null || s.isEmpty()) {
             return Pattern.compile("^.*$");
         }
-        String regex="^(?:.*["+s+"]+).*"+String.join("?",s.split(""))+"?.*$";
+        String regex = "^(?:.*[" + s + "]+).*" + String.join("?", s.split("")) + "?.*$";
         return Pattern.compile(regex);
     }
 
