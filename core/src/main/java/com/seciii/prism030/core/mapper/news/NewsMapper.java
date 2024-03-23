@@ -1,22 +1,18 @@
 package com.seciii.prism030.core.mapper.news;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.seciii.prism030.core.pojo.po.news.NewsPO;
-import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-
 /**
- * 新闻Mapper类
+ * 新闻Mapper类接口
  *
- * @author xueruichen
- * @date 2024.02.29
+ * @author wang mingsong
+ * @date 2024.03.23
  */
-@Mapper
-public interface NewsMapper extends BaseMapper<NewsPO> {
+public interface NewsMapper {
     /**
      * 获取筛选后的新闻条目数
      *
@@ -84,5 +80,4 @@ public interface NewsMapper extends BaseMapper<NewsPO> {
                                       @Param("startTime") LocalDateTime startTime,
                                       @Param("endTime") LocalDateTime endTime,
                                       @Param("originSource") String originSource);
-
 }
