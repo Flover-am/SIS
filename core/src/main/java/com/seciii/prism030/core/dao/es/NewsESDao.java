@@ -13,6 +13,8 @@ public interface NewsESDao extends ElasticsearchRepository<NewsESPO, Long> {
 
     NewsESPO findByNewsId(Long id);
 
+    void updateByNewsId(Long newsId);
+
 
     List<NewsESPO> findByTitle(String title);
 }
