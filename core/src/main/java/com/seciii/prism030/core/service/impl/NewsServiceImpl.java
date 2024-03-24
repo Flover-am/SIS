@@ -1,10 +1,12 @@
 package com.seciii.prism030.core.service.impl;
 
 import com.seciii.prism030.common.exception.error.ErrorType;
+import com.seciii.prism030.core.dao.es.NewsESDao;
 import com.seciii.prism030.core.enums.CategoryType;
 import com.seciii.prism030.common.exception.NewsException;
 import com.seciii.prism030.core.mapper.news.NewsMapper;
 import com.seciii.prism030.core.pojo.dto.PagedNews;
+import com.seciii.prism030.core.pojo.po.es.NewsESPO;
 import com.seciii.prism030.core.pojo.po.news.NewsPO;
 import com.seciii.prism030.core.pojo.vo.news.NewNews;
 import com.seciii.prism030.core.pojo.vo.news.NewsItemVO;
@@ -16,6 +18,9 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.time.format.DateTimeFormatter;
+import java.util.Optional;
+
 
 /**
  * 新闻服务接口实现类
@@ -27,24 +32,35 @@ import java.util.List;
 public class NewsServiceImpl implements NewsService {
 
     private final NewsMapper newsMapper;
+    private final NewsESDao newsESDao;
 
-    public NewsServiceImpl(NewsMapper newsMapper) {
+    public NewsServiceImpl(NewsMapper newsMapper, NewsESDao newsESDao) {
         this.newsMapper = newsMapper;
+        this.newsESDao = newsESDao;
     }
 
     @Override
     public void addNews(NewNews newNews) {
-        newsMapper.insert(toNewsPO(newNews));
+        NewsPO newsPO = toNewsPO(newNews);
+        Long newsID = (long) newsMapper.insert(newsPO);
+        newsESDao.save(toNewsESPO(newNews,newsID));
     }
 
     @Override
     public NewsVO getNewsDetail(Long id) throws NewsException {
-        NewsPO newsPO = newsMapper.selectById(id);
-        if (newsPO == null) {
+        NewsESPO newsESPO = newsESDao.findByNewsId(id);;
+        if (newsESPO == null) {
             throw new NewsException(ErrorType.NEWS_NOT_FOUND);
         }
-        return toNewsVO(newsPO);
+        return toNewsVO(newsESPO);
+
+//        NewsPO newsPO = newsMapper.selectById(id);
+//        if (newsPO == null) {
+//            throw new NewsException(ErrorType.NEWS_NOT_FOUND);
+//        }
+//        return toNewsVO(newsPO);
     }
+
 
     @Override
     public void modifyNewsTitle(Long id, String title) throws NewsException {
@@ -229,6 +245,48 @@ public class NewsServiceImpl implements NewsService {
                 .link(newNews.getLink())
                 .sourceLink(newNews.getSourceLink())
                 .category(CategoryType.getCategoryType(newNews.getCategory()).toInt())
+                .build();
+    }
+
+    /**
+     * 将新闻ESPO转换为新闻VO
+     *
+     * @param newsESPO 新闻ESPO
+     * @return 新闻VO
+     */
+    private NewsVO toNewsVO(NewsESPO newsESPO) {
+        return NewsVO.builder()
+                .id(newsESPO.getNewsId())
+                .title(newsESPO.getTitle())
+                .content(newsESPO.getContent())
+                .originSource(newsESPO.getOriginSource())
+                .sourceTime(DateTimeUtil.defaultFormat(newsESPO.getSourceTime()))
+                .link(newsESPO.getLink())
+                .sourceLink(newsESPO.getSourceLink())
+                .category(CategoryType.getCategoryType(newsESPO.getCategory()).getCategoryEN())
+                .createTime(newsESPO.getCreateTime())
+                .updateTime(newsESPO.getUpdateTime())
+                .build();
+    }
+
+    /**
+     * 将新闻NewNews对象转换为新闻ESPO
+     *
+     * @param newNews 新闻NewNews对象
+     * @return 新闻ESPO
+     */
+    private NewsESPO toNewsESPO(NewNews newNews,Long newsId) {
+        return NewsESPO.builder()
+                .newsId(newsId)
+                .title(newNews.getTitle())
+                .content(newNews.getContent())
+                .originSource(newNews.getOriginSource())
+                .sourceTime(DateTimeUtil.defaultParse(newNews.getSourceTime()))
+                .link(newNews.getLink())
+                .sourceLink(newNews.getSourceLink())
+                .category(CategoryType.getCategoryType(newNews.getCategory()).toInt())
+                .createTime(LocalDateTime.now())
+                .updateTime(LocalDateTime.now())
                 .build();
     }
 }
