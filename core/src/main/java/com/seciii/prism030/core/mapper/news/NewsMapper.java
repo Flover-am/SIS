@@ -85,4 +85,10 @@ public interface NewsMapper extends BaseMapper<NewsPO> {
                                       @Param("endTime") LocalDateTime endTime,
                                       @Param("originSource") String originSource);
 
+    /**
+     * 通过标题获得PO
+     * @param title
+     * @return 新闻PO
+     */
+    NewsPO selectByTitle(String title);
 }

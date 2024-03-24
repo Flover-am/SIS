@@ -42,36 +42,38 @@ public class NewsServiceImpl implements NewsService {
     @Override
     public void addNews(NewNews newNews) {
         NewsPO newsPO = toNewsPO(newNews);
-        Long newsID = (long) newsMapper.insert(newsPO);
-//        newsESDao.save(toNewsESPO(newNews,newsID));
+        newsMapper.insert(newsPO);
+//        long newsID = newsMapper.selectByTitle(newsPO.getTitle()).getId();
+        long newsID = newsPO.getId();
+        newsESDao.save(toNewsESPO(newNews,newsID));
     }
 
     @Override
     public NewsVO getNewsDetail(Long id) throws NewsException {
-//        NewsESPO newsESPO = newsESDao.findByNewsId(id);;
-//        if (newsESPO == null) {
-//            throw new NewsException(ErrorType.NEWS_NOT_FOUND);
-//        }
-//        return toNewsVO(newsESPO);
-
-        NewsPO newsPO = newsMapper.selectById(id);
-        if (newsPO == null) {
+        NewsESPO newsESPO = newsESDao.findByNewsId(id);;
+        if (newsESPO == null) {
             throw new NewsException(ErrorType.NEWS_NOT_FOUND);
         }
-        return toNewsVO(newsPO);
+        return toNewsVO(newsESPO);
+
+//        NewsPO newsPO = newsMapper.selectById(id);
+//        if (newsPO == null) {
+//            throw new NewsException(ErrorType.NEWS_NOT_FOUND);
+//        }
+//        return toNewsVO(newsPO);
     }
 
 
     @Override
     public void modifyNewsTitle(Long id, String title) throws NewsException {
-//        NewsESPO newsESPO = newsESDao.findByNewsId(id);;
-//        if (newsESPO == null) {
-//            throw new NewsException(ErrorType.NEWS_NOT_FOUND);
-//        }
-//        if (!newsESPO.getTitle().equals(title)) {
-//            newsESPO.setTitle(title);
-//            newsESDao.updateByNewsId(newsESPO.getNewsId());
-//        }
+        NewsESPO newsESPO = newsESDao.findByNewsId(id);;
+        if (newsESPO == null) {
+            throw new NewsException(ErrorType.NEWS_NOT_FOUND);
+        }
+        if (!newsESPO.getTitle().equals(title)) {
+            newsESPO.setTitle(title);
+            newsESDao.save(newsESPO);
+        }
 
 
 

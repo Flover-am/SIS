@@ -26,6 +26,7 @@ public class NewsESPO {
      * ES文档id,固定为String类型，不要自己修改
      */
     @Id
+    @Field(type = FieldType.Text)
     private String id;
 
     /**

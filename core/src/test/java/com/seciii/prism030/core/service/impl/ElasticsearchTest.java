@@ -44,5 +44,6 @@ public class ElasticsearchTest {
     @Test
     void addNewsTest() {
         newsService.addNews(fakeNewNews);
+//        newsService.modifyNewsTitle(1L,"test-title1");
     }
 }
