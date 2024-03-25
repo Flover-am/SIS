@@ -69,7 +69,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void login(String username, String password) {
+    public RoleType login(String username, String password) {
         UserPO user = userMapper.getUserByUsername(username);
         // 若用户不存在，抛出异常
         if (user == null) {
@@ -82,8 +82,8 @@ public class UserServiceImpl implements UserService {
             log.error("Password error.");
             throw new UserException(ErrorType.PASSWORD_ERROR, "密码错误");
         }
-
         StpUtil.login(user.getId());
+        return RoleType.getRoleType(userRoleMapper.getUserRoleByUserId(user.getId()).getRoleId());
     }
 
     @Override

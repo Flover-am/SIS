@@ -23,46 +23,13 @@ import java.util.List;
 public class SuperAdminServiceImpl implements SuperAdminService {
 
     private final UserMapper userMapper;
-    private final RoleMapper roleMapper;
     private final UserService userService;
 
     public SuperAdminServiceImpl(UserMapper userMapper, RoleMapper roleMapper, UserService userService) {
         this.userMapper = userMapper;
-        this.roleMapper = roleMapper;
         this.userService = userService;
     }
 
-    @Override
-    public void login(String username, String password) {
-        UserPO user = userMapper.getUserByUsername(username);
-        // 若用户不存在，抛出异常
-        if (user == null) {
-            log.error(String.format("User: %s not exist.", username));
-            throw new UserException(ErrorType.USER_NOT_EXISTS, "用户不存在");
-        }
-
-        // 若密码不匹配，抛出异常
-        if (!BCrypt.checkpw(password, user.getPassword())) {
-            log.error("Password error.");
-            throw new UserException(ErrorType.PASSWORD_ERROR, "用户名或密码错误");
-        }
-
-        // 若用户不存在角色，则抛出异常
-        List<RolePO> role = roleMapper.getUserRole(user.getId());
-        if (role.isEmpty()) {
-            log.error(String.format("User: %s role not exist.", username));
-            throw new UserException(ErrorType.USER_ROLE_NOT_EXISTS, "用户角色不存在");
-        }
-
-        // 若用户角色为普通用户，则抛出异常
-        if ("super-admin".equals(role.get(0).getRoleName())) {
-            log.error("Admin try to login through user system.");
-            throw new UserException(ErrorType.USERNAME_OR_PASSWORD_ERROR, "用户名或密码错误");
-        }
-
-        StpUtil.login(user.getId());
-        StpUtil.checkPermission("super-admin");
-    }
 
     @Override
     public void addUser(String username, String password, RoleType role) {

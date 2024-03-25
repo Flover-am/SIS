@@ -12,4 +12,8 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface UserRoleMapper extends BaseMapper<UserRolePO> {
+    /**
+     * 根据用户ID查询用户角色
+     */
+    UserRolePO getUserRoleByUserId(Long userId);
 }

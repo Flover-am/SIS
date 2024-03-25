@@ -14,9 +14,8 @@ import java.util.List;
 
 
 /**
- * @auth: lidongsheng
+ * @author : lidongsheng
  * @date 2024.03.25
- * @desc: 超级管理员控制器类
  */
 @RestController
 @RequestMapping("/v1")
@@ -28,11 +27,7 @@ public class SuperAdminController {
         this.superAdminService = superAdminService;
     }
 
-    @PostMapping("/superAdmin/login")
-    public Result<String> login(@Validated LoginVO loginVO) {
-        superAdminService.login(loginVO.getUsername(), loginVO.getPassword());
-        return Result.success(StpUtil.getTokenInfo().tokenValue);
-    }
+
 
     @PostMapping("/superAdmin/addUser")
     public Result<Void> addUser(@Validated NewUserVo newUserVo) {

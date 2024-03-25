@@ -8,7 +8,6 @@ import java.util.List;
 
 public interface SuperAdminService {
 
-    void login(String username, String password);
 
     void addUser(String username, String password, RoleType role);
 

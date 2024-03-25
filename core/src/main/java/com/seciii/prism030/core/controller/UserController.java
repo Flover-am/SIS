@@ -1,6 +1,7 @@
 package com.seciii.prism030.core.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
+import com.seciii.prism030.core.pojo.vo.user.LoginResVo;
 import com.seciii.prism030.core.pojo.vo.user.LoginVO;
 import com.seciii.prism030.core.pojo.vo.user.RegisterVO;
 import com.seciii.prism030.common.Result;
@@ -43,9 +44,9 @@ public class UserController {
      * @return 返回token
      */
     @PostMapping("/user/login")
-    public Result<String> login(@Validated LoginVO loginVO) {
-        userService.login(loginVO.getUsername(), loginVO.getPassword());
-        return Result.success(StpUtil.getTokenInfo().tokenValue);
+    public Result<LoginResVo> login(@Validated LoginVO loginVO) {
+        String roleName = userService.login(loginVO.getUsername(), loginVO.getPassword()).getRoleName();
+        return Result.success(new LoginResVo(StpUtil.getTokenValue(), roleName));
     }
 
     /**

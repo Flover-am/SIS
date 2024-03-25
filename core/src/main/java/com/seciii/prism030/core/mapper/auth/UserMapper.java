@@ -37,8 +37,6 @@ public interface UserMapper extends BaseMapper<UserPO> {
      *
      * @return 用户列表
      */
-    List<UserPO> getUsers(int pageSize, int pageOffset);
-
 
     List<UserRolePO> getUsers(
             @Param("pageSize") int pageSize,
