@@ -17,4 +17,6 @@ public interface SuperAdminService {
     List<UserVo> getUsers(RoleType roleType, int pageSize, int pageOffset);
 
     Long getUsersCount(RoleType roleType);
+
+    void modifyRole(String username, RoleType roleType);
 }

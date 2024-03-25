@@ -7,6 +7,7 @@ import com.seciii.prism030.common.exception.error.ErrorType;
 import com.seciii.prism030.core.enums.RoleType;
 import com.seciii.prism030.core.mapper.auth.RoleMapper;
 import com.seciii.prism030.core.mapper.auth.UserMapper;
+import com.seciii.prism030.core.mapper.auth.UserRoleMapper;
 import com.seciii.prism030.core.pojo.po.auth.RolePO;
 import com.seciii.prism030.core.pojo.po.auth.UserPO;
 import com.seciii.prism030.core.pojo.po.auth.UserRolePO;
@@ -23,10 +24,12 @@ import java.util.List;
 public class SuperAdminServiceImpl implements SuperAdminService {
 
     private final UserMapper userMapper;
+    private final UserRoleMapper userRoleMapper;
     private final UserService userService;
 
-    public SuperAdminServiceImpl(UserMapper userMapper, RoleMapper roleMapper, UserService userService) {
+    public SuperAdminServiceImpl(UserMapper userMapper, RoleMapper roleMapper, UserRoleMapper userRoleMapper, UserService userService) {
         this.userMapper = userMapper;
+        this.userRoleMapper = userRoleMapper;
         this.userService = userService;
     }
 
@@ -70,5 +73,19 @@ public class SuperAdminServiceImpl implements SuperAdminService {
                         .build()
         ).toList();
 
+    }
+
+    @Override
+    public void modifyRole(String username, RoleType roleType) {
+        UserPO user = userMapper.getUserByUsername(username);
+        if (user == null) {
+            log.error(String.format("User: %s not exist.", username));
+            throw new UserException(ErrorType.USER_NOT_EXISTS, "用户不存在");
+        }
+        if (roleType.equals(RoleType.SUPER_ADMIN)) {
+            log.error("Can not modify role to super admin.");
+            throw new UserException(ErrorType.UNAUTHORIZED, "无法修改为超级管理员");
+        }
+        userRoleMapper.updateRoleByUserId(user.getId(), roleType.getRoleId());
     }
 }

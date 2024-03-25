@@ -8,4 +8,9 @@
         WHERE user_id = #{userId}
     </select>
 
+    <select id="updateRoleByUserId" parameterType="Long" >
+        UPDATE prism030.t_auth_user_role
+        SET role_id = #{roleId}
+        WHERE user_id = #{userId}
+    </select>
 </mapper>

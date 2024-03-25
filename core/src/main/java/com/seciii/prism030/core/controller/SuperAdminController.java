@@ -53,5 +53,10 @@ public class SuperAdminController {
     public Result<Long> getUserCount(@RequestParam(required = false) String role) {
         return Result.success(superAdminService.getUsersCount(RoleType.getRoleType(role)));
     }
+    @PostMapping("/superAdmin/modifyRole")
+    public Result<Void> modifyRole(@RequestParam String username, @RequestParam String role) {
+        superAdminService.modifyRole(username, RoleType.getRoleType(role));
+        return Result.success();
+    }
 
 }

@@ -1,5 +1,7 @@
 package com.seciii.prism030.core.enums;
 
+import com.seciii.prism030.common.exception.UserException;
+import com.seciii.prism030.common.exception.error.ErrorType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -36,7 +38,7 @@ public enum RoleType {
                 return roleType;
             }
         }
-        return null;
+        throw new UserException(ErrorType.UNKNOWN_ERROR, "未知角色");
     }
 
     public static RoleType getRoleType(Long roleId) {
@@ -45,7 +47,7 @@ public enum RoleType {
                 return roleType;
             }
         }
-        return null;
+        throw new UserException(ErrorType.UNKNOWN_ERROR, "未知角色");
     }
 
     @Override
