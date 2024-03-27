@@ -3,6 +3,7 @@ package com.seciii.prism030.core.service.impl;
 import com.seciii.prism030.common.exception.NewsException;
 import com.seciii.prism030.common.exception.error.ErrorType;
 import com.seciii.prism030.core.enums.CategoryType;
+import com.seciii.prism030.core.pojo.po.es.ESNewsPO;
 import com.seciii.prism030.core.pojo.vo.news.NewNews;
 import com.seciii.prism030.core.pojo.vo.news.NewsVO;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,6 +12,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -28,7 +31,7 @@ public class ESNewsServiceTest {
     @BeforeEach
     void initTestObjects() {
         fakeNewNews = new NewNews(
-                "singularTest",
+                "singular test",
                 "singularTestContent",
                 "singularTestSource",
                 "2024-01-01 12:34:56",
@@ -98,6 +101,18 @@ public class ESNewsServiceTest {
         esNewsService.modifyESNewsSource(newsId,source);
         NewsVO newsVO = esNewsService.getESNewsDetailByNewsId(newsId);
         assertEquals(newsVO.getOriginSource(),source);
+    }
+
+    @Test
+    void fuzzySearchByTitleTest() {
+        long newsId = newsService.addNews(fakeNewNews);
+        esNewsService.addESNews(fakeNewNews,newsId);
+        NewsVO newsVO = esNewsService.getESNewsDetailByNewsId(newsId);
+        List<ESNewsPO> esNewsPOS = esNewsService.fuzzySearchByTitle("tesx");
+        for(ESNewsPO esNewsPO : esNewsPOS){
+            assertEquals(newsVO.getTitle(),esNewsPO.getTitle());
+            System.out.println(esNewsPO.getTitle());
+        }
     }
 
 }

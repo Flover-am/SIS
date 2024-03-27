@@ -34,7 +34,7 @@ public class ESNewsPO {
     /**
      * 新闻标题
      */
-    @Field(type = FieldType.Text)
+    @Field(type = FieldType.Text,analyzer = "standard")
     private String title;
     /**
      * 新闻内容

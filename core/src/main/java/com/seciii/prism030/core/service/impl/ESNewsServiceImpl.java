@@ -12,6 +12,8 @@ import com.seciii.prism030.core.utils.DateTimeUtil;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
+
 @Service
 public class ESNewsServiceImpl implements ESNewsService {
 
@@ -78,6 +80,11 @@ public class ESNewsServiceImpl implements ESNewsService {
             throw new NewsException(ErrorType.NEWS_NOT_FOUND);
         }
         return toNewsVO(esNewsPO);
+    }
+
+    @Override
+    public List<ESNewsPO> fuzzySearchByTitle(String title) {
+        return esNewsDao.findByTitleFuzzy(title);
     }
 
 
