@@ -64,8 +64,9 @@ public interface NewsService {
      * 新增新闻
      *
      * @param newNews 新增的新闻对象
+     * @return 数据库中新闻插入编号
      */
-    void addNews(NewNews newNews);
+    long addNews(NewNews newNews);
 
     /**
      * 分页获取过滤后的新闻列表

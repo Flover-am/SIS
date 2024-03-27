@@ -1,12 +1,12 @@
 package com.seciii.prism030.core.service.impl;
 
 import com.seciii.prism030.common.exception.error.ErrorType;
-import com.seciii.prism030.core.dao.es.NewsESDao;
+import com.seciii.prism030.core.dao.es.ESNewsDao;
 import com.seciii.prism030.core.enums.CategoryType;
 import com.seciii.prism030.common.exception.NewsException;
 import com.seciii.prism030.core.mapper.news.NewsMapper;
 import com.seciii.prism030.core.pojo.dto.PagedNews;
-import com.seciii.prism030.core.pojo.po.es.NewsESPO;
+import com.seciii.prism030.core.pojo.po.es.ESNewsPO;
 import com.seciii.prism030.core.pojo.po.news.NewsPO;
 import com.seciii.prism030.core.pojo.vo.news.NewNews;
 import com.seciii.prism030.core.pojo.vo.news.NewsItemVO;
@@ -18,8 +18,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-import java.time.format.DateTimeFormatter;
-import java.util.Optional;
 
 
 /**
@@ -32,51 +30,33 @@ import java.util.Optional;
 public class NewsServiceImpl implements NewsService {
 
     private final NewsMapper newsMapper;
-    private final NewsESDao newsESDao;
+    private final ESNewsDao esNewsDao;
 
-    public NewsServiceImpl(NewsMapper newsMapper, NewsESDao newsESDao) {
+    public NewsServiceImpl(NewsMapper newsMapper, ESNewsDao newsESDao) {
         this.newsMapper = newsMapper;
-        this.newsESDao = newsESDao;
+        this.esNewsDao = newsESDao;
     }
 
     @Override
-    public void addNews(NewNews newNews) {
+    public long addNews(NewNews newNews) {
         NewsPO newsPO = toNewsPO(newNews);
         newsMapper.insert(newsPO);
-//        long newsID = newsMapper.selectByTitle(newsPO.getTitle()).getId();
         long newsID = newsPO.getId();
-        newsESDao.save(toNewsESPO(newNews,newsID));
+        return newsID;
     }
 
     @Override
     public NewsVO getNewsDetail(Long id) throws NewsException {
-        NewsESPO newsESPO = newsESDao.findByNewsId(id);;
-        if (newsESPO == null) {
+        NewsPO newsPO = newsMapper.selectById(id);
+        if (newsPO == null) {
             throw new NewsException(ErrorType.NEWS_NOT_FOUND);
         }
-        return toNewsVO(newsESPO);
-
-//        NewsPO newsPO = newsMapper.selectById(id);
-//        if (newsPO == null) {
-//            throw new NewsException(ErrorType.NEWS_NOT_FOUND);
-//        }
-//        return toNewsVO(newsPO);
+        return toNewsVO(newsPO);
     }
 
 
     @Override
     public void modifyNewsTitle(Long id, String title) throws NewsException {
-        NewsESPO newsESPO = newsESDao.findByNewsId(id);;
-        if (newsESPO == null) {
-            throw new NewsException(ErrorType.NEWS_NOT_FOUND);
-        }
-        if (!newsESPO.getTitle().equals(title)) {
-            newsESPO.setTitle(title);
-            newsESDao.save(newsESPO);
-        }
-
-
-
         NewsPO newsPO = newsMapper.selectById(id);
         if (newsPO == null) {
             throw new NewsException(ErrorType.NEWS_NOT_FOUND);
@@ -258,48 +238,6 @@ public class NewsServiceImpl implements NewsService {
                 .link(newNews.getLink())
                 .sourceLink(newNews.getSourceLink())
                 .category(CategoryType.getCategoryType(newNews.getCategory()).toInt())
-                .build();
-    }
-
-    /**
-     * 将新闻ESPO转换为新闻VO
-     *
-     * @param newsESPO 新闻ESPO
-     * @return 新闻VO
-     */
-    private NewsVO toNewsVO(NewsESPO newsESPO) {
-        return NewsVO.builder()
-                .id(newsESPO.getNewsId())
-                .title(newsESPO.getTitle())
-                .content(newsESPO.getContent())
-                .originSource(newsESPO.getOriginSource())
-                .sourceTime(DateTimeUtil.defaultFormat(newsESPO.getSourceTime()))
-                .link(newsESPO.getLink())
-                .sourceLink(newsESPO.getSourceLink())
-                .category(CategoryType.getCategoryType(newsESPO.getCategory()).getCategoryEN())
-                .createTime(newsESPO.getCreateTime())
-                .updateTime(newsESPO.getUpdateTime())
-                .build();
-    }
-
-    /**
-     * 将新闻NewNews对象转换为新闻ESPO
-     *
-     * @param newNews 新闻NewNews对象
-     * @return 新闻ESPO
-     */
-    private NewsESPO toNewsESPO(NewNews newNews,Long newsId) {
-        return NewsESPO.builder()
-                .newsId(newsId)
-                .title(newNews.getTitle())
-                .content(newNews.getContent())
-                .originSource(newNews.getOriginSource())
-                .sourceTime(DateTimeUtil.defaultParse(newNews.getSourceTime()))
-                .link(newNews.getLink())
-                .sourceLink(newNews.getSourceLink())
-                .category(CategoryType.getCategoryType(newNews.getCategory()).toInt())
-                .createTime(LocalDateTime.now())
-                .updateTime(LocalDateTime.now())
                 .build();
     }
 }

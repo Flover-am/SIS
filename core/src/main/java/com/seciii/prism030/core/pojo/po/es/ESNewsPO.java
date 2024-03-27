@@ -1,9 +1,5 @@
 package com.seciii.prism030.core.pojo.po.es;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,7 +17,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Document(indexName = "news-index")
-public class NewsESPO {
+public class ESNewsPO {
     /**
      * ES文档id,固定为String类型，不要自己修改
      */
