@@ -1,4 +1,4 @@
-package com.secii.prism030.core.mapper;
+package com.seciii.prism030.core.mapper;
 
 import com.seciii.prism030.core.dao.news.NewsDAOMongo;
 
