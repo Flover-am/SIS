@@ -1,10 +1,14 @@
 package com.seciii.prism030.core.pojo.po.news;
 
 
-import com.baomidou.mybatisplus.annotation.*;
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
@@ -15,57 +19,73 @@ import java.time.LocalDateTime;
  */
 @Data
 @Builder
-@TableName(schema="prism030", value="t_news")
-public class NewsPO {
+@Document("news")
+public class NewsPO implements Serializable {
     /**
      * 新闻id
      */
-    @TableId(value="id",type=IdType.AUTO)
+    @Id
     private Long id;
     /**
      * 新闻标题
      */
-    @TableField("title")
+    @Field("title")
     private String title;
     /**
      * 新闻内容
      */
-    @TableField("content")
+    @Field("content")
     private String content;
     /**
      * 新闻来源
      */
-    @TableField("origin_source")
+    @Field("origin_source")
     private String originSource;
     /**
      * 新闻时间
      */
-    @TableField("source_time")
+    @Indexed
+    @Field("source_time")
     private LocalDateTime sourceTime;
     /**
      * 新闻链接
      */
-    @TableField("link")
+    @Field("link")
     private String link;
     /**
      * 新闻源链接
      */
-    @TableField("source_link")
+    @Field("source_link")
     private String sourceLink;
     /**
      * 新闻分类(暂未使用)
      */
-    @TableField("category")
+    @Field("category")
     private Integer category;
     /**
      * 新闻创建时间戳
      */
-    @TableField(value = "create_time", fill = FieldFill.INSERT)
+    @Field(value = "create_time")
     private LocalDateTime createTime;
     /**
      * 新闻更新时间戳
      */
-    @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE, update = "now()")
+    @Field(value = "update_time")
     private LocalDateTime updateTime;
 
+    @Override
+    public String toString() {
+        return "{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", content='" + content + '\'' +
+                ", originSource='" + originSource + '\'' +
+                ", sourceTime=" + sourceTime +
+                ", link='" + link + '\'' +
+                ", sourceLink='" + sourceLink + '\'' +
+                ", category=" + category +
+                ", createTime=" + createTime +
+                ", updateTime=" + updateTime +
+                '}';
+    }
 }
