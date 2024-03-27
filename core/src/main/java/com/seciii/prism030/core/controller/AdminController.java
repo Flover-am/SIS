@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping("/v1")
+@Deprecated
 public class AdminController {
     private final AdminService adminService;
     private final UserService userService;
@@ -26,17 +27,17 @@ public class AdminController {
         this.userService = userService;
     }
 
-//    /**
-//     * 管理员登陆
-//     *
-//     * @param loginVO 用户登陆VO
-//     * @return 用户token
-//     */
-//    @PostMapping("/admin/login")
-//    public Result<String> login(@Validated LoginVO loginVO) {
-//        adminService.login(loginVO.getUsername(), loginVO.getPassword());
-//        return Result.success(StpUtil.getTokenInfo().tokenValue);
-//    }
+    /**
+     * 管理员登陆
+     *
+     * @param loginVO 用户登陆VO
+     * @return 用户token
+     */
+    @PostMapping("/admin/login")
+    public Result<String> login(@Validated LoginVO loginVO) {
+        adminService.login(loginVO.getUsername(), loginVO.getPassword());
+        return Result.success(StpUtil.getTokenInfo().tokenValue);
+    }
 
     /**
      * 管理员修改密码

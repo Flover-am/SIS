@@ -6,6 +6,7 @@ package com.seciii.prism030.core.service;
  * @author xueruichen
  * @date 2024.03.09
  */
+@Deprecated
 public interface AdminService {
     /**
      * 管理员登陆

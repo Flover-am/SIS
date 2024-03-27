@@ -7,7 +7,11 @@ import lombok.Data;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-
+/**
+ * 新建用户VO类
+ * @date 2024.03.25
+ * @author lidongsheng
+ */
 @Data
 @Builder
 public class NewUserVo {

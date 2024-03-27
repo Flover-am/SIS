@@ -22,6 +22,7 @@ import java.util.List;
  */
 @Slf4j
 @Service
+@Deprecated
 public class AdminServiceImpl implements AdminService {
     private final UserMapper userMapper;
     private final RoleMapper roleMapper;

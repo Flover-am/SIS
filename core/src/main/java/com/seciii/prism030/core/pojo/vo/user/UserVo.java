@@ -4,7 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
+/**
+ * VO for user
+ * @date 2024.03.25
+ * @author lidongsheng
+ */
 @Data
 @Builder
 @NoArgsConstructor
