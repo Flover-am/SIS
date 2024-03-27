@@ -1,18 +1,17 @@
 package com.seciii.prism030.core.service.impl;
 
+import com.seciii.prism030.core.dao.news.impl.NewsDAOMongoImpl;
 import com.seciii.prism030.core.enums.CategoryType;
-import com.seciii.prism030.core.mapper.news.NewsMapperMP;
 import com.seciii.prism030.core.pojo.po.news.NewsPO;
-import com.seciii.prism030.core.pojo.vo.news.NewNews;
 import com.seciii.prism030.core.pojo.vo.news.NewsItemVO;
 import com.seciii.prism030.core.pojo.vo.news.NewsVO;
+import com.seciii.prism030.core.pojo.vo.news.NewNews;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
@@ -21,20 +20,17 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@ExtendWith(MockitoExtension.class)
 @SpringBootTest
-@Deprecated
-class NewsServiceImplTest {
+@ExtendWith(MockitoExtension.class)
+public class NewsServiceMongoImplTest {
     @MockBean
-    private NewsMapperMP newsMapperMPMock;
+    private NewsDAOMongoImpl newsDAOMongoMock;
 
     @InjectMocks
-    private NewsServiceImpl newsService=new NewsServiceImpl(newsMapperMPMock);
+    private NewsServiceMongoImpl newsServiceMongoImpl = new NewsServiceMongoImpl();
 
-    //初始化测试类
     private List<NewsItemVO> fakeNewsItemList;
     private List<NewsPO> fakeNewsPOList;
     private NewsPO fakeNewsPO;
@@ -43,7 +39,7 @@ class NewsServiceImplTest {
 
     @BeforeEach
     void initTestObjects() {
-        Mockito.reset(newsMapperMPMock);
+        Mockito.reset(newsDAOMongoMock);
         fakeNewsItemList = new ArrayList<>();
         fakeNewsPOList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
@@ -107,7 +103,6 @@ class NewsServiceImplTest {
                 "www.singulartestsource.com",
                 CategoryType.getCategoryType(1).toString()
         );
-
     }
 
     private boolean newsItemVOsEqual(NewsItemVO a, NewsItemVO b) {
@@ -133,55 +128,47 @@ class NewsServiceImplTest {
 
     @Test
     void addNewsTest() {
-        Mockito.when(newsMapperMPMock.insert(Mockito.any(NewsPO.class))).thenReturn(0);
-        newsService.addNews(fakeNewNews);
+        Mockito.when(newsDAOMongoMock.insert(Mockito.any())).thenReturn(fakeNewsPO);
+        newsServiceMongoImpl.addNews(fakeNewNews);
     }
 
     @Test
     void getNewsDetailTest() {
-        Mockito.when(newsMapperMPMock.selectById(512L)).thenReturn(fakeNewsPO);
-        NewsVO result = newsService.getNewsDetail(512L);
-        assertTrue(newsVOsEqual(result, fakeNewsVO));
+        Mockito.when(newsDAOMongoMock.getNewsById(Mockito.anyLong())).thenReturn(fakeNewsPO);
+        NewsVO result = newsServiceMongoImpl.getNewsDetail(512L);
+        assert newsVOsEqual(result, fakeNewsVO);
     }
 
     @Test
-    void modifyNewsTitleTest() {
-        Mockito.when(newsMapperMPMock.selectById(512L)).thenReturn(fakeNewsPO);
-        Mockito.when(newsMapperMPMock.updateById(Mockito.any(NewsPO.class))).thenReturn(0);
-        newsService.modifyNewsTitle(512L, "newTitle");
-    }
-
-    @Test
-    void modifyNewsContentTest() {
-        Mockito.when(newsMapperMPMock.selectById(512L)).thenReturn(fakeNewsPO);
-        Mockito.when(newsMapperMPMock.updateById(Mockito.any(NewsPO.class))).thenReturn(0);
-        newsService.modifyNewsContent(512L, "newContent");
-    }
-
-    @Test
-    void modifyNewsSourceTest() {
-        Mockito.when(newsMapperMPMock.selectById(512L)).thenReturn(fakeNewsPO);
-        Mockito.when(newsMapperMPMock.updateById(Mockito.any(NewsPO.class))).thenReturn(0);
-        newsService.modifyNewsSource(512L, "newSource");
+    void modifyNewsTest() {
+        Mockito.when(newsDAOMongoMock.updateNewsContent(Mockito.anyLong(), Mockito.anyString())).thenReturn(0);
+        Mockito.when(newsDAOMongoMock.updateNewsTitle(Mockito.anyLong(), Mockito.anyString())).thenReturn(0);
+        Mockito.when(newsDAOMongoMock.updateNewsSource(Mockito.anyLong(), Mockito.anyString())).thenReturn(0);
+        newsServiceMongoImpl.modifyNewsContent(512L, "newContent");
+        newsServiceMongoImpl.modifyNewsTitle(512L, "newTitle");
+        newsServiceMongoImpl.modifyNewsSource(512L, "newSource");
     }
 
     @Test
     void deleteNewsTest() {
-        Mockito.when(newsMapperMPMock.deleteById(512L)).thenReturn(1);
-        newsService.deleteNews(512L);
+        Mockito.when(newsDAOMongoMock.deleteById(Mockito.any())).thenReturn(0);
+        newsServiceMongoImpl.deleteNews(512L);
     }
 
     @Test
     void deleteMultipleNewsTest() {
-        Mockito.when(newsMapperMPMock.deleteBatchIds(Mockito.anyList())).thenReturn(0);
-        newsService.deleteMultipleNews(List.of(1L, 2L, 3L));
-
+        List<Long> idList = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            idList.add((long) i);
+        }
+        Mockito.when(newsDAOMongoMock.batchDeleteNews(Mockito.any())).thenReturn((long) idList.size());
+        newsServiceMongoImpl.deleteMultipleNews(idList);
     }
 
     @Test
     void filterNewsPagedTest() {
-        Mockito.when(newsMapperMPMock.getFilteredNewsCount(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).thenReturn((long) fakeNewsPOList.size());
-        Mockito.when(newsMapperMPMock.getFilteredNewsByPage(Mockito.anyInt(), Mockito.anyInt(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(fakeNewsPOList.stream().map(
+        Mockito.when(newsDAOMongoMock.getFilteredNewsCount(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).thenReturn((long) fakeNewsPOList.size());
+        Mockito.when(newsDAOMongoMock.getFilteredNewsByPage(Mockito.anyInt(), Mockito.anyInt(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(fakeNewsPOList.stream().map(
                 x -> {
                     if (x.getTitle().contains("test")) {
                         return x;
@@ -189,7 +176,7 @@ class NewsServiceImplTest {
                     return null;
                 }
         ).toList());
-        List<NewsItemVO> result = newsService.filterNewsPaged(1, 5, null, null, null, null).getNewsList();
+        List<NewsItemVO> result = newsServiceMongoImpl.filterNewsPaged(1, 5, null, null, null, null).getNewsList();
         for (int i = 0; i < result.size(); i++) {
             assertTrue(newsItemVOsEqual(result.get(i), fakeNewsItemList.get(i)));
         }
@@ -197,7 +184,7 @@ class NewsServiceImplTest {
 
     @Test
     void searchNewsByTitleFilteredTest() {
-        Mockito.when(newsMapperMPMock.searchFilteredNewsByPage(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
+        Mockito.when(newsDAOMongoMock.searchFilteredNewsByPage(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
                 .thenReturn(fakeNewsPOList.stream().map(
                         x -> {
                             if (x.getTitle().contains("test")) {
@@ -206,8 +193,8 @@ class NewsServiceImplTest {
                             return null;
                         }
                 ).toList());
-        Mockito.when(newsMapperMPMock.getSearchedFilteredNewsCount(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).thenReturn((long) fakeNewsPOList.size());
-        List<NewsItemVO> result = newsService.searchNewsByTitleFiltered(1, 5, "test", null, null, null, null).getNewsList();
+        Mockito.when(newsDAOMongoMock.getSearchedFilteredNewsCount(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).thenReturn((long) fakeNewsPOList.size());
+        List<NewsItemVO> result = newsServiceMongoImpl.searchNewsByTitleFiltered(1, 5, "test", null, null, null, null).getNewsList();
         for (int i = 0; i < result.size(); i++) {
             assertTrue(newsItemVOsEqual(result.get(i), fakeNewsItemList.get(i)));
         }
