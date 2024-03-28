@@ -57,19 +57,21 @@ public enum CategoryType {
 
     /**
      * 从下标获取新闻类型
+     *
      * @param category 类型下标
      * @return 新闻类型
      */
-    public static CategoryType of(int category){
+    public static CategoryType of(int category) {
         return CategoryType.getCategoryType(category);
     }
 
     /**
      * 从字符串获取新闻类型
+     *
      * @param category 类型字符串
      * @return 新闻类型
      */
-    public static CategoryType of(String category){
+    public static CategoryType of(String category) {
         return CategoryType.getCategoryType(category);
     }
 
@@ -85,7 +87,7 @@ public enum CategoryType {
                 return categoryType;
             }
         }
-        return CategoryType.OTHER;
+        return null;
     }
 
     /**
@@ -100,6 +102,6 @@ public enum CategoryType {
                 return categoryType;
             }
         }
-        return CategoryType.OTHER;
+        return null;
     }
 }
