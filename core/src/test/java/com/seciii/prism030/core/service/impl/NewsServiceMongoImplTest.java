@@ -42,7 +42,7 @@ public class NewsServiceMongoImplTest {
     private NewsPO fakeNewsPO;
     private NewsVO fakeNewsVO;
     private NewNews fakeNewNews;
-    private List<Pair<CategoryType,Double>> fakeClassifyResult;
+    private List<Pair<CategoryType, Double>> fakeClassifyResult;
 
     @BeforeEach
     void initTestObjects() {
@@ -111,7 +111,7 @@ public class NewsServiceMongoImplTest {
                 CategoryType.getCategoryType(1).toString()
         );
         fakeClassifyResult = new ArrayList<>();
-        for(int i = 0; i < 5; i++) {
+        for (int i = 0; i < 5; i++) {
             fakeClassifyResult.add(Pair.of(CategoryType.getCategoryType(i), 0.1 * i));
         }
     }
@@ -210,13 +210,14 @@ public class NewsServiceMongoImplTest {
             assertTrue(newsItemVOsEqual(result.get(i), fakeNewsItemList.get(i)));
         }
     }
+
     @Test
     void topNClassifyTest() {
         Mockito.when(classifier.topNClassify(Mockito.anyString(), Mockito.anyInt())).thenReturn(fakeClassifyResult);
-        List<ClassifyResultVO>result=newsServiceMongoImpl.topNClassify("test", 5);
-        for(int i=0;i<5;i++){
+        List<ClassifyResultVO> result = newsServiceMongoImpl.topNClassify("test", 5);
+        for (int i = 0; i < 5; i++) {
             assertTrue(CategoryType.of(i).equals(result.get(i).getCategory()));
-            assertEquals(0.1*i,result.get(i).getProbability());
+            assertEquals(0.1 * i, result.get(i).getProbability());
         }
     }
 }

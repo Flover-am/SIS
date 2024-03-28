@@ -221,8 +221,8 @@ public class NewsServiceMongoImpl implements NewsService {
     @Override
     public List<ClassifyResultVO> topNClassify(String text, int topN) {
         return classifier.topNClassify(text, topN).stream().map(
-                pair ->{
-                    return new ClassifyResultVO(pair.getFirst().toString(),pair.getSecond());
+                pair -> {
+                    return new ClassifyResultVO(pair.getFirst().toString(), pair.getSecond());
                 }
         ).toList();
     }
