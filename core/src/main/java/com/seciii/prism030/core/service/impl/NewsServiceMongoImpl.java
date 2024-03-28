@@ -2,9 +2,11 @@ package com.seciii.prism030.core.service.impl;
 
 import com.seciii.prism030.common.exception.NewsException;
 import com.seciii.prism030.common.exception.error.ErrorType;
+import com.seciii.prism030.core.classifier.Classifier;
 import com.seciii.prism030.core.dao.news.NewsDAOMongo;
 import com.seciii.prism030.core.pojo.dto.PagedNews;
 import com.seciii.prism030.core.pojo.po.news.NewsPO;
+import com.seciii.prism030.core.pojo.vo.news.ClassifyResultVO;
 import com.seciii.prism030.core.pojo.vo.news.NewNews;
 import com.seciii.prism030.core.pojo.vo.news.NewsVO;
 import com.seciii.prism030.core.service.NewsService;
@@ -26,10 +28,16 @@ import java.util.List;
 @Service
 public class NewsServiceMongoImpl implements NewsService {
     private NewsDAOMongo newsDAOMongo;
+    private Classifier classifier;
 
     @Autowired
     public void setNewsDAOMongo(NewsDAOMongo newsDAOMongo) {
         this.newsDAOMongo = newsDAOMongo;
+    }
+
+    @Autowired
+    public void setClassifier(Classifier classifier) {
+        this.classifier = classifier;
     }
 
 
@@ -202,4 +210,21 @@ public class NewsServiceMongoImpl implements NewsService {
         );
         return new PagedNews(total, NewsUtil.toNewsVO(newsPOList));
     }
+
+    /**
+     * 获取新闻前N可能的分类结果
+     *
+     * @param text 新闻标题字符串
+     * @param topN topN个数
+     * @return topN分类结果
+     */
+    @Override
+    public List<ClassifyResultVO> topNClassify(String text, int topN) {
+        return classifier.topNClassify(text, topN).stream().map(
+                pair ->{
+                    return new ClassifyResultVO(pair.getFirst().toString(),pair.getSecond());
+                }
+        ).toList();
+    }
+
 }

@@ -1,5 +1,6 @@
 package com.seciii.prism030.core.controller;
 
+import com.seciii.prism030.core.pojo.vo.news.ClassifyResultVO;
 import com.seciii.prism030.core.pojo.vo.news.NewsVO;
 import com.seciii.prism030.common.Result;
 import com.seciii.prism030.core.pojo.dto.PagedNews;
@@ -7,6 +8,7 @@ import com.seciii.prism030.core.pojo.vo.news.Filter;
 import com.seciii.prism030.core.pojo.vo.news.NewNews;
 import com.seciii.prism030.core.service.NewsService;
 import com.seciii.prism030.core.utils.DateTimeUtil;
+import org.springframework.data.util.Pair;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -178,5 +180,11 @@ public class NewsController {
     public Result<Void> deleteMultiple(@RequestBody List<Long> idList) {
         newsService.deleteMultipleNews(idList);
         return Result.success();
+    }
+
+    @GetMapping("/news/top-n-classify")
+    public Result<List<ClassifyResultVO>> getTopNClassify(@RequestParam String text, @RequestParam int topN){
+        List<ClassifyResultVO> result = newsService.topNClassify(text,topN);
+        return Result.success(result);
     }
 }

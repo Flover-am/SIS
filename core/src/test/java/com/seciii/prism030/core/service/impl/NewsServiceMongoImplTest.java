@@ -1,8 +1,10 @@
 package com.seciii.prism030.core.service.impl;
 
+import com.seciii.prism030.core.classifier.Classifier;
 import com.seciii.prism030.core.dao.news.impl.NewsDAOMongoImpl;
 import com.seciii.prism030.core.enums.CategoryType;
 import com.seciii.prism030.core.pojo.po.news.NewsPO;
+import com.seciii.prism030.core.pojo.vo.news.ClassifyResultVO;
 import com.seciii.prism030.core.pojo.vo.news.NewsItemVO;
 import com.seciii.prism030.core.pojo.vo.news.NewsVO;
 import com.seciii.prism030.core.pojo.vo.news.NewNews;
@@ -14,12 +16,14 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.util.Pair;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
@@ -27,6 +31,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class NewsServiceMongoImplTest {
     @MockBean
     private NewsDAOMongoImpl newsDAOMongoMock;
+    @MockBean
+    private Classifier classifier;
 
     @InjectMocks
     private NewsServiceMongoImpl newsServiceMongoImpl = new NewsServiceMongoImpl();
@@ -36,6 +42,7 @@ public class NewsServiceMongoImplTest {
     private NewsPO fakeNewsPO;
     private NewsVO fakeNewsVO;
     private NewNews fakeNewNews;
+    private List<Pair<CategoryType,Double>> fakeClassifyResult;
 
     @BeforeEach
     void initTestObjects() {
@@ -103,6 +110,10 @@ public class NewsServiceMongoImplTest {
                 "www.singulartestsource.com",
                 CategoryType.getCategoryType(1).toString()
         );
+        fakeClassifyResult = new ArrayList<>();
+        for(int i = 0; i < 5; i++) {
+            fakeClassifyResult.add(Pair.of(CategoryType.getCategoryType(i), 0.1 * i));
+        }
     }
 
     private boolean newsItemVOsEqual(NewsItemVO a, NewsItemVO b) {
@@ -199,5 +210,13 @@ public class NewsServiceMongoImplTest {
             assertTrue(newsItemVOsEqual(result.get(i), fakeNewsItemList.get(i)));
         }
     }
-
+    @Test
+    void topNClassifyTest() {
+        Mockito.when(classifier.topNClassify(Mockito.anyString(), Mockito.anyInt())).thenReturn(fakeClassifyResult);
+        List<ClassifyResultVO>result=newsServiceMongoImpl.topNClassify("test", 5);
+        for(int i=0;i<5;i++){
+            assertTrue(CategoryType.of(i).equals(result.get(i).getCategory()));
+            assertEquals(0.1*i,result.get(i).getProbability());
+        }
+    }
 }
