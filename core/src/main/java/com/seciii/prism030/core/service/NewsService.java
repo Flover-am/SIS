@@ -14,6 +14,13 @@ import java.util.List;
  * @date 2024.02.29
  */
 public interface NewsService {
+
+    Integer countDateNews();
+
+    Integer countCategoryNews(int category);
+
+    Integer countWeekNews();
+
     /**
      * 获取新闻详情
      *

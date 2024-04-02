@@ -27,6 +27,33 @@ public class NewsController {
         this.newsService = newsService;
     }
 
+
+    /**
+     * 获取今日新闻数量
+     * @return 今日新闻数量
+     */
+    @GetMapping("/news/countDay")
+    public Result<Integer> countDateNews() {
+        return Result.success(newsService.countDateNews());
+    }
+
+    /**
+     * 获取今日新闻分类数量
+     */
+    @GetMapping("/news/countCategory")
+    public Result<Integer> countCategoryNews(@RequestParam int category) {
+        return Result.success(newsService.countCategoryNews(category));
+    }
+
+    /**
+     * 获取一周内新闻数量
+     */
+    @GetMapping("/news/countWeek")
+    public Result<Integer> countWeekNews() {
+        return Result.success(newsService.countWeekNews());
+    }
+
+
     /**
      * 新增新闻
      */

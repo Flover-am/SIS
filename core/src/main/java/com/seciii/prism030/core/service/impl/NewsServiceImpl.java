@@ -24,7 +24,7 @@ import java.util.List;
  */
 //@Service
 @Deprecated
-public class NewsServiceImpl implements NewsService {
+public abstract class NewsServiceImpl implements NewsService {
 
     private final NewsMapperMP newsMapperMP;
 

@@ -27,11 +27,45 @@ import java.util.List;
 public class NewsServiceMongoImpl implements NewsService {
     private NewsDAOMongo newsDAOMongo;
 
+    private RedisService redisService;
+
+    @Autowired
+    public void setRedisService(RedisService redisService) {
+        this.redisService = redisService;
+    }
+
     @Autowired
     public void setNewsDAOMongo(NewsDAOMongo newsDAOMongo) {
         this.newsDAOMongo = newsDAOMongo;
     }
 
+
+    /**
+     *
+     * 今日新闻数量
+     * @return 新闻数量
+     */
+
+    @Override
+    public Integer countDateNews() {
+        return redisService.countDateNews();
+    }
+
+    /**
+     * 今日新闻分类数量
+     *
+     * @param category 新闻分类
+     * @return 新闻数量
+     */
+    @Override
+    public Integer countCategoryNews(int category) {
+        return redisService.countCategoryNews(category);
+    }
+
+    @Override
+    public Integer countWeekNews() {
+        return redisService.countWeekNews();
+    }
 
     /**
      * 获取新闻详情
@@ -106,6 +140,7 @@ public class NewsServiceMongoImpl implements NewsService {
             log.error(String.format("News with id %d not found", id));
             throw new NewsException(ErrorType.NEWS_NOT_FOUND);
         }
+        redisService.deleteNews(newsDAOMongo.getNewsById(id).getCategory());
     }
 
     /**
@@ -116,6 +151,9 @@ public class NewsServiceMongoImpl implements NewsService {
     @Override
     public void deleteMultipleNews(List<Long> idList) {
         newsDAOMongo.batchDeleteNews(idList);
+        for (Long id : idList) {
+            redisService.deleteNews(newsDAOMongo.getNewsById(id).getCategory());
+        }
     }
 
     /**
@@ -125,8 +163,10 @@ public class NewsServiceMongoImpl implements NewsService {
      */
     @Override
     public void addNews(NewNews newNews) {
-        newsDAOMongo.insert(NewsUtil.toNewsPO(newNews));
+        NewsPO newsPO = newsDAOMongo.insert(NewsUtil.toNewsPO(newNews));
+        redisService.addNews(newsPO.getCategory());
     }
+
 
     /**
      * 分页获取过滤后的新闻列表

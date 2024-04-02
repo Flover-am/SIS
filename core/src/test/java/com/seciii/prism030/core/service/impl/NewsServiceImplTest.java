@@ -7,6 +7,7 @@ import com.seciii.prism030.core.pojo.vo.news.NewNews;
 import com.seciii.prism030.core.pojo.vo.news.NewsItemVO;
 import com.seciii.prism030.core.pojo.vo.news.NewsVO;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -26,13 +27,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest
+@Disabled
 @Deprecated
 class NewsServiceImplTest {
     @MockBean
     private NewsMapperMP newsMapperMPMock;
 
     @InjectMocks
-    private NewsServiceImpl newsService=new NewsServiceImpl(newsMapperMPMock);
+    private NewsServiceImpl newsService; /*new NewsServiceImpl(newsMapperMPMock)*/
+    ;
 
     //初始化测试类
     private List<NewsItemVO> fakeNewsItemList;

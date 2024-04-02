@@ -20,13 +20,16 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
 public class NewsServiceMongoImplTest {
     @MockBean
     private NewsDAOMongoImpl newsDAOMongoMock;
+
+    @MockBean
+    private RedisService redisService;
 
     @InjectMocks
     private NewsServiceMongoImpl newsServiceMongoImpl = new NewsServiceMongoImpl();
@@ -103,7 +106,32 @@ public class NewsServiceMongoImplTest {
                 "www.singulartestsource.com",
                 CategoryType.getCategoryType(1).toString()
         );
+
+        /*--------- mockRedis ------------*/
+//        Mockito.when(redisService.countCategoryNews(Mockito.anyInt())).thenReturn(10);
+//        Mockito.when(redisService.countWeekNews()).thenReturn(10);
+//        Mockito.when(redisService.countDateNews()).thenReturn(10);
+        Mockito.doNothing().when(redisService).deleteNews(Mockito.anyInt());
+        Mockito.doNothing().when(redisService).addNews(Mockito.anyInt());
+
+        Mockito.when(newsDAOMongoMock.getNewsById(Mockito.anyLong())).thenReturn(fakeNewsPO);
     }
+
+    @Test
+    void countDateNewsTest() {
+        assertDoesNotThrow(() -> newsServiceMongoImpl.countDateNews());
+    }
+
+    @Test
+    void countCategoryNewsTest() {
+        assertDoesNotThrow(() -> newsServiceMongoImpl.countCategoryNews(1));
+    }
+
+    @Test
+    void countWeekNewsTest() {
+        assertDoesNotThrow(() -> newsServiceMongoImpl.countWeekNews());
+    }
+
 
     private boolean newsItemVOsEqual(NewsItemVO a, NewsItemVO b) {
         return a.getId().equals(b.getId())
@@ -130,6 +158,7 @@ public class NewsServiceMongoImplTest {
     void addNewsTest() {
         Mockito.when(newsDAOMongoMock.insert(Mockito.any())).thenReturn(fakeNewsPO);
         newsServiceMongoImpl.addNews(fakeNewNews);
+
     }
 
     @Test
