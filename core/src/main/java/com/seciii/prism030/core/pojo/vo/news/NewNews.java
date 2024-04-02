@@ -2,6 +2,7 @@ package com.seciii.prism030.core.pojo.vo.news;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
@@ -14,6 +15,7 @@ import javax.validation.constraints.NotNull;
  */
 @Getter
 @Setter
+@NoArgsConstructor
 @AllArgsConstructor
 public class NewNews {
     /**
