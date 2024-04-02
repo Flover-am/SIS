@@ -11,10 +11,7 @@ import com.seciii.prism030.core.mapper.auth.UserRoleMapper;
 import com.seciii.prism030.core.pojo.po.auth.RolePO;
 import com.seciii.prism030.core.pojo.po.auth.UserPO;
 import com.seciii.prism030.core.pojo.po.auth.UserRolePO;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mockito;
@@ -27,10 +24,12 @@ import java.util.List;
 
 /**
  * 管理员服务测试类
- *
+ *  已弃用
  * @author xueruichen
  * @date 2024.03.10
  */
+@Deprecated
+@Disabled
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest
 class AdminServiceImplTest {

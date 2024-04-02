@@ -1,5 +1,6 @@
 package com.seciii.prism030.core.service.impl;
 
+import cn.dev33.satoken.annotation.SaCheckRole;
 import cn.dev33.satoken.secure.BCrypt;
 import cn.dev33.satoken.stp.StpUtil;
 import com.seciii.prism030.common.exception.UserException;
@@ -21,6 +22,7 @@ import java.util.List;
 
 @Service
 @Slf4j
+@SaCheckRole("super-admin")
 public class SuperAdminServiceImpl implements SuperAdminService {
 
     private final UserMapper userMapper;
@@ -37,19 +39,25 @@ public class SuperAdminServiceImpl implements SuperAdminService {
     @Override
     public void addUser(String username, String password, RoleType role) {
         // 检查自己是否是超级管理员
+        StpUtil.checkRole("super-admin");
         userService.addUser(username, password, role);
     }
 
     @Override
     public void deleteUser(String username) {
         // 删除用户
+//        StpUtil.checkRole("super-admin");
         UserPO user = userMapper.getUserByUsername(username);
         if (user == null) {
             log.error(String.format("User: %s not exist.", username));
             throw new UserException(ErrorType.USER_NOT_EXISTS, "用户不存在");
         }
 
-        userMapper.deleteById(user.getId());
+        int res1 = userMapper.deleteById(user.getId());
+        if (res1 <= 0) {
+            log.error(String.format("Delete user: %s failed.", username));
+            throw new UserException(ErrorType.UNKNOWN_ERROR, "删除用户失败");
+        }
         userMapper.deleteUserRole(user.getId());
     }
 
