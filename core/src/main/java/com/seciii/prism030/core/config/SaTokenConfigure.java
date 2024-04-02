@@ -46,8 +46,8 @@ public class SaTokenConfigure {
                     SaRouter.match("/**/news/**")
                             .notMatchMethod("GET")
                             .check(() -> StpUtil.checkRoleOr("super-admin", "news-admin"));
-//                    SaRouter.match("/**/superAdmin/**")
-//                            .check(() -> StpUtil.checkRoleOr("super-admin"));
+                    SaRouter.match("/**/superAdmin/**")
+                            .check(() -> StpUtil.checkRoleOr("super-admin"));
                 })
                 // 返回异常结果
                 .setError(e -> {
