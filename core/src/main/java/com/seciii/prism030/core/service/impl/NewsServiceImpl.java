@@ -33,8 +33,8 @@ public class NewsServiceImpl implements NewsService {
     }
 
     @Override
-    public void addNews(NewNews newNews) {
-        newsMapperMP.insert(toNewsPO(newNews));
+    public long addNews(NewNews newNews) {
+        return newsMapperMP.insert(toNewsPO(newNews));
     }
 
     @Override

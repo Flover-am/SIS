@@ -18,12 +18,12 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@ExtendWith(MockitoExtension.class)
+//@ExtendWith(MockitoExtension.class)
 @SpringBootTest
 public class ESNewsServiceTest {
 
     @Autowired
-    private NewsServiceImpl newsService;
+    private NewsServiceMongoImpl newsService;
     @Autowired
     private ESNewsServiceImpl esNewsService;
     //初始化测试类

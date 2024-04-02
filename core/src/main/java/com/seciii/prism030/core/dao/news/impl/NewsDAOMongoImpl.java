@@ -62,8 +62,9 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
      * @return 插入成功返回新闻PO，否则返回null
      */
     @Override
-    public NewsPO insert(NewsPO newsPO) {
-        return mongoTemplate.insert(newsPO, COLLECTION_NAME);
+    public long insert(NewsPO newsPO) {
+        mongoTemplate.insert(newsPO, COLLECTION_NAME);
+        return newsPO.getId();
     }
 
     /**

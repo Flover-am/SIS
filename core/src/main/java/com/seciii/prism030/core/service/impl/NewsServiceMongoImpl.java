@@ -124,8 +124,8 @@ public class NewsServiceMongoImpl implements NewsService {
      * @param newNews 新增的新闻对象
      */
     @Override
-    public void addNews(NewNews newNews) {
-        newsDAOMongo.insert(NewsUtil.toNewsPO(newNews));
+    public long addNews(NewNews newNews) {
+        return newsDAOMongo.insert(NewsUtil.toNewsPO(newNews));
     }
 
     /**
