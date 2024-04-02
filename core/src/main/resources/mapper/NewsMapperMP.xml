@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seciii.prism030.core.mapper.news.NewsMapperMP">
+    <!--定义可重用的筛选条件sql语句-->
+    <!--以分页形式返回-->
+    <sql id="byPage">
+        <if test="pageSize > 0 and pageOffset >= 0">
+            LIMIT #{pageOffset}, #{pageSize}
+        </if>
+    </sql>
+    <!--按类别列表筛选-->
+    <sql id="filterCategory">
+        <if test="category != null and category.size() > 0">
+            AND category IN
+            <foreach collection="category" item="cat" open="(" separator="," close=")">
+                #{cat}
+            </foreach>
+        </if>
+    </sql>
+    <!--按开始时间筛选-->
+    <sql id="filterStartTime">
+        <if test="startTime != null">
+            AND source_time >= #{startTime}
+        </if>
+    </sql>
+    <!--按结束时间筛选-->
+    <sql id="filterEndTime">
+        <if test="endTime != null">
+            AND #{endTime} >= source_time
+        </if>
+    </sql>
+    <!--按标题模糊筛选-->
+    <sql id="likeTitle">
+        <if test="title != null and title != ''">
+            AND title LIKE CONCAT('%', #{title}, '%')
+        </if>
+    </sql>
+    <sql id="likeSource">
+        <if test="originSource != null and originSource != ''">
+            AND origin_source LIKE CONCAT('%', #{originSource}, '%')
+        </if>
+    </sql>
+    <!--END:定义可重用的筛选条件sql语句-->
+
+    <!--Mapper方法定义-->
+    <select id="getFilteredNewsCount" resultType="Long">
+        SELECT COUNT(id)
+        FROM prism030.t_news
+        <where>
+            <include refid="filterCategory"></include>
+            <include refid="filterStartTime"></include>
+            <include refid="filterEndTime"></include>
+            <include refid="likeSource"></include>
+        </where>
+    </select>
+
+    <select id="getFilteredNewsByPage" resultType="com.seciii.prism030.core.pojo.po.news.NewsPO">
+        SELECT *
+        FROM prism030.t_news
+        <where>
+            <include refid="filterCategory"></include>
+            <include refid="filterStartTime"></include>
+            <include refid="filterEndTime"></include>
+            <include refid="likeSource"></include>
+        </where>
+        ORDER BY id ASC
+        <include refid="byPage"></include>
+    </select>
+
+    <select id="searchFilteredNewsByPage" resultType="com.seciii.prism030.core.pojo.po.news.NewsPO">
+        SELECT *
+        FROM prism030.t_news
+        <where>
+            <include refid="filterCategory"></include>
+            <include refid="filterStartTime"></include>
+            <include refid="filterEndTime"></include>
+            <include refid="likeSource"></include>
+            <include refid="likeTitle"></include>
+        </where>
+        ORDER BY id ASC
+        <include refid="byPage"></include>
+    </select>
+
+    <select id="getSearchedFilteredNewsCount" resultType="Long">
+        SELECT COUNT(id)
+        FROM prism030.t_news
+        <where>
+            <include refid="filterCategory"></include>
+            <include refid="filterStartTime"></include>
+            <include refid="filterEndTime"></include>
+            <include refid="likeSource"></include>
+            <include refid="likeTitle"></include>
+        </where>
+    </select>
+</mapper>

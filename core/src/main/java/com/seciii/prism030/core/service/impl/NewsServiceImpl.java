@@ -1,24 +1,20 @@
 package com.seciii.prism030.core.service.impl;
 
 import com.seciii.prism030.common.exception.error.ErrorType;
-import com.seciii.prism030.core.dao.es.ESNewsDao;
 import com.seciii.prism030.core.enums.CategoryType;
 import com.seciii.prism030.common.exception.NewsException;
-import com.seciii.prism030.core.mapper.news.NewsMapper;
+import com.seciii.prism030.core.mapper.news.NewsMapperMP;
 import com.seciii.prism030.core.pojo.dto.PagedNews;
-import com.seciii.prism030.core.pojo.po.es.ESNewsPO;
 import com.seciii.prism030.core.pojo.po.news.NewsPO;
 import com.seciii.prism030.core.pojo.vo.news.NewNews;
 import com.seciii.prism030.core.pojo.vo.news.NewsItemVO;
 import com.seciii.prism030.core.pojo.vo.news.NewsVO;
 import com.seciii.prism030.core.service.NewsService;
 import com.seciii.prism030.core.utils.DateTimeUtil;
-import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-
 
 /**
  * 新闻服务接口实现类
@@ -26,74 +22,69 @@ import java.util.List;
  * @author xueruichen
  * @date 2024.02.29
  */
-@Service
+//@Service
+@Deprecated
 public class NewsServiceImpl implements NewsService {
 
-    private final NewsMapper newsMapper;
-    private final ESNewsDao esNewsDao;
+    private final NewsMapperMP newsMapperMP;
 
-    public NewsServiceImpl(NewsMapper newsMapper, ESNewsDao newsESDao) {
-        this.newsMapper = newsMapper;
-        this.esNewsDao = newsESDao;
+    public NewsServiceImpl(NewsMapperMP newsMapperMP) {
+        this.newsMapperMP = newsMapperMP;
     }
 
     @Override
-    public long addNews(NewNews newNews) {
-        NewsPO newsPO = toNewsPO(newNews);
-        newsMapper.insert(newsPO);
-        long newsID = newsPO.getId();
-        return newsID;
+    public void addNews(NewNews newNews) {
+        newsMapperMP.insert(toNewsPO(newNews));
     }
 
     @Override
     public NewsVO getNewsDetail(Long id) throws NewsException {
-        NewsPO newsPO = newsMapper.selectById(id);
+        NewsPO newsPO = newsMapperMP.selectById(id);
         if (newsPO == null) {
             throw new NewsException(ErrorType.NEWS_NOT_FOUND);
         }
         return toNewsVO(newsPO);
     }
 
-
     @Override
     public void modifyNewsTitle(Long id, String title) throws NewsException {
-        NewsPO newsPO = newsMapper.selectById(id);
+        NewsPO newsPO = newsMapperMP.selectById(id);
         if (newsPO == null) {
             throw new NewsException(ErrorType.NEWS_NOT_FOUND);
         }
         if (!newsPO.getTitle().equals(title)) {
             newsPO.setTitle(title);
-            newsMapper.updateById(newsPO);
+            newsMapperMP.updateById(newsPO);
         }
     }
 
     @Override
     public void modifyNewsContent(Long id, String content) throws NewsException {
-        NewsPO newsPO = newsMapper.selectById(id);
+        NewsPO newsPO = newsMapperMP.selectById(id);
         if (newsPO == null) {
             throw new NewsException(ErrorType.NEWS_NOT_FOUND);
         }
         if (!newsPO.getContent().equals(content)) {
             newsPO.setContent(content);
-            newsMapper.updateById(newsPO);
+            newsMapperMP.updateById(newsPO);
         }
     }
 
     @Override
     public void modifyNewsSource(Long id, String source) throws NewsException {
-        NewsPO newsPO = newsMapper.selectById(id);
+        NewsPO newsPO = newsMapperMP.selectById(id);
         if (newsPO == null) {
             throw new NewsException(ErrorType.NEWS_NOT_FOUND);
         }
         if (!newsPO.getOriginSource().equals(source)) {
             newsPO.setOriginSource(source);
-            newsMapper.updateById(newsPO);
+            newsMapperMP.updateById(newsPO);
         }
     }
 
     @Override
     public void deleteNews(Long id) throws NewsException {
-        int result = newsMapper.deleteById(id);
+        int result = newsMapperMP.deleteById(id);
         if (result == 0) {
             throw new NewsException(ErrorType.NEWS_NOT_FOUND);
         }
@@ -101,7 +92,7 @@ public class NewsServiceImpl implements NewsService {
 
     @Override
     public void deleteMultipleNews(List<Long> idList) {
-        newsMapper.deleteBatchIds(idList);
+        newsMapperMP.deleteBatchIds(idList);
     }
 
     @Override
@@ -115,7 +106,7 @@ public class NewsServiceImpl implements NewsService {
     ) {
         originSource = splitString(originSource);
         List<Integer> categoryIdList = getCategoryTypeList(category);
-        long count = newsMapper.getFilteredNewsCount(categoryIdList, startTime, endTime, originSource);
+        long count = newsMapperMP.getFilteredNewsCount(categoryIdList, startTime, endTime, originSource);
         if (count == 0) {
             return new PagedNews(0, Collections.emptyList());
         }
@@ -124,7 +115,7 @@ public class NewsServiceImpl implements NewsService {
         if (offset >= count) {
             throw new NewsException(ErrorType.NEWS_PAGE_OVERFLOW, "新闻页获取错误");
         }
-        List<NewsPO> result = newsMapper.getFilteredNewsByPage(pageSize, (int) offset, categoryIdList, startTime, endTime, originSource);
+        List<NewsPO> result = newsMapperMP.getFilteredNewsByPage(pageSize, (int) offset, categoryIdList, startTime, endTime, originSource);
         return new PagedNews(count, toNewsVO(result));
     }
 
@@ -141,7 +132,7 @@ public class NewsServiceImpl implements NewsService {
         originSource = splitString(originSource);
         title = splitString(title);
         List<Integer> categoryIdList = getCategoryTypeList(category);
-        long count = newsMapper.getSearchedFilteredNewsCount(title, categoryIdList, startTime, endTime, originSource);
+        long count = newsMapperMP.getSearchedFilteredNewsCount(title, categoryIdList, startTime, endTime, originSource);
         if (count == 0) {
             return new PagedNews(0, Collections.emptyList());
         }
@@ -149,7 +140,7 @@ public class NewsServiceImpl implements NewsService {
         if (offset >= count) {
             throw new NewsException(ErrorType.NEWS_PAGE_OVERFLOW, "新闻页获取错误");
         }
-        List<NewsPO> result = newsMapper.searchFilteredNewsByPage(pageSize, (int) offset, title, categoryIdList, startTime, endTime, originSource);
+        List<NewsPO> result = newsMapperMP.searchFilteredNewsByPage(pageSize, (int) offset, title, categoryIdList, startTime, endTime, originSource);
         return new PagedNews(count, toNewsVO(result));
     }
 

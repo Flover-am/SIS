@@ -1,22 +1,18 @@
 package com.seciii.prism030.core.mapper.news;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.seciii.prism030.core.pojo.po.news.NewsPO;
-import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-
 /**
- * 新闻Mapper类
+ * 新闻Mapper类接口
  *
- * @author xueruichen
- * @date 2024.02.29
+ * @author wang mingsong
+ * @date 2024.03.23
  */
-@Mapper
-public interface NewsMapper extends BaseMapper<NewsPO> {
+public interface NewsMapper {
     /**
      * 获取筛选后的新闻条目数
      *
@@ -26,10 +22,10 @@ public interface NewsMapper extends BaseMapper<NewsPO> {
      * @param originSource 新闻来源
      * @return 新闻条目数
      */
-    Long getFilteredNewsCount(@Param("category") List<Integer> category,
-                              @Param("startTime") LocalDateTime startTime,
-                              @Param("endTime") LocalDateTime endTime,
-                              @Param("originSource") String originSource);
+    Long getFilteredNewsCount(List<Integer> category,
+                              LocalDateTime startTime,
+                              LocalDateTime endTime,
+                              String originSource);
 
     /**
      * 获取筛选后的新闻列表
@@ -42,12 +38,12 @@ public interface NewsMapper extends BaseMapper<NewsPO> {
      * @param originSource 新闻来源
      * @return 新闻PO列表
      */
-    List<NewsPO> getFilteredNewsByPage(@Param("pageSize") int pageSize,
-                                       @Param("pageOffset") int pageOffset,
-                                       @Param("category") List<Integer> category,
-                                       @Param("startTime") LocalDateTime startTime,
-                                       @Param("endTime") LocalDateTime endTime,
-                                       @Param("originSource") String originSource);
+    List<NewsPO> getFilteredNewsByPage(int pageSize,
+                                       int pageOffset,
+                                       List<Integer> category,
+                                       LocalDateTime startTime,
+                                       LocalDateTime endTime,
+                                       String originSource);
 
     /**
      * 按标题模糊搜索并筛选后的新闻条目
@@ -61,13 +57,13 @@ public interface NewsMapper extends BaseMapper<NewsPO> {
      * @param originSource 新闻来源
      * @return 新闻PO列表
      */
-    List<NewsPO> searchFilteredNewsByPage(@Param("pageSize") int pageSize,
-                                          @Param("pageOffset") int pageOffset,
-                                          @Param("title") String title,
-                                          @Param("category") List<Integer> category,
-                                          @Param("startTime") LocalDateTime startTime,
-                                          @Param("endTime") LocalDateTime endTime,
-                                          @Param("originSource") String originSource);
+    List<NewsPO> searchFilteredNewsByPage(int pageSize,
+                                          int pageOffset,
+                                          String title,
+                                          List<Integer> category,
+                                          LocalDateTime startTime,
+                                          LocalDateTime endTime,
+                                          String originSource);
 
     /**
      * 按标题模糊搜索并筛选后的新闻条目数
@@ -79,16 +75,9 @@ public interface NewsMapper extends BaseMapper<NewsPO> {
      * @param originSource 新闻来源
      * @return 新闻条目数
      */
-    Long getSearchedFilteredNewsCount(@Param("title") String title,
-                                      @Param("category") List<Integer> category,
-                                      @Param("startTime") LocalDateTime startTime,
-                                      @Param("endTime") LocalDateTime endTime,
-                                      @Param("originSource") String originSource);
-
-    /**
-     * 通过标题获得PO
-     * @param title
-     * @return 新闻PO
-     */
-    NewsPO selectByTitle(String title);
+    Long getSearchedFilteredNewsCount(String title,
+                                      List<Integer> category,
+                                      LocalDateTime startTime,
+                                      LocalDateTime endTime,
+                                      String originSource);
 }
