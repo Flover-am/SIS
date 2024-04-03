@@ -6,10 +6,33 @@ ENV PORT=8080 \
     TZ="Asia/Shanghai" \
     MYSQL_URL="" \
     MYSQL_USER="" \
-    MYSQL_PASSWORD=""
+    MYSQL_PASSWORD="" \
+
+    MONGO_HOST="" \
+    MONGO_PORT="" \
+    MONGO_DATABASE="" \
+    MONGO_USER="" \
+    MONGO_PASSWORD="" \
+    MONGO_AUTHENTICATION_DATABASE=""
+
+
 WORKDIR /app
 RUN echo "MYSQL_URL is: $MYSQL_URL"
 COPY core-0.0.1-SNAPSHOT.jar /app
-ENTRYPOINT ["sh", "-c", "java -jar core-0.0.1-SNAPSHOT.jar --server.port=${PORT} --spring.datasource.url=${MYSQL_URL} --spring.datasource.username=${MYSQL_USER} --spring.datasource.password=${MYSQL_PASSWORD} -Duser.timezone=GMT+08"]
+ENTRYPOINT ["sh", "-c", "java"
+            ,"-jar core-0.0.1-SNAPSHOT.jar"
+            ,"--server.port=${PORT}"
+            ,"--spring.datasource.url=${MYSQL_URL}"
+            ,"--spring.datasource.username=${MYSQL_USER}"
+            ,"--spring.datasource.password=${MYSQL_PASSWORD}"
+            
+            ,"--spring.data.mongodb.host=${MONGO_HOST}"
+            ,"--spring.data.mongodb.port=${MONGO_PORT}"
+            ,"--spring.data.mongodb.database=${MONGO_DATABASE}"
+            ,"--spring.data.mongodb.username=${MONGO_USER}"
+            ,"--spring.data.mongodb.password=${MONGO_PASSWORD}"
+            ,"--spring.data.mongodb.authentication-database=${MONGO_AUTHENTICATION_DATABASE}"
+            
+            ,"-Duser.timezone=GMT+08"]
 
 #ENTRYPOINT ["java", "-jar", "core-0.0.1-SNAPSHOT.jar", "--server.port=${PORT}","--spring.datasource.url=$MYSQL_URL","--spring.datasource.username=$MYSQL_USER","--spring.datasource.password=$MYSQL_PASSWORD", "-Duser.timezone=GMT+08"]
