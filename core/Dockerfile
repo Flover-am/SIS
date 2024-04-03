@@ -17,7 +17,12 @@ ENV PORT=8080 \
 
     REDIS_HOST="" \
     REDIS_PORT="" \
-    REDIS_PASSWORD=""
+    REDIS_PASSWORD="" \
+
+    RabbitMQ_HOST="" \
+    RabbitMQ_PORT="" \
+    RabbitMQ_USERNAME="" \
+    RabbitMQ_PASSWORD="" \
 
 WORKDIR /app
 RUN echo "MYSQL_URL is: $MYSQL_URL"
@@ -40,6 +45,10 @@ ENTRYPOINT ["sh", "-c", "java"
             ,"--spring.redis.port=${REDIS_PORT}"
             ,"--spring.redis.password=${REDIS_PASSWORD}"
 
+            ,"--spring.rabbitmq.host=${RabbitMQ_HOST}"
+            ,"--spring.rabbitmq.port=${RabbitMQ_PORT}"
+            ,"--spring.rabbitmq.username=${RabbitMQ_USERNAME}"
+            ,"--spring.rabbitmq.password=${RabbitMQ_PASSWORD}"
 
             ,"-Duser.timezone=GMT+08"]
 
