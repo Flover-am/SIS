@@ -32,7 +32,7 @@ import java.util.regex.Pattern;
 @Component
 public class NewsDAOMongoImpl implements NewsDAOMongo {
 
-    private final static String COLLECTION_NAME = "news";
+    private static final String COLLECTION_NAME = "news";
 
     private MongoTemplate mongoTemplate;
 

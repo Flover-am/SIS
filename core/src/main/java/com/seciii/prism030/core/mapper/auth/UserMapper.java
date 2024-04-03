@@ -2,7 +2,11 @@ package com.seciii.prism030.core.mapper.auth;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.seciii.prism030.core.pojo.po.auth.UserPO;
+import com.seciii.prism030.core.pojo.po.auth.UserRolePO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * 用户Mapper接口
@@ -27,4 +31,26 @@ public interface UserMapper extends BaseMapper<UserPO> {
      * @return 用户数据
      */
     UserPO getUserByUsername(String username);
+
+    /**
+     * 获取所有用户
+     *
+     * @return 用户列表
+     */
+
+    List<UserRolePO> getUsers(
+            @Param("pageSize") int pageSize,
+            @Param("pageOffset") int pageOffset,
+            @Param("roleId") Long roleId
+    );
+
+    Long getUsersCount(
+            @Param("roleId") Long roleId
+    );
+
+    void deleteUserRole(
+            @Param("userId") Long userId
+    );
+
+
 }
