@@ -13,15 +13,6 @@ import org.springframework.messaging.handler.annotation.support.MessageHandlerMe
 @EnableRabbit
 @Configuration
 public class RabbitMQConfig implements RabbitListenerConfigurer {
-    /**
-     * 创建一个名叫hello的队列
-     * @return
-     */
-    @Bean
-    public Queue queue() {
-        return new Queue("news_queue");
-    }
-
 
     @Override
     public void configureRabbitListeners(RabbitListenerEndpointRegistrar registrar) {
@@ -31,12 +22,6 @@ public class RabbitMQConfig implements RabbitListenerConfigurer {
     @Bean
     MessageHandlerMethodFactory messageHandlerMethodFactory() {
         DefaultMessageHandlerMethodFactory messageHandlerMethodFactory = new DefaultMessageHandlerMethodFactory();
-        messageHandlerMethodFactory.setMessageConverter(consumerJackson2MessageConverter());
         return messageHandlerMethodFactory;
-    }
-
-    @Bean
-    public MappingJackson2MessageConverter consumerJackson2MessageConverter() {
-        return new MappingJackson2MessageConverter();
     }
 }

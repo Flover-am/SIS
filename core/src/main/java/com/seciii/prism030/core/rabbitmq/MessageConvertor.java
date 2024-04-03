@@ -21,15 +21,13 @@ public class MessageConvertor {
         // 获取属性值示例
         String title = jsonObject.getString("title");
         String content = jsonObject.getString("content");
-        String originSource = jsonObject.getString("origin_source");
+        String originSource = jsonObject.getString("originSource");
         String link = jsonObject.getString("link");
-        String sourceLink = jsonObject.getString("source_link");
-        String sourceTimeStr = jsonObject.getString("source_time");
+        String sourceLink = jsonObject.getString("sourceLink");
+        String sourceTimeStr = jsonObject.getString("sourceTime");
         sourceTimeStr = sourceTimeStr + ":00";
 
         String categoryStr = jsonObject.getString("category");
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-//        LocalDateTime sourceTime = LocalDateTime.parse(sourceTimeStr, formatter);
 
 
         NewNews newNews = new NewNews();
