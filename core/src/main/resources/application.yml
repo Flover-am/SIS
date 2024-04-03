@@ -8,10 +8,10 @@ spring:
   elasticsearch:
     uris: http://127.0.0.1:9200
   rabbitmq:
-    host: 127.0.0.1
+    host: 124.223.39.48
     port: 5672
-    username: admin
-    password: 123456
+    username: se3
+    password: se3
   data:
     mongodb:
       host: 124.223.39.48
