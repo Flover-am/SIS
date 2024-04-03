@@ -1,5 +1,6 @@
 package com.seciii.prism030.core.service.impl;
 
+import com.seciii.prism030.core.pojo.po.graph.node.EntityNode;
 import com.seciii.prism030.core.pojo.po.graph.node.NewsNode;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +13,12 @@ public class GraphServiceImplTest {
 
     @Test
     void test() {
-        graphService.addNewsNode(10L, "科比坠机");
-        graphService.addEntityNode(11L, "科比", 10L);
-        graphService.addEntityNode(12L, "飞机", 10L);
-        graphService.addEntityRelationship(11L, 12L, "乘坐");
+        NewsNode news = graphService.addNewsNode(10L, "科比坠机");
+        EntityNode node1 = graphService.addEntityNode(news.getId(), "科比");
+        EntityNode node2 = graphService.addEntityNode(news.getId(), "飞机");
+        graphService.addEntityRelationship(node1.getId(), node2.getId(), "乘坐");
+        news = graphService.getNewsNode(news.getId());
+        System.out.println(news);
     }
 
     @Test

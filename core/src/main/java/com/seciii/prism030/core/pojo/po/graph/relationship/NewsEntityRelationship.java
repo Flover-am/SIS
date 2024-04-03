@@ -18,10 +18,16 @@ import org.springframework.data.neo4j.core.schema.TargetNode;
 @Data
 @Builder
 public class NewsEntityRelationship {
+    /**
+     * id
+     */
     @RelationshipId
     @GeneratedValue
     private Long id;
 
+    /**
+     * 关系目标实体节点
+     */
     @TargetNode
     private EntityNode entity;
 }

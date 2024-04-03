@@ -30,29 +30,29 @@ public class GraphServiceImpl implements GraphService {
     }
 
     @Override
-    public void addNewsNode(Long id, String title) {
+    public NewsNode addNewsNode(Long newsId, String title) {
         NewsNode newsNode = NewsNode.builder()
-                .id(id)
+                .newsId(newsId)
                 .title(title)
                 .entities(Collections.emptyList())
                 .build();
-        newsNodeDAO.save(newsNode);
+        return newsNodeDAO.save(newsNode);
     }
 
     @Override
-    public void addEntityNode(Long id, String name, Long newsId) {
+    public EntityNode addEntityNode(Long newsNodeId, String name) {
         EntityNode entityNode = EntityNode.builder()
-                .id(id)
                 .name(name)
                 .entities(Collections.emptyList())
                 .build();
-        entityNodeDAO.save(entityNode);
-        NewsNode newsNode = newsNodeDAO.findById(newsId).orElseThrow();
+        EntityNode node = entityNodeDAO.save(entityNode);
+        NewsNode newsNode = newsNodeDAO.findById(newsNodeId).orElseThrow();
         NewsEntityRelationship relationship = NewsEntityRelationship.builder()
                 .entity(entityNode)
                 .build();
         newsNode.getEntities().add(relationship);
         newsNodeDAO.save(newsNode);
+        return node;
     }
 
     @Override

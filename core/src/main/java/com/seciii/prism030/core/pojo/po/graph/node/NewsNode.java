@@ -17,12 +17,28 @@ import java.util.List;
 @Builder
 @Data
 public class NewsNode {
+    /**
+     * id
+     */
     @Id
+    @GeneratedValue
     private Long id;
 
+    /**
+     * 对应新闻id
+     */
+    @Property("newsId")
+    private Long newsId;
+
+    /**
+     * 标题
+     */
     @Property("title")
     private String title;
 
+    /**
+     * 实体类关系
+     */
     @Relationship(type = "CONTAINS", direction = Relationship.Direction.OUTGOING)
     private List<NewsEntityRelationship> entities;
 }

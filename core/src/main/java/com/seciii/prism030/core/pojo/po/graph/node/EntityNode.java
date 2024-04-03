@@ -3,10 +3,7 @@ package com.seciii.prism030.core.pojo.po.graph.node;
 import com.seciii.prism030.core.pojo.po.graph.relationship.EntityRelationship;
 import lombok.Builder;
 import lombok.Data;
-import org.springframework.data.neo4j.core.schema.Id;
-import org.springframework.data.neo4j.core.schema.Node;
-import org.springframework.data.neo4j.core.schema.Property;
-import org.springframework.data.neo4j.core.schema.Relationship;
+import org.springframework.data.neo4j.core.schema.*;
 
 import java.util.List;
 
@@ -20,12 +17,22 @@ import java.util.List;
 @Builder
 @Data
 public class EntityNode {
+    /**
+     * id
+     */
     @Id
+    @GeneratedValue
     private Long id;
 
+    /**
+     * 名称
+     */
     @Property("name")
     private String name;
 
+    /**
+     * 实体关系
+     */
     @Relationship(type = "RELATE_TO", direction = Relationship.Direction.OUTGOING)
     private List<EntityRelationship> entities;
 }

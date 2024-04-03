@@ -18,12 +18,21 @@ import org.springframework.data.neo4j.core.schema.TargetNode;
 @Data
 @Builder
 public class EntityRelationship {
+    /**
+     * id
+     */
     @RelationshipId
     @GeneratedValue
     private Long id;
 
+    /**
+     * 关系名
+     */
     private String relationship;
 
+    /**
+     * 实体节点
+     */
     @TargetNode
     private EntityNode entity;
 }

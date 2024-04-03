@@ -1,5 +1,6 @@
 package com.seciii.prism030.core.service;
 
+import com.seciii.prism030.core.pojo.po.graph.node.EntityNode;
 import com.seciii.prism030.core.pojo.po.graph.node.NewsNode;
 
 /**
@@ -13,19 +14,18 @@ public interface GraphService {
     /**
      * 添加新闻节点
      *
-     * @param id 新闻id
+     * @param newsId 新闻id
      * @param title 新闻标题
      */
-    void addNewsNode(Long id, String title);
+    NewsNode addNewsNode(Long newsId, String title);
 
     /**
      * 添加实体节点
      *
-     * @param id 实体id
-     * @param name 实体名
      * @param newsId 对应新闻id
+     * @param name 实体名
      */
-    void addEntityNode(Long id, String name, Long newsId);
+    EntityNode addEntityNode(Long newsNodeId, String name);
 
 
     /**
