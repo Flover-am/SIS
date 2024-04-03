@@ -31,6 +31,15 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
+        <!--THUCTC相关本地依赖-->
+        <dependency>
+            <groupId>org.thunlp</groupId>
+            <artifactId>THUCTC-trimmed</artifactId>
+            <version>1.0.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/resources/lib/THUCTC_java_v1_trimmed.jar</systemPath>
+        </dependency>
+
     </dependencies>
     <build>
         <plugins>

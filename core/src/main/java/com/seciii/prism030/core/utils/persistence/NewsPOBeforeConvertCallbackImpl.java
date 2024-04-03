@@ -1,5 +1,6 @@
 package com.seciii.prism030.core.utils.persistence;
 
+import com.seciii.prism030.core.classifier.Classifier;
 import com.seciii.prism030.core.dao.news.NewsDAOMongo;
 import com.seciii.prism030.core.pojo.po.news.NewsPO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +16,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class NewsPOBeforeConvertCallbackImpl implements BeforeConvertCallback<NewsPO> {
     private NewsDAOMongo newsDAOMongo;
+    private Classifier classifier;
 
     @Autowired
     public void setNewsDAOMongo(NewsDAOMongo newsDAOMongo) {
         this.newsDAOMongo = newsDAOMongo;
+    }
+    @Autowired
+    public void setClassifier(Classifier classifier) {
+        this.classifier = classifier;
     }
 
     /**
@@ -33,6 +39,9 @@ public class NewsPOBeforeConvertCallbackImpl implements BeforeConvertCallback<Ne
     public NewsPO onBeforeConvert(NewsPO newsPO, String collection) {
         if (newsPO.getId() == null) {
             newsPO.setId(newsDAOMongo.getNextNewsId());
+        }
+        if(newsPO.getCategory() == null){
+            newsPO.setCategory(classifier.classify(newsPO.getTitle()).toInt());
         }
         return newsPO;
     }

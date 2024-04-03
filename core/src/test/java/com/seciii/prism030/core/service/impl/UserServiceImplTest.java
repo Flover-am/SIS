@@ -158,7 +158,6 @@ class UserServiceImplTest {
      * 添加用户接口测试
      */
     @Test
-    @Disabled
     void addUserTest2() {
         // 测试添加重复用户
         Assertions.assertThrows(UserException.class, () -> userService.addUser("admin", "123abc"));

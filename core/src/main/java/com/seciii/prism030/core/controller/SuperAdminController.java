@@ -2,8 +2,8 @@ package com.seciii.prism030.core.controller;
 
 import com.seciii.prism030.common.Result;
 import com.seciii.prism030.core.enums.RoleType;
-import com.seciii.prism030.core.pojo.vo.user.NewUserVo;
-import com.seciii.prism030.core.pojo.vo.user.UserVo;
+import com.seciii.prism030.core.pojo.vo.user.NewUserVO;
+import com.seciii.prism030.core.pojo.vo.user.UserVO;
 import com.seciii.prism030.core.pojo.vo.user.UserListVO;
 import com.seciii.prism030.core.service.SuperAdminService;
 import org.springframework.validation.annotation.Validated;
@@ -33,7 +33,7 @@ public class SuperAdminController {
      * @date 2024.03.27
      */
     @PostMapping("/superAdmin/addUser")
-    public Result<Void> addUser(@Validated  NewUserVo newUserVo) {
+    public Result<Void> addUser(@Validated NewUserVO newUserVo) {
         superAdminService.addUser(newUserVo.getUsername(), newUserVo.getPassword(), RoleType.getRoleType(newUserVo.getRole()));
         return Result.success();
     }
@@ -51,7 +51,7 @@ public class SuperAdminController {
             @RequestParam(required = false) String role,
             @RequestParam int pageSize,
             @RequestParam int pageOffset) {
-        List<UserVo> res = superAdminService.getUsers(RoleType.getRoleType(role), pageSize, pageOffset);
+        List<UserVO> res = superAdminService.getUsers(RoleType.getRoleType(role), pageSize, pageOffset);
         long count = superAdminService.getUsersCount(RoleType.getRoleType(role));
         return Result.success(new UserListVO(count, res));
     }

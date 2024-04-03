@@ -1,7 +1,6 @@
 package com.seciii.prism030.core.service.impl;
 
 import cn.dev33.satoken.annotation.SaCheckRole;
-import cn.dev33.satoken.secure.BCrypt;
 import cn.dev33.satoken.stp.StpUtil;
 import com.seciii.prism030.common.exception.UserException;
 import com.seciii.prism030.common.exception.error.ErrorType;
@@ -9,10 +8,9 @@ import com.seciii.prism030.core.enums.RoleType;
 import com.seciii.prism030.core.mapper.auth.RoleMapper;
 import com.seciii.prism030.core.mapper.auth.UserMapper;
 import com.seciii.prism030.core.mapper.auth.UserRoleMapper;
-import com.seciii.prism030.core.pojo.po.auth.RolePO;
 import com.seciii.prism030.core.pojo.po.auth.UserPO;
 import com.seciii.prism030.core.pojo.po.auth.UserRolePO;
-import com.seciii.prism030.core.pojo.vo.user.UserVo;
+import com.seciii.prism030.core.pojo.vo.user.UserVO;
 import com.seciii.prism030.core.service.SuperAdminService;
 import com.seciii.prism030.core.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +18,12 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * 超级管理员服务实现类
+ *
+ * @author lidongsheng
+ * @date 2024.03.25
+ */
 @Service
 @Slf4j
 @SaCheckRole("super-admin")
@@ -46,7 +50,6 @@ public class SuperAdminServiceImpl implements SuperAdminService {
     @Override
     public void deleteUser(String username) {
         // 删除用户
-//        StpUtil.checkRole("super-admin");
         UserPO user = userMapper.getUserByUsername(username);
         if (user == null) {
             log.error(String.format("User: %s not exist.", username));
@@ -62,20 +65,19 @@ public class SuperAdminServiceImpl implements SuperAdminService {
     }
 
     @Override
-    public List<UserVo> getUsers(RoleType roleType, int pageSize, int pageOffset) {
+    public List<UserVO> getUsers(RoleType roleType, int pageSize, int pageOffset) {
         List<UserRolePO> res = userMapper.getUsers(pageSize, pageOffset, roleType == null ? null : roleType.getRoleId());
         return toUserVo(res);
     }
-
 
     @Override
     public Long getUsersCount(RoleType roleType) {
         return userMapper.getUsersCount(roleType == null ? null : roleType.getRoleId());
     }
 
-    private List<UserVo> toUserVo(List<UserRolePO> userRolePOS) {
+    private List<UserVO> toUserVo(List<UserRolePO> userRolePOS) {
         return userRolePOS.stream().map(
-                userRolePO -> UserVo.builder()
+                userRolePO -> UserVO.builder()
                         .username(userMapper.selectById(userRolePO.getUserId()).getUsername())
                         .role(RoleType.getRoleType(userRolePO.getRoleId()).getRoleName())
                         .build()

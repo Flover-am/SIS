@@ -24,5 +24,5 @@ public class UserListVO {
     /**
      * list of users
      */
-    public List<UserVo> usersList;
+    public List<UserVO> usersList;
 }
