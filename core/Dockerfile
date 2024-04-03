@@ -13,8 +13,11 @@ ENV PORT=8080 \
     MONGO_DATABASE="" \
     MONGO_USER="" \
     MONGO_PASSWORD="" \
-    MONGO_AUTHENTICATION_DATABASE=""
+    MONGO_AUTHENTICATION_DATABASE="" \
 
+    REDIS_HOST="" \
+    REDIS_PORT="" \
+    REDIS_PASSWORD=""
 
 WORKDIR /app
 RUN echo "MYSQL_URL is: $MYSQL_URL"
@@ -32,7 +35,12 @@ ENTRYPOINT ["sh", "-c", "java"
             ,"--spring.data.mongodb.username=${MONGO_USER}"
             ,"--spring.data.mongodb.password=${MONGO_PASSWORD}"
             ,"--spring.data.mongodb.authentication-database=${MONGO_AUTHENTICATION_DATABASE}"
-            
+
+            ,"--spring.redis.host=${REDIS_HOST}"
+            ,"--spring.redis.port=${REDIS_PORT}"
+            ,"--spring.redis.password=${REDIS_PASSWORD}"
+
+
             ,"-Duser.timezone=GMT+08"]
 
 #ENTRYPOINT ["java", "-jar", "core-0.0.1-SNAPSHOT.jar", "--server.port=${PORT}","--spring.datasource.url=$MYSQL_URL","--spring.datasource.username=$MYSQL_USER","--spring.datasource.password=$MYSQL_PASSWORD", "-Duser.timezone=GMT+08"]
