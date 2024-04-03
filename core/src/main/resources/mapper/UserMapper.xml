@@ -2,12 +2,49 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.seciii.prism030.core.mapper.auth.UserMapper">
+
+    <sql id="byPage">
+        <if test="pageSize > 0 and pageOffset >= 0">
+            LIMIT #{pageOffset}, #{pageSize}
+        </if>
+    </sql>
+    <!--    查找对应权限的用户数量   -->
+    <select id="getUsersCount" resultType="Long">
+        SELECT COUNT(1)
+        FROM prism030.t_auth_user_role
+        # 根据类型查找
+        <where>
+            <if test="roleId != null and roleId != 0">
+                AND role_id = #{roleId}
+            </if>
+        </where>
+    </select>
+    <!--    查找对应权限的用户   -->
+    <select id="getUsers" resultType="com.seciii.prism030.core.pojo.po.auth.UserRolePO">
+        SELECT *
+        FROM prism030.t_auth_user_role
+        <where>
+            <if test="roleId != null and roleId != 0">
+                AND role_id = #{roleId}
+            </if>
+        </where>
+        <include refid="byPage"></include>
+    </select>
+
+    <!--    删除用户角色表中，有关用户的表项-->
+    <delete id="deleteUserRole" parameterType="Long">
+        DELETE
+        FROM prism030.t_auth_user_role
+        WHERE user_id = #{userId}
+    </delete>
+
+
     <select id="existsUser" parameterType="String" resultType="int">
         SELECT EXISTS (SELECT username
                        FROM `t_auth_user`
                        WHERE username = #{username});
     </select>
-    
+
     <select id="getUserByUsername" parameterType="String" resultType="com.seciii.prism030.core.pojo.po.auth.UserPO">
         SELECT *
         FROM `t_auth_user`

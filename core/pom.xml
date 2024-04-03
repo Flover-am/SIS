@@ -58,6 +58,15 @@
             <version>1.10.0</version>
         </dependency>
 
+        <!--THUCTC相关本地依赖-->
+        <dependency>
+            <groupId>org.thunlp</groupId>
+            <artifactId>THUCTC-trimmed</artifactId>
+            <version>1.0.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/resources/lib/THUCTC_java_v1_trimmed.jar</systemPath>
+        </dependency>
+
     </dependencies>
     <build>
         <plugins>

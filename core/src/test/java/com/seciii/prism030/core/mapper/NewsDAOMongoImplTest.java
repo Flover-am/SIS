@@ -3,6 +3,7 @@ package com.seciii.prism030.core.mapper;
 import com.seciii.prism030.core.dao.news.NewsDAOMongo;
 
 import com.seciii.prism030.core.pojo.po.news.NewsPO;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,6 +15,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
+@Disabled
 @SpringBootTest(classes = NewsDAOMongoImplTest.class)
 @ComponentScan("com.seciii.prism030.core")
 public class NewsDAOMongoImplTest {

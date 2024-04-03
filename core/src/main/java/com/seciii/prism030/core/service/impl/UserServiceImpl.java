@@ -36,6 +36,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void addUser(String username, String password) {
+        addUser(username, password, RoleType.USER);
+    }
+
+    @Override
+    public void addUser(String username, String password, RoleType role) {
+        if (role.equals(RoleType.SUPER_ADMIN)) {
+            log.warn(String.format("User: %s try to add an admin!", StpUtil.getLoginIdAsLong()));
+            throw new UserException(ErrorType.UNAUTHORIZED, "超级管理员不能通过此方法添加");
+        }
         // 如果已存在username，则抛出异常
         if (userMapper.existsUser(username) > 0) {
             log.error(String.format("Username: %s already exists.", username));
@@ -48,8 +57,8 @@ public class UserServiceImpl implements UserService {
             log.error(String.format("Insert error while adding user: %s.", username));
             throw new UserException(ErrorType.UNKNOWN_ERROR, "数据库添加数据失败");
         }
-        // 为用户设定角色：普通用户
-        Long roleId = roleMapper.getRoleIdByName(RoleType.USER.getRoleName());
+        // 为用户设定角色
+        Long roleId = roleMapper.getRoleIdByName(role.getRoleName());
         UserRolePO userRole = UserRolePO.builder().userId(user.getId()).roleId(roleId).build();
         result = userRoleMapper.insert(userRole);
         // 如果数据库添加数据失败，则抛出异常
@@ -60,7 +69,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void login(String username, String password) {
+    public RoleType login(String username, String password) {
         UserPO user = userMapper.getUserByUsername(username);
         // 若用户不存在，抛出异常
         if (user == null) {
@@ -73,8 +82,8 @@ public class UserServiceImpl implements UserService {
             log.error("Password error.");
             throw new UserException(ErrorType.PASSWORD_ERROR, "密码错误");
         }
-
         StpUtil.login(user.getId());
+        return RoleType.getRoleType(userRoleMapper.getUserRoleByUserId(user.getId()).getRoleId());
     }
 
     @Override

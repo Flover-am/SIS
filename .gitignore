@@ -33,3 +33,6 @@ build/
 .vscode/
 
 core/src/main/resources/application.yml
+
+### Server Configs ###
+**/application-prod.yml
