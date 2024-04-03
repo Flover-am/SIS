@@ -8,7 +8,8 @@
         WHERE id =
               (SELECT `t_auth_user_role`.role_id
                FROM `t_auth_user_role`
-               WHERE user_id = #{userId});
+               WHERE user_id = #{userId})
+        ORDER BY id;
     </select>
 
     <select id="getRoleIdByName" parameterType="String" resultType="Long">
