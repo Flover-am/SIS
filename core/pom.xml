@@ -34,7 +34,6 @@
         <dependency>
             <groupId>org.thunlp</groupId>
             <artifactId>thuctc-trimmed</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
         </dependency>
 
     </dependencies>
