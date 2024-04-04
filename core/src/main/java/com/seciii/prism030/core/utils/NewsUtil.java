@@ -23,6 +23,7 @@ public class NewsUtil {
     public final static String CATEGORY = "category";
     public final static String UPDATE_TIME = "update_time";
     public final static String CREATE_TIME = "create_time";
+
     private NewsUtil() {
     }
 
@@ -51,7 +52,7 @@ public class NewsUtil {
             return null;
         }
         return category.stream().map(
-                x -> CategoryType.getCategoryType(x).toInt()
+                x -> CategoryType.of(x).toInt()
         ).toList();
     }
 
@@ -68,7 +69,7 @@ public class NewsUtil {
                         .title(newsPO.getTitle())
                         .originSource(newsPO.getOriginSource())
                         .sourceTime(DateTimeUtil.defaultFormat(newsPO.getSourceTime()))
-                        .category(CategoryType.getCategoryType(newsPO.getCategory()).getCategoryEN())
+                        .category(CategoryType.of(newsPO.getCategory()).toString())
                         .link(newsPO.getLink())
                         .updateTime(DateTimeUtil.defaultFormat(newsPO.getUpdateTime()))
                         .build()
@@ -90,7 +91,7 @@ public class NewsUtil {
                 .sourceTime(DateTimeUtil.defaultFormat(newsPO.getSourceTime()))
                 .link(newsPO.getLink())
                 .sourceLink(newsPO.getSourceLink())
-                .category(CategoryType.getCategoryType(newsPO.getCategory()).getCategoryEN())
+                .category(CategoryType.of(newsPO.getCategory()).getCategoryEN())
                 .createTime(newsPO.getCreateTime())
                 .updateTime(newsPO.getUpdateTime())
                 .build();
@@ -103,6 +104,10 @@ public class NewsUtil {
      * @return 新闻PO
      */
     public static NewsPO toNewsPO(NewNews newNews) {
+        Integer category = null;
+        if (CategoryType.of(newNews.getCategory()) != null) {
+            category = CategoryType.of(newNews.getCategory()).toInt();
+        }
         return NewsPO.builder()
                 .title(newNews.getTitle())
                 .content(newNews.getContent())
@@ -110,7 +115,7 @@ public class NewsUtil {
                 .sourceTime(DateTimeUtil.defaultParse(newNews.getSourceTime()))
                 .link(newNews.getLink())
                 .sourceLink(newNews.getSourceLink())
-                .category(CategoryType.getCategoryType(newNews.getCategory()).toInt())
+                .category(category)
                 .build();
     }
 }

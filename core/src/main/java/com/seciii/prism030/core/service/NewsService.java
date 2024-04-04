@@ -1,6 +1,7 @@
 package com.seciii.prism030.core.service;
 
 import com.seciii.prism030.core.pojo.dto.PagedNews;
+import com.seciii.prism030.core.pojo.vo.news.ClassifyResultVO;
 import com.seciii.prism030.core.pojo.vo.news.NewNews;
 import com.seciii.prism030.core.pojo.vo.news.NewsVO;
 
@@ -100,4 +101,12 @@ public interface NewsService {
      * @return 搜索结果新闻列表
      */
     PagedNews searchNewsByTitleFiltered(int pageNo, int pageSize, String title, List<String> category, LocalDateTime startTime, LocalDateTime endTime, String originSource);
+
+    /**
+     * 获取新闻前N可能的分类结果
+     * @param text 新闻标题字符串
+     * @param topN topN个数
+     * @return topN分类结果
+     */
+    List<ClassifyResultVO> topNClassify(String text, int topN);
 }
