@@ -1,9 +1,7 @@
 package com.seciii.prism030.core.service;
 
 import com.seciii.prism030.core.pojo.dto.PagedNews;
-import com.seciii.prism030.core.pojo.vo.news.ClassifyResultVO;
-import com.seciii.prism030.core.pojo.vo.news.NewNews;
-import com.seciii.prism030.core.pojo.vo.news.NewsVO;
+import com.seciii.prism030.core.pojo.vo.news.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,6 +17,10 @@ public interface NewsService {
     Integer countDateNews();
 
     Integer countCategoryNews(int category);
+
+    List<NewsCategoryCountVO> countAllCategoryNews();
+
+    List<NewsDateCountVo> countPeriodNews(String startTime, String endTime);
 
     Integer countWeekNews();
 

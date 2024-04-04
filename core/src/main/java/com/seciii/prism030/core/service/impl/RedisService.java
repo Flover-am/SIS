@@ -62,12 +62,24 @@ public class RedisService {
         redisTemplate.opsForValue().decrement(categoryCountKey);
         redisTemplate.opsForValue().decrement(dateCountKey);
     }
-
+    /**
+     * 今日新闻数量
+     *
+     * @return 新闻数量
+     */
     public Integer countDateNews() {
-        LocalDate now = LocalDate.now();
-        String date = now.toString();
+        return countDateNews(LocalDate.now());
+    }
+    /**
+     * 某一天新闻数量
+     *
+     * @param date 日期
+     * @return 新闻数量
+     */
+    public Integer countDateNews(LocalDate date) {
+        String dateStr = date.toString();
         // newsDate:2024-03-11:count
-        String dateCountKey = "newsDate:" + date + ":count";
+        String dateCountKey = "newsDate:" + dateStr + ":count";
         Object res = redisTemplate.opsForValue().get(dateCountKey);
         if (res != null) {
             return (Integer) res > 0 ? (Integer) res : 0;
@@ -75,11 +87,27 @@ public class RedisService {
         return 0;
     }
 
+    /**
+     * 某一类新闻数量
+     *
+     * @param category 新闻类别
+     * @return 新闻数量
+     */
     public int countCategoryNews(int category) {
-        LocalDate now = LocalDate.now();
-        String date = now.toString();
+        return countCategoryNews(category, LocalDate.now());
+    }
+
+    /**
+     * 某一天某一类新闻数量
+     *
+     * @param category 新闻类别
+     * @param date     日期
+     * @return 新闻数量
+     */
+    public int countCategoryNews(int category, LocalDate date) {
+        String dateStr = date.toString();
         // newsDate:2024-03-11:category:1:count
-        String categoryCountKey = "newsDate:" + date + ":category:" + category + ":count";
+        String categoryCountKey = "newsDate:" + dateStr + ":category:" + category + ":count";
         Object res = redisTemplate.opsForValue().get(categoryCountKey);
         if (res != null) {
             return (Integer) res > 0 ? (Integer) res : 0;
@@ -87,6 +115,11 @@ public class RedisService {
         return 0;
     }
 
+    /**
+     * 一周内新闻数量
+     *
+     * @return 一周内新闻数量
+     */
     public int countWeekNews() {
         LocalDate now = LocalDate.now();
         String date = now.toString();

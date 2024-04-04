@@ -4,18 +4,19 @@ import com.seciii.prism030.common.exception.NewsException;
 import com.seciii.prism030.common.exception.error.ErrorType;
 import com.seciii.prism030.core.classifier.Classifier;
 import com.seciii.prism030.core.dao.news.NewsDAOMongo;
+import com.seciii.prism030.core.enums.CategoryType;
 import com.seciii.prism030.core.pojo.dto.PagedNews;
 import com.seciii.prism030.core.pojo.po.news.NewsPO;
-import com.seciii.prism030.core.pojo.vo.news.ClassifyResultVO;
-import com.seciii.prism030.core.pojo.vo.news.NewNews;
-import com.seciii.prism030.core.pojo.vo.news.NewsVO;
+import com.seciii.prism030.core.pojo.vo.news.*;
 import com.seciii.prism030.core.service.NewsService;
 import com.seciii.prism030.core.utils.NewsUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -69,6 +70,39 @@ public class NewsServiceMongoImpl implements NewsService {
     public Integer countCategoryNews(int category) {
         return redisService.countCategoryNews(category);
     }
+
+    /**
+     * 今日所有种类新闻数量
+     * @return 每个种类的新闻数量
+     */
+    @Override
+    public List<NewsCategoryCountVO> countAllCategoryNews() {
+        List<NewsCategoryCountVO> newsCategoryCountVOList = new ArrayList<>();
+        for (int i = 0; i < CategoryType.values().length; i++) {
+            newsCategoryCountVOList.add(NewsCategoryCountVO.builder().category(CategoryType.of(i).toString()).count(redisService.countCategoryNews(i)).build());
+        }
+        return newsCategoryCountVOList;
+    }
+
+    /**
+     * 一段时间内新闻数量
+     * @return 每天每种新闻数量
+     */
+    @Override
+    public List<NewsDateCountVo> countPeriodNews(String startTime, String endTime) {
+        LocalDate startDate = LocalDate.parse(startTime);
+        LocalDate endDate = LocalDate.parse(endTime);
+        List<NewsDateCountVo> newsDateCountVoList = new ArrayList<>();
+        for (LocalDate date = startDate; date.isBefore(endDate); date = date.plusDays(1)) {
+            List<NewsCategoryCountVO> newsCategoryCountVOList = new ArrayList<>();
+            for (int i = 0; i < CategoryType.values().length; i++) {
+                newsCategoryCountVOList.add(NewsCategoryCountVO.builder().category(CategoryType.of(i).toString()).count(redisService.countCategoryNews(i, date)).build());
+            }
+            newsDateCountVoList.add(NewsDateCountVo.builder().date(date.toString()).newsCategoryCounts(newsCategoryCountVOList).build());
+        }
+        return newsDateCountVoList;
+    }
+
 
     @Override
     public Integer countWeekNews() {

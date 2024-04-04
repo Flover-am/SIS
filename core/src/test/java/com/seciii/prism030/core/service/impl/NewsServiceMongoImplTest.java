@@ -23,8 +23,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
@@ -33,6 +32,8 @@ public class NewsServiceMongoImplTest {
     private NewsDAOMongoImpl newsDAOMongoMock;
     @MockBean
     private Classifier classifier;
+    @MockBean
+    private RedisService redisService;
 
     @InjectMocks
     private NewsServiceMongoImpl newsServiceMongoImpl = new NewsServiceMongoImpl();
@@ -114,7 +115,13 @@ public class NewsServiceMongoImplTest {
         for (int i = 0; i < 5; i++) {
             fakeClassifyResult.add(Pair.of(CategoryType.getCategoryType(i), 0.1 * i));
         }
+        Mockito.when(redisService.countCategoryNews(Mockito.anyInt(), Mockito.any())).thenReturn(1);
+        Mockito.when(redisService.countDateNews()).thenReturn(1);
+        Mockito.when(redisService.countDateNews(Mockito.any())).thenReturn(3);
+
+
     }
+
 
     private boolean newsItemVOsEqual(NewsItemVO a, NewsItemVO b) {
         return a.getId().equals(b.getId())
@@ -219,5 +226,16 @@ public class NewsServiceMongoImplTest {
             assertTrue(CategoryType.of(i).equals(result.get(i).getCategory()));
             assertEquals(0.1 * i, result.get(i).getProbability());
         }
+    }
+
+    @Test
+    void countPeriod() {
+        assertDoesNotThrow(() -> newsServiceMongoImpl.countPeriodNews("2022-01-01", "2022-01-03"));
+        assertEquals(0, newsServiceMongoImpl.countPeriodNews("2022-01-04", "2022-01-03").size());
+    }
+
+    @Test
+    void c() {
+        assertDoesNotThrow(() -> newsServiceMongoImpl.countAllCategoryNews());
     }
 }

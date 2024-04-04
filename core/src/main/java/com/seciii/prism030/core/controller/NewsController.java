@@ -1,11 +1,8 @@
 package com.seciii.prism030.core.controller;
 
-import com.seciii.prism030.core.pojo.vo.news.ClassifyResultVO;
-import com.seciii.prism030.core.pojo.vo.news.NewsVO;
+import com.seciii.prism030.core.pojo.vo.news.*;
 import com.seciii.prism030.common.Result;
 import com.seciii.prism030.core.pojo.dto.PagedNews;
-import com.seciii.prism030.core.pojo.vo.news.Filter;
-import com.seciii.prism030.core.pojo.vo.news.NewNews;
 import com.seciii.prism030.core.service.NewsService;
 import com.seciii.prism030.core.utils.DateTimeUtil;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +25,21 @@ public class NewsController {
         this.newsService = newsService;
     }
 
+    /**
+     * 今日每种新闻的新闻数量
+     */
+    @GetMapping("/news/countAllCategory")
+    public Result<List<NewsCategoryCountVO>> countAllCategoryNews() {
+        return Result.success(newsService.countAllCategoryNews());
+    }
+
+    /**
+     * 获取一段时间内每天每种的新闻数量
+     */
+    @GetMapping("/news/countPeriod")
+    public Result<List<NewsDateCountVo>> countPeriodNews(@RequestParam String startTime, @RequestParam String endTime) {
+        return Result.success(newsService.countPeriodNews(startTime, endTime));
+    }
 
     /**
      * 获取今日新闻数量
