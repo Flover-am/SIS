@@ -35,8 +35,19 @@
             <groupId>org.thunlp</groupId>
             <artifactId>thuctc-trimmed</artifactId>
         </dependency>
-
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>github</id>
+            <url>https://maven.pkg.github.com/mas233/thuctc-trimmed</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </repository>
+    </repositories>
+
     <build>
         <plugins>
             <plugin>
