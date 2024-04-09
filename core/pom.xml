@@ -35,6 +35,10 @@
             <groupId>org.thunlp</groupId>
             <artifactId>thuctc-trimmed</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.unfbx</groupId>
+            <artifactId>SparkDesk-Java</artifactId>
+        </dependency>
 
     </dependencies>
     <build>

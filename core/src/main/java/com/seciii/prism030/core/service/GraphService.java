@@ -22,7 +22,7 @@ public interface GraphService {
     /**
      * 添加实体节点
      *
-     * @param newsId 对应新闻id
+     * @param newsNodeId 对应新闻id
      * @param name 实体名
      */
     EntityNode addEntityNode(Long newsNodeId, String name);
@@ -44,4 +44,13 @@ public interface GraphService {
      * @return 新闻节点
      */
     NewsNode getNewsNode(Long id);
+
+    /**
+     * 抽取新闻实体关系并持久化
+     *
+     * @param newsId 新闻id
+     * @param title 新闻标题
+     * @param content 新闻内容
+     */
+    void analyzeNews(Long newsId, String title, String content);
 }
