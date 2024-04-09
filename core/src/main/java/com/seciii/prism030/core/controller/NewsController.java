@@ -1,5 +1,6 @@
 package com.seciii.prism030.core.controller;
 
+import com.seciii.prism030.core.pojo.vo.news.ClassifyResultVO;
 import com.seciii.prism030.core.pojo.vo.news.NewsVO;
 import com.seciii.prism030.common.Result;
 import com.seciii.prism030.core.pojo.dto.PagedNews;
@@ -178,5 +179,18 @@ public class NewsController {
     public Result<Void> deleteMultiple(@RequestBody List<Long> idList) {
         newsService.deleteMultipleNews(idList);
         return Result.success();
+    }
+
+    /**
+     * 获取前N个最可能的新闻分类
+     *
+     * @param text 新闻标题字符串
+     * @param topN topN个数
+     * @return 分类结果
+     */
+    @GetMapping("/news/top-n-classify")
+    public Result<List<ClassifyResultVO>> getTopNClassify(@RequestParam String text, @RequestParam int topN) {
+        List<ClassifyResultVO> result = newsService.topNClassify(text, topN);
+        return Result.success(result);
     }
 }
