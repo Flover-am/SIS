@@ -22,8 +22,7 @@ ENV PORT=8080 \
     RabbitMQ_HOST="" \
     RabbitMQ_PORT="" \
     RabbitMQ_USERNAME="" \
-    RabbitMQ_PASSWORD="" \
-
+    RabbitMQ_PASSWORD=""
 WORKDIR /app
 RUN echo "MYSQL_URL is: $MYSQL_URL"
 COPY core-0.0.1-SNAPSHOT.jar /app
