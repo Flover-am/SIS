@@ -16,6 +16,8 @@
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <fastjson.version>2.0.24</fastjson.version>
+        <common.text.version>1.9</common.text.version>
+        <amqp.version>3.0.5</amqp.version>
 
     </properties>
 
@@ -36,6 +38,25 @@
         <dependency>
             <groupId>org.thunlp</groupId>
             <artifactId>thuctc-trimmed</artifactId>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.springframework.amqp/spring-rabbit -->
+        <dependency>
+            <groupId>org.springframework.amqp</groupId>
+            <artifactId>spring-rabbit</artifactId>
+            <version>${amqp.version}</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.alibaba/fastjson -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>${fastjson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
+            <version>${common.text.version}</version>
         </dependency>
 
     </dependencies>
