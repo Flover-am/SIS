@@ -23,9 +23,9 @@ public class RabbitConsumer {
     @RabbitHandler
     public void process(byte[] data) {
         String jsonString = new String(data, StandardCharsets.UTF_8);
-        String fullString = StringEscapeUtils.unescapeJava(jsonString);
+
 //        System.out.println(fullString);
-        NewNews newNews = MessageConvertor.parseJsonToNewNews(fullString);
+        NewNews newNews = MessageConvertor.parseJsonToNewNews(jsonString);
 
 
         newsServiceMongo.addNews(newNews);
