@@ -49,8 +49,6 @@ public interface GraphService {
      * 抽取新闻实体关系并持久化
      *
      * @param newsId 新闻id
-     * @param title 新闻标题
-     * @param content 新闻内容
      */
-    void analyzeNews(Long newsId, String title, String content);
+    void analyzeNews(Long newsId);
 }

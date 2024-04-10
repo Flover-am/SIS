@@ -1,14 +1,16 @@
 package com.seciii.prism030.core.service.impl;
 
-import com.seciii.prism030.common.exception.NewsException;
+import com.seciii.prism030.common.exception.GraphException;
 import com.seciii.prism030.common.exception.error.ErrorType;
 import com.seciii.prism030.core.dao.graph.EntityNodeDAO;
 import com.seciii.prism030.core.dao.graph.NewsNodeDAO;
+import com.seciii.prism030.core.dao.news.NewsDAOMongo;
 import com.seciii.prism030.core.pojo.dto.NewsEntityRelationshipDTO;
 import com.seciii.prism030.core.pojo.po.graph.node.EntityNode;
 import com.seciii.prism030.core.pojo.po.graph.node.NewsNode;
 import com.seciii.prism030.core.pojo.po.graph.relationship.EntityRelationship;
 import com.seciii.prism030.core.pojo.po.graph.relationship.NewsEntityRelationship;
+import com.seciii.prism030.core.pojo.po.news.NewsPO;
 import com.seciii.prism030.core.service.GraphService;
 import com.seciii.prism030.core.utils.SparkUtil;
 import org.springframework.stereotype.Service;
@@ -25,12 +27,13 @@ import java.util.*;
 public class GraphServiceImpl implements GraphService {
 
     private final EntityNodeDAO entityNodeDAO;
-
     private final NewsNodeDAO newsNodeDAO;
+    private final NewsDAOMongo newsDAOMongo;
 
-    public GraphServiceImpl(EntityNodeDAO entityNodeDAO, NewsNodeDAO newsNodeDAO) {
+    public GraphServiceImpl(EntityNodeDAO entityNodeDAO, NewsNodeDAO newsNodeDAO, NewsDAOMongo newsDAOMongo) {
         this.entityNodeDAO = entityNodeDAO;
         this.newsNodeDAO = newsNodeDAO;
+        this.newsDAOMongo = newsDAOMongo;
     }
 
     @Override
@@ -77,18 +80,29 @@ public class GraphServiceImpl implements GraphService {
     }
 
     @Override
-    public void analyzeNews(Long newsId, String title, String content) {
+    public void analyzeNews(Long newsId) {
         NewsNode newsNode = getNewsNodeByNewsId(newsId);
         if (newsNode != null) {
+            // neo4j中已有该节点，直接返回
             return;
         }
 
+        NewsPO news = newsDAOMongo.getNewsById(newsId);
+        if (news == null) {
+            // 未找到新闻，抛出异常
+            throw new GraphException(ErrorType.NEWS_NOT_FOUND, "未找到对应id的新闻");
+        }
+        String title = news.getTitle();
+        String content = news.getContent();
+        // 将新闻节点添加进neo4j
         newsNode = addNewsNode(newsId, title);
 
+        // 获取大模型返回结果
         String llmResult = SparkUtil.chat(content);
         Map<String, Long> entities = new HashMap<>();
         List<NewsEntityRelationshipDTO> relations = new ArrayList<>();
         if (llmResult != null) {
+            // 获取结果按照模型返回结果格式解析
             String[] split = llmResult.split("\\n");
             for (String s : split) {
                 String[] tuple = s.substring(1, s.length() - 1).
@@ -102,7 +116,7 @@ public class GraphServiceImpl implements GraphService {
                                     .relationship(tuple[1])
                                     .build());
                 } else {
-                    throw new NewsException(ErrorType.ILLEGAL_ARGUMENTS);
+                    throw new GraphException(ErrorType.LLM_RESULT_ERROR, "大模型返回结果异常");
                 }
             }
         }

@@ -47,8 +47,12 @@ public enum ErrorType {
      */
     NEWS_NOT_FOUND(300000, "News does not exist", 404), /* 查找的新闻不存在 */
 
-    NEWS_PAGE_OVERFLOW(300001, "News page overflow", 400); /* 新闻页码溢出 */
+    NEWS_PAGE_OVERFLOW(300001, "News page overflow", 400), /* 新闻页码溢出 */
 
+    /**
+     * 图数据库模块错误码
+     */
+    LLM_RESULT_ERROR(400000, "LLM result error", 500); /* LLM返回结果错误 */
 
     /**
      * 状态码
