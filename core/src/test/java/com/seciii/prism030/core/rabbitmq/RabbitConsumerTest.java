@@ -12,6 +12,11 @@ import org.mockito.MockitoAnnotations;
 
 import static org.mockito.Mockito.*;
 
+/**
+ * RabbitMQ测试类
+ * @author:windloong
+ */
+
 public class RabbitConsumerTest {
 
     @Mock

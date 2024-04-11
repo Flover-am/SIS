@@ -12,10 +12,14 @@ import java.time.format.DateTimeFormatter;
 
 public class MessageConvertor {
 
+    /**
+     * 将json格式新闻映射为NewNews对象
+     * @param jsonString
+     * @return newNews
+     */
 
     public static NewNews parseJsonToNewNews(String jsonString) {
 
-//        return JSON.parseObject(jsonString,NewNews.class);
 
         JSONObject jsonObject = JSON.parseObject(jsonString);
 
@@ -51,37 +55,5 @@ public class MessageConvertor {
 
         return newNews;
     }
-
-    public static NewsPO parseJsonToNewsPO(String jsonString)
-    {
-        JSONObject jsonObject = JSON.parseObject(jsonString);
-
-        // 获取属性值示例
-        String title = jsonObject.getString("title");
-        String content = jsonObject.getString("content");
-        String originSource = jsonObject.getString("originSource");
-        String link = jsonObject.getString("link");
-        String sourceLink = jsonObject.getString("sourceLink");
-        String sourceTimeStr = jsonObject.getString("sourceTime");
-        String categoryStr = jsonObject.getString("category");
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        LocalDateTime sourceTime = LocalDateTime.parse(sourceTimeStr, formatter);
-
-
-        return  NewsPO.builder()
-                .title(title) // 设置标题
-                .content(content) // 设置内容
-                .originSource(originSource) // 设置来源
-                .sourceTime(sourceTime) // 设置时间
-                .link(link) // 设置链接
-                .sourceLink(sourceLink) // 设置源链接
-                .category(1) // 设置分类
-                .createTime(LocalDateTime.now()) // 设置创建时间
-                .updateTime(LocalDateTime.now()) // 设置更新时间
-                .build(); // 构建NewsPO对象
-    }
-
-
-
 
 }
