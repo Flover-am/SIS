@@ -37,7 +37,7 @@
         </dependency>
         <dependency>
             <groupId>org.thunlp</groupId>
-            <artifactId>thuctc-trimmed</artifactId>
+            <artifactId>thuctc-classifier-lite</artifactId>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.springframework.amqp/spring-rabbit -->

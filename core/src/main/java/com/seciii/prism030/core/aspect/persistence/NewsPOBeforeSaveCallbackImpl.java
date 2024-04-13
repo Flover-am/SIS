@@ -1,4 +1,4 @@
-package com.seciii.prism030.core.utils.persistence;
+package com.seciii.prism030.core.aspect.persistence;
 
 import com.seciii.prism030.core.pojo.po.news.NewsPO;
 import org.bson.Document;
