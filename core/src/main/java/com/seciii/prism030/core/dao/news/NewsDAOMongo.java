@@ -27,7 +27,7 @@ public interface NewsDAOMongo extends NewsMapper {
      * @param newsPO 新闻PO
      * @return 插入成功返回新闻PO，否则返回null
      */
-    NewsPO insert(NewsPO newsPO);
+    long insert(NewsPO newsPO);
 
     /**
      * 删除新闻

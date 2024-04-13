@@ -38,7 +38,7 @@ public class NewsDAOMongoImplTest {
                     .sourceLink("testOriginLink"+i)
                     .sourceTime(LocalDateTime.now())
                     .build();
-            assertEquals(newsPO.getId(),newsDAOMongo.insert(newsPO).getId());
+            assertEquals(newsPO.getId(),newsDAOMongo.insert(newsPO));
         }
     }
     @Test
