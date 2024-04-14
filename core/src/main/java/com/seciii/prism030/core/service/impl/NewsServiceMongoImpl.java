@@ -2,11 +2,14 @@ package com.seciii.prism030.core.service.impl;
 
 import com.seciii.prism030.common.exception.NewsException;
 import com.seciii.prism030.common.exception.error.ErrorType;
-import com.seciii.prism030.core.decorator.classifier.Classifier;
 import com.seciii.prism030.core.dao.news.NewsDAOMongo;
+import com.seciii.prism030.core.decorator.classifier.Classifier;
+import com.seciii.prism030.core.decorator.segment.TextSegment;
+import com.seciii.prism030.core.pojo.dto.NewsWordDetail;
 import com.seciii.prism030.core.pojo.dto.PagedNews;
 import com.seciii.prism030.core.pojo.po.news.NewsPO;
 import com.seciii.prism030.core.pojo.po.news.NewsSegmentPO;
+import com.seciii.prism030.core.pojo.po.news.NewsWordPO;
 import com.seciii.prism030.core.pojo.vo.news.ClassifyResultVO;
 import com.seciii.prism030.core.pojo.vo.news.NewNews;
 import com.seciii.prism030.core.pojo.vo.news.NewsSegmentVO;
@@ -18,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -31,6 +35,7 @@ import java.util.List;
 public class NewsServiceMongoImpl implements NewsService {
     private NewsDAOMongo newsDAOMongo;
     private Classifier classifier;
+    private TextSegment textSegment;
 
     @Autowired
     public void setNewsDAOMongo(NewsDAOMongo newsDAOMongo) {
@@ -42,6 +47,10 @@ public class NewsServiceMongoImpl implements NewsService {
         this.classifier = classifier;
     }
 
+    @Autowired
+    public void setTextSegment(TextSegment textSegment) {
+        this.textSegment = textSegment;
+    }
 
     /**
      * 获取新闻详情
@@ -242,8 +251,34 @@ public class NewsServiceMongoImpl implements NewsService {
         if (newsSegmentPO != null) {
             return NewsUtil.toNewsSegmentVO(newsSegmentPO);
         }
-
-        return null;
+        NewsWordDetail[] newsWordDetails = textSegment.rank(newsDAOMongo.getNewsById(id).getContent());
+        List<NewsWordDetail> filteredNewsWordDetail = NewsUtil.filterNewsWordDetail(newsWordDetails);
+        List<NewsWordPO> newsWordPOList = new ArrayList<>();
+        for (NewsWordDetail newsWordDetail : filteredNewsWordDetail) {
+            boolean isContained = false;
+            for (NewsWordPO newsWordPO : newsWordPOList) {
+                if (newsWordPO.getText().equals(newsWordDetail.getText())) {
+                    newsWordPO.setCount(newsWordPO.getCount() + 1);
+                    isContained = true;
+                    break;
+                }
+            }
+            if (!isContained) {
+                newsWordPOList.add(NewsWordPO.builder()
+                        .text(newsWordDetail.getText())
+                        .count(1)
+                        .build());
+            }
+        }
+        NewsSegmentPO newNewsSegmentPO = NewsSegmentPO.builder()
+                .id(id)
+                .content(newsWordPOList.toArray(new NewsWordPO[0]))
+                .build();
+        int code = newsDAOMongo.insertSegment(newNewsSegmentPO);
+        if (code != 0) {
+            throw new NewsException(ErrorType.UNKNOWN_ERROR);
+        }
+        return NewsUtil.toNewsSegmentVO(newNewsSegmentPO);
     }
 
 }

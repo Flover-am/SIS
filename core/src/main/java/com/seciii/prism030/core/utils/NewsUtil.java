@@ -1,6 +1,8 @@
 package com.seciii.prism030.core.utils;
 
 import com.seciii.prism030.core.enums.CategoryType;
+import com.seciii.prism030.core.enums.SpeechPart;
+import com.seciii.prism030.core.pojo.dto.NewsWordDetail;
 import com.seciii.prism030.core.pojo.po.news.NewsPO;
 import com.seciii.prism030.core.pojo.po.news.NewsSegmentPO;
 import com.seciii.prism030.core.pojo.vo.news.*;
@@ -23,6 +25,16 @@ public class NewsUtil {
     public final static String CATEGORY = "category";
     public final static String UPDATE_TIME = "update_time";
     public final static String CREATE_TIME = "create_time";
+
+    public final static List<SpeechPart> ignoredParts = Arrays.asList(
+            SpeechPart.ADVERB,
+            SpeechPart.PRONOUN,
+            SpeechPart.PREPOSITION,
+            SpeechPart.CONJUNCTION,
+            SpeechPart.AUXILIARY,
+            SpeechPart.FUNCTION,
+            SpeechPart.PUNCTUATION
+    );
 
     private NewsUtil() {
     }
@@ -121,12 +133,13 @@ public class NewsUtil {
 
     /**
      * 将新闻分词PO转换为新闻分词VO
+     *
      * @param newsSegmentPO 新闻分词PO
      * @return 新闻分词VO
      */
     public static NewsSegmentVO toNewsSegmentVO(NewsSegmentPO newsSegmentPO) {
         NewsWordVO[] newsWordVOS = Arrays.stream(newsSegmentPO.getContent()).map(
-                x->{
+                x -> {
                     return NewsWordVO.builder()
                             .text(x.getText())
                             .count(x.getCount())
@@ -137,5 +150,18 @@ public class NewsUtil {
                 .id(newsSegmentPO.getId())
                 .content(newsWordVOS)
                 .build();
+    }
+
+    /**
+     * 过滤新闻分词结果
+     *
+     * @param newsWordDetails 新闻分词结果
+     * @return 过滤后的新闻分词结果
+     */
+    public static List<NewsWordDetail> filterNewsWordDetail(NewsWordDetail[] newsWordDetails) {
+        return Arrays.stream(newsWordDetails).filter(
+                word -> word.getRank() > 1
+                        && !ignoredParts.contains(word.getPartOfSpeech())
+        ).toList();
     }
 }

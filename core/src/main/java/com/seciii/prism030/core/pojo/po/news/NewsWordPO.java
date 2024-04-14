@@ -5,6 +5,7 @@ import lombok.Data;
 
 /**
  * 新闻分词元素PO类
+ *
  * @author wang mingsong
  * @date 2024.04.14
  */

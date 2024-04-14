@@ -71,7 +71,7 @@ public class TextSegment {
         for (int i = 0; i < list.get(0).size(); i++) {
             res[i] = NewsWordDetail.builder()
                     .text((String) (list.get(0)).get(i))
-                    .partOfSpeech(SpeechPart.of((String) (list.get(1)).get(i)))
+                    .partOfSpeech(SpeechPart.ofTag((String) (list.get(1)).get(i)))
                     .rank((int) (list.get(2)).get(i))
                     .build();
         }

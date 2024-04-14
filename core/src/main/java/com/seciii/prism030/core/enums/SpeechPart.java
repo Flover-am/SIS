@@ -61,7 +61,7 @@ public enum SpeechPart {
      * @param tag 词性标签
      * @return 词性枚举
      */
-    public static SpeechPart of(String tag) {
+    public static SpeechPart ofTag(String tag) {
         for (SpeechPart speechPart : SpeechPart.values()) {
             if (speechPart.tag.equals(tag)) {
                 return speechPart;

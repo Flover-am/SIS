@@ -6,6 +6,7 @@ import lombok.Setter;
 
 /**
  * 新闻分词元素VO类
+ *
  * @author wang mingsong
  * @date 2024.04.14
  */
