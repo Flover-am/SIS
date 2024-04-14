@@ -3,6 +3,7 @@ package com.seciii.prism030.core.dao.news;
 
 import com.seciii.prism030.core.mapper.news.NewsMapper;
 import com.seciii.prism030.core.pojo.po.news.NewsPO;
+import com.seciii.prism030.core.pojo.po.news.NewsSegmentPO;
 
 import java.util.List;
 
@@ -88,4 +89,18 @@ public interface NewsDAOMongo extends NewsMapper {
      * @return 下一个可用新闻id
      */
     Long getNextNewsId();
+
+    /**
+     * 获取新闻分词词云
+     * @param id 新闻id
+     * @return 新闻分词词云
+     */
+    NewsSegmentPO getNewsSegmentById(Long id);
+
+    /**
+     * 插入新闻分词词云
+     * @param newsSegmentPO 新闻分词词云
+     * @return 插入成功返回0，否则返回-1
+     */
+    int insertSegment(NewsSegmentPO newsSegmentPO);
 }

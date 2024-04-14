@@ -2,10 +2,10 @@ package com.seciii.prism030.core.utils;
 
 import com.seciii.prism030.core.enums.CategoryType;
 import com.seciii.prism030.core.pojo.po.news.NewsPO;
-import com.seciii.prism030.core.pojo.vo.news.NewNews;
-import com.seciii.prism030.core.pojo.vo.news.NewsItemVO;
-import com.seciii.prism030.core.pojo.vo.news.NewsVO;
+import com.seciii.prism030.core.pojo.po.news.NewsSegmentPO;
+import com.seciii.prism030.core.pojo.vo.news.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -116,6 +116,26 @@ public class NewsUtil {
                 .link(newNews.getLink())
                 .sourceLink(newNews.getSourceLink())
                 .category(category)
+                .build();
+    }
+
+    /**
+     * 将新闻分词PO转换为新闻分词VO
+     * @param newsSegmentPO 新闻分词PO
+     * @return 新闻分词VO
+     */
+    public static NewsSegmentVO toNewsSegmentVO(NewsSegmentPO newsSegmentPO) {
+        NewsWordVO[] newsWordVOS = Arrays.stream(newsSegmentPO.getContent()).map(
+                x->{
+                    return NewsWordVO.builder()
+                            .text(x.getText())
+                            .count(x.getCount())
+                            .build();
+                }
+        ).toArray(NewsWordVO[]::new);
+        return NewsSegmentVO.builder()
+                .id(newsSegmentPO.getId())
+                .content(newsWordVOS)
                 .build();
     }
 }

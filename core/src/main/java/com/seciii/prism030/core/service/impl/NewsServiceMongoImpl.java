@@ -6,8 +6,10 @@ import com.seciii.prism030.core.decorator.classifier.Classifier;
 import com.seciii.prism030.core.dao.news.NewsDAOMongo;
 import com.seciii.prism030.core.pojo.dto.PagedNews;
 import com.seciii.prism030.core.pojo.po.news.NewsPO;
+import com.seciii.prism030.core.pojo.po.news.NewsSegmentPO;
 import com.seciii.prism030.core.pojo.vo.news.ClassifyResultVO;
 import com.seciii.prism030.core.pojo.vo.news.NewNews;
+import com.seciii.prism030.core.pojo.vo.news.NewsSegmentVO;
 import com.seciii.prism030.core.pojo.vo.news.NewsVO;
 import com.seciii.prism030.core.service.NewsService;
 import com.seciii.prism030.core.utils.NewsUtil;
@@ -224,4 +226,24 @@ public class NewsServiceMongoImpl implements NewsService {
                 pair -> new ClassifyResultVO(pair.getFirst().toString(), pair.getSecond())
         ).toList();
     }
+
+    /**
+     * 获取新闻词云
+     *
+     * @param id 新闻id
+     * @return 词云结果
+     */
+    @Override
+    public NewsSegmentVO getNewsWordCloud(long id) {
+        if (newsDAOMongo.getNewsById(id) == null) {
+            throw new NewsException(ErrorType.NEWS_NOT_FOUND);
+        }
+        NewsSegmentPO newsSegmentPO = newsDAOMongo.getNewsSegmentById(id);
+        if (newsSegmentPO != null) {
+            return NewsUtil.toNewsSegmentVO(newsSegmentPO);
+        }
+
+        return null;
+    }
+
 }
