@@ -1,6 +1,6 @@
 package com.seciii.prism030.core.service.impl;
 
-import com.seciii.prism030.core.classifier.Classifier;
+import com.seciii.prism030.core.decorator.classifier.Classifier;
 import com.seciii.prism030.core.dao.news.impl.NewsDAOMongoImpl;
 import com.seciii.prism030.core.enums.CategoryType;
 import com.seciii.prism030.core.pojo.po.news.NewsPO;
