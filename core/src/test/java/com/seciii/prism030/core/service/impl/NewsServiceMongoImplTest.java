@@ -1,13 +1,15 @@
 package com.seciii.prism030.core.service.impl;
 
-import com.seciii.prism030.core.classifier.Classifier;
+import com.seciii.prism030.core.decorator.classifier.Classifier;
 import com.seciii.prism030.core.dao.news.impl.NewsDAOMongoImpl;
+import com.seciii.prism030.core.decorator.segment.TextSegment;
 import com.seciii.prism030.core.enums.CategoryType;
+import com.seciii.prism030.core.enums.SpeechPart;
+import com.seciii.prism030.core.pojo.dto.NewsWordDetail;
 import com.seciii.prism030.core.pojo.po.news.NewsPO;
-import com.seciii.prism030.core.pojo.vo.news.ClassifyResultVO;
-import com.seciii.prism030.core.pojo.vo.news.NewsItemVO;
-import com.seciii.prism030.core.pojo.vo.news.NewsVO;
-import com.seciii.prism030.core.pojo.vo.news.NewNews;
+import com.seciii.prism030.core.pojo.po.news.NewsSegmentPO;
+import com.seciii.prism030.core.pojo.po.news.NewsWordPO;
+import com.seciii.prism030.core.pojo.vo.news.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,7 +25,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
@@ -33,7 +36,7 @@ public class NewsServiceMongoImplTest {
     @MockBean
     private Classifier classifier;
     @MockBean
-    private SummaryService summaryService;
+    private TextSegment textSegment;
 
     @InjectMocks
     private NewsServiceMongoImpl newsServiceMongoImpl = new NewsServiceMongoImpl();
@@ -115,13 +118,7 @@ public class NewsServiceMongoImplTest {
         for (int i = 0; i < 5; i++) {
             fakeClassifyResult.add(Pair.of(CategoryType.getCategoryType(i), 0.1 * i));
         }
-        Mockito.when(summaryService.countCategoryNews(Mockito.anyInt(), Mockito.any())).thenReturn(1);
-        Mockito.when(summaryService.countDateNews()).thenReturn(1);
-        Mockito.when(summaryService.countDateNews(Mockito.any())).thenReturn(3);
-
-
     }
-
 
     private boolean newsItemVOsEqual(NewsItemVO a, NewsItemVO b) {
         return a.getId().equals(b.getId())
@@ -182,9 +179,7 @@ public class NewsServiceMongoImplTest {
         Mockito.when(newsDAOMongoMock.batchDeleteNews(Mockito.any())).thenReturn((long) idList.size());
         newsServiceMongoImpl.deleteMultipleNews(idList);
     }
-    /**
-     * 测试获取新闻数量
-     */
+
     @Test
     void filterNewsPagedTest() {
         Mockito.when(newsDAOMongoMock.getFilteredNewsCount(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).thenReturn((long) fakeNewsPOList.size());
@@ -201,9 +196,7 @@ public class NewsServiceMongoImplTest {
             assertTrue(newsItemVOsEqual(result.get(i), fakeNewsItemList.get(i)));
         }
     }
-    /**
-     * 测试获取新闻数量
-     */
+
     @Test
     void searchNewsByTitleFilteredTest() {
         Mockito.when(newsDAOMongoMock.searchFilteredNewsByPage(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
@@ -221,9 +214,7 @@ public class NewsServiceMongoImplTest {
             assertTrue(newsItemVOsEqual(result.get(i), fakeNewsItemList.get(i)));
         }
     }
-    /**
-     * 测试获取新闻数量
-     */
+
     @Test
     void topNClassifyTest() {
         Mockito.when(classifier.topNClassify(Mockito.anyString(), Mockito.anyInt())).thenReturn(fakeClassifyResult);
@@ -234,20 +225,73 @@ public class NewsServiceMongoImplTest {
         }
     }
 
-    /**
-     * 测试获取新闻数量
-     */
     @Test
-    void countPeriod() {
-        assertDoesNotThrow(() -> newsServiceMongoImpl.countPeriodNews("2022-01-01", "2022-01-03"));
-        assertEquals(0, newsServiceMongoImpl.countPeriodNews("2022-01-04", "2022-01-03").size());
-    }
+    void getWordCloudHitTest(){
+        Mockito.when(newsDAOMongoMock.getNewsById(Mockito.anyLong())).thenReturn(fakeNewsPO);
+        Mockito.when(newsDAOMongoMock.getNewsSegmentById(Mockito.anyLong())).thenReturn(NewsSegmentPO.builder()
+                .id(512L)
+                .content(new NewsWordPO[]{
+                        NewsWordPO.builder()
+                                .text("test1")
+                                .count(1)
+                                .build(),
+                        NewsWordPO.builder()
+                                .text("test2")
+                                .count(2)
+                                .build(),
+                        NewsWordPO.builder()
+                                .text("test3")
+                                .count(3)
+                                .build(),
+                        NewsWordPO.builder()
+                                .text("test4")
+                                .count(4)
+                                .build(),
+                })
+                .build()
+        );
+        NewsSegmentVO result = newsServiceMongoImpl.getNewsWordCloud(512L);
+        assertEquals(512L, result.getId());
+        assertEquals(4, result.getContent().length);
+        for(int i=0;i<result.getContent().length;i++){
+            assertEquals("test"+(i+1), result.getContent()[i].getText());
+            assertEquals(i+1, result.getContent()[i].getCount());
+        }
 
-    /**
-     * 测试获取新闻数量
-     */
+    }
     @Test
-    void countAllCategoryNews() {
-        assertDoesNotThrow(() -> newsServiceMongoImpl.countAllCategoryNews());
+    void getWordCloudNullTest(){
+        Mockito.when(newsDAOMongoMock.getNewsById(Mockito.anyLong())).thenReturn(fakeNewsPO);
+        Mockito.when(newsDAOMongoMock.getNewsSegmentById(Mockito.anyLong())).thenReturn(null);
+        Mockito.when(newsDAOMongoMock.insertSegment(Mockito.any())).thenReturn(0);
+        Mockito.when(textSegment.rank(Mockito.anyString())).thenReturn(new NewsWordDetail[]{
+                NewsWordDetail.builder()
+                        .text("test1")
+                        .partOfSpeech(SpeechPart.ofTag("n"))
+                        .rank(0)
+                        .build(),
+                NewsWordDetail.builder()
+                        .text("test2")
+                        .partOfSpeech(SpeechPart.ofTag("n"))
+                        .rank(1)
+                        .build(),
+                NewsWordDetail.builder()
+                        .text("test3")
+                        .partOfSpeech(SpeechPart.ofTag("n"))
+                        .rank(2)
+                        .build(),
+                NewsWordDetail.builder()
+                        .text("test4")
+                        .partOfSpeech(SpeechPart.ofTag("n"))
+                        .rank(3)
+                        .build(),
+        });
+        NewsSegmentVO result=newsServiceMongoImpl.getNewsWordCloud(512L);
+        assertEquals(512L, result.getId());
+        assertEquals(2, result.getContent().length);
+        for(int i=0;i<result.getContent().length;i++){
+            assertEquals("test"+(i+3), result.getContent()[i].getText());
+            assertEquals(1, result.getContent()[i].getCount());
+        }
     }
 }

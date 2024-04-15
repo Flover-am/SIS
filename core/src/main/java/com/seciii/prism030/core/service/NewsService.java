@@ -1,6 +1,11 @@
 package com.seciii.prism030.core.service;
 
 import com.seciii.prism030.core.pojo.dto.PagedNews;
+import com.seciii.prism030.core.pojo.po.news.NewsSegmentPO;
+import com.seciii.prism030.core.pojo.vo.news.ClassifyResultVO;
+import com.seciii.prism030.core.pojo.vo.news.NewNews;
+import com.seciii.prism030.core.pojo.vo.news.NewsSegmentVO;
+import com.seciii.prism030.core.pojo.vo.news.NewsVO;
 import com.seciii.prism030.core.pojo.vo.news.*;
 
 import java.time.LocalDateTime;
@@ -135,9 +140,26 @@ public interface NewsService {
 
     /**
      * 获取新闻前N可能的分类结果
+     *
      * @param text 新闻标题字符串
      * @param topN topN个数
      * @return topN分类结果
      */
     List<ClassifyResultVO> topNClassify(String text, int topN);
+
+    /**
+     * 获取新闻词云
+     *
+     * @param id 新闻id
+     * @return 词云结果
+     */
+    NewsSegmentVO getNewsWordCloud(long id);
+
+    /**
+     * 生成并保存新闻词云
+     * @param id 新闻id
+     * @param text 新闻内容
+     * @return 词云结果
+     */
+    NewsSegmentPO generateAndSaveWordCloud(long id, String text);
 }

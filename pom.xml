@@ -54,7 +54,7 @@
             </dependency>
             <dependency>
                 <groupId>org.thunlp</groupId>
-                <artifactId>thuctc-trimmed</artifactId>
+                <artifactId>thuctc-classifier-lite</artifactId>
                 <version>${thunlp.version}</version>
             </dependency>
         </dependencies>
