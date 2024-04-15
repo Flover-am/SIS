@@ -1,7 +1,8 @@
-package com.seciii.prism030.core.utils.persistence;
+package com.seciii.prism030.core.aspect.persistence;
 
-import com.seciii.prism030.core.classifier.Classifier;
+import com.seciii.prism030.core.decorator.classifier.Classifier;
 import com.seciii.prism030.core.dao.news.NewsDAOMongo;
+import com.seciii.prism030.core.enums.CategoryType;
 import com.seciii.prism030.core.pojo.po.news.NewsPO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.mapping.event.BeforeConvertCallback;
@@ -22,6 +23,7 @@ public class NewsPOBeforeConvertCallbackImpl implements BeforeConvertCallback<Ne
     public void setNewsDAOMongo(NewsDAOMongo newsDAOMongo) {
         this.newsDAOMongo = newsDAOMongo;
     }
+
     @Autowired
     public void setClassifier(Classifier classifier) {
         this.classifier = classifier;
@@ -40,7 +42,7 @@ public class NewsPOBeforeConvertCallbackImpl implements BeforeConvertCallback<Ne
         if (newsPO.getId() == null) {
             newsPO.setId(newsDAOMongo.getNextNewsId());
         }
-        if(newsPO.getCategory() == null){
+        if (newsPO.getCategory() == null || newsPO.getCategory() == CategoryType.OTHER.ordinal()) {
             newsPO.setCategory(classifier.classify(newsPO.getTitle()).toInt());
         }
         return newsPO;

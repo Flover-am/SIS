@@ -43,11 +43,13 @@ public enum ErrorType {
     USER_ROLE_NOT_EXISTS(200004, "User role not exists", 500), /* 用户身份不存在 */
 
     /**
-     * 新闻获取相关错误
+     * 新闻相关错误码
      */
     NEWS_NOT_FOUND(300000, "News does not exist", 404), /* 查找的新闻不存在 */
 
     NEWS_PAGE_OVERFLOW(300001, "News page overflow", 400), /* 新闻页码溢出 */
+
+    NEWS_SEGMENT_SERVICE_UNAVAILABLE(300002, "News segment service unavailable", 500), /* 新闻分词服务不可用 */
 
     /**
      * 图数据库模块错误码

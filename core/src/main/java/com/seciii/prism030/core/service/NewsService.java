@@ -1,9 +1,12 @@
 package com.seciii.prism030.core.service;
 
 import com.seciii.prism030.core.pojo.dto.PagedNews;
+import com.seciii.prism030.core.pojo.po.news.NewsSegmentPO;
 import com.seciii.prism030.core.pojo.vo.news.ClassifyResultVO;
 import com.seciii.prism030.core.pojo.vo.news.NewNews;
+import com.seciii.prism030.core.pojo.vo.news.NewsSegmentVO;
 import com.seciii.prism030.core.pojo.vo.news.NewsVO;
+import com.seciii.prism030.core.pojo.vo.news.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -15,6 +18,45 @@ import java.util.List;
  * @date 2024.02.29
  */
 public interface NewsService {
+
+    /**
+     * 获取所有新闻
+     *
+     * @return 所有新闻列表
+     */
+    Integer countDateNews();
+    /**
+     * 获取所有新闻
+     *
+     * @return 所有新闻列表
+     */
+    String getLastModified();
+    /**
+     * 获取所有新闻
+     *
+     * @return 所有新闻列表
+     */
+
+    Integer countCategoryNews(int category);
+
+    /**
+     * 获取所有新闻
+     *
+     * @return 所有新闻列表
+     */
+    List<NewsCategoryCountVO> countAllCategoryNews();
+    /**
+     * 获取所有新闻
+     *
+     * @return 所有新闻列表
+     */
+    List<NewsDateCountVO> countPeriodNews(String startTime, String endTime);
+    /**
+     * 获取所有新闻
+     *
+     * @return 所有新闻列表
+     */
+    Integer countWeekNews();
     /**
      * 获取新闻详情
      *
@@ -65,8 +107,9 @@ public interface NewsService {
      * 新增新闻
      *
      * @param newNews 新增的新闻对象
+     * @return 数据库中新闻插入编号
      */
-    void addNews(NewNews newNews);
+    long addNews(NewNews newNews);
 
     /**
      * 分页获取过滤后的新闻列表
@@ -97,9 +140,26 @@ public interface NewsService {
 
     /**
      * 获取新闻前N可能的分类结果
+     *
      * @param text 新闻标题字符串
      * @param topN topN个数
      * @return topN分类结果
      */
     List<ClassifyResultVO> topNClassify(String text, int topN);
+
+    /**
+     * 获取新闻词云
+     *
+     * @param id 新闻id
+     * @return 词云结果
+     */
+    NewsSegmentVO getNewsWordCloud(long id);
+
+    /**
+     * 生成并保存新闻词云
+     * @param id 新闻id
+     * @param text 新闻内容
+     * @return 词云结果
+     */
+    NewsSegmentPO generateAndSaveWordCloud(long id, String text);
 }
