@@ -27,7 +27,6 @@ import java.util.List;
  */
 @Slf4j
 @Service
-@DependsOn("classifier")
 public class NewsServiceMongoImpl implements NewsService {
     private NewsDAOMongo newsDAOMongo;
     private Classifier classifier;
