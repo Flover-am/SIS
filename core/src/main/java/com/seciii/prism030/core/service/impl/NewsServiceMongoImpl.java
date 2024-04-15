@@ -2,12 +2,15 @@ package com.seciii.prism030.core.service.impl;
 
 import com.seciii.prism030.common.exception.NewsException;
 import com.seciii.prism030.common.exception.error.ErrorType;
+import com.seciii.prism030.core.aspect.annotation.Modified;
 import com.seciii.prism030.core.dao.news.NewsDAOMongo;
+import com.seciii.prism030.core.enums.CategoryType;
 import com.seciii.prism030.core.decorator.classifier.Classifier;
 import com.seciii.prism030.core.decorator.segment.TextSegment;
 import com.seciii.prism030.core.pojo.dto.NewsWordDetail;
 import com.seciii.prism030.core.pojo.dto.PagedNews;
 import com.seciii.prism030.core.pojo.po.news.NewsPO;
+import com.seciii.prism030.core.pojo.vo.news.*;
 import com.seciii.prism030.core.pojo.po.news.NewsSegmentPO;
 import com.seciii.prism030.core.pojo.po.news.NewsWordPO;
 import com.seciii.prism030.core.pojo.vo.news.ClassifyResultVO;
@@ -15,6 +18,7 @@ import com.seciii.prism030.core.pojo.vo.news.NewNews;
 import com.seciii.prism030.core.pojo.vo.news.NewsSegmentVO;
 import com.seciii.prism030.core.pojo.vo.news.NewsVO;
 import com.seciii.prism030.core.service.NewsService;
+import com.seciii.prism030.core.service.SummaryService;
 import com.seciii.prism030.core.utils.NewsUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +26,7 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +44,13 @@ public class NewsServiceMongoImpl implements NewsService {
     private Classifier classifier;
     private TextSegment textSegment;
 
+    private SummaryService summaryService;
+
+    @Autowired
+    public void setRedisService(SummaryService summaryService) {
+        this.summaryService = summaryService;
+    }
+
     @Autowired
     public void setNewsDAOMongo(NewsDAOMongo newsDAOMongo) {
         this.newsDAOMongo = newsDAOMongo;
@@ -52,6 +64,70 @@ public class NewsServiceMongoImpl implements NewsService {
     @Autowired
     public void setTextSegment(TextSegment textSegment) {
         this.textSegment = textSegment;
+    }
+
+    @Override
+    public String getLastModified() {
+        return summaryService.getLastModified();
+    }
+
+    /**
+     *
+     * 今日新闻数量
+     * @return 新闻数量
+     */
+    @Override
+    public Integer countDateNews() {
+        return summaryService.countDateNews();
+    }
+
+    /**
+     * 今日新闻分类数量
+     *
+     * @param category 新闻分类
+     * @return 新闻数量
+     */
+    @Override
+    public Integer countCategoryNews(int category) {
+        return summaryService.countCategoryNews(category);
+    }
+
+    /**
+     * 今日所有种类新闻数量
+     * @return 每个种类的新闻数量
+     */
+    @Override
+    public List<NewsCategoryCountVO> countAllCategoryNews() {
+        List<NewsCategoryCountVO> newsCategoryCountVOList = new ArrayList<>();
+        for (int i = 0; i < CategoryType.values().length; i++) {
+            newsCategoryCountVOList.add(NewsCategoryCountVO.builder().category(CategoryType.of(i).toString()).count(summaryService.countCategoryNews(i)).build());
+        }
+        return newsCategoryCountVOList;
+    }
+
+    /**
+     * 一段时间内新闻数量
+     * @return 每天每种新闻数量
+     */
+    @Override
+    public List<NewsDateCountVO> countPeriodNews(String startTime, String endTime) {
+        LocalDate startDate = LocalDate.parse(startTime);
+        LocalDate endDate = LocalDate.parse(endTime);
+        List<NewsDateCountVO> newsDateCountVoList = new ArrayList<>();
+        for (LocalDate date = startDate; date.isBefore(endDate); date = date.plusDays(1)) {
+            List<NewsCategoryCountVO> newsCategoryCountVOList = new ArrayList<>();
+            for (int i = 0; i < CategoryType.values().length; i++) {
+                newsCategoryCountVOList.add(NewsCategoryCountVO.builder().category(CategoryType.of(i).toString()).count(summaryService.countCategoryNews(i, date)).build());
+            }
+            newsDateCountVoList.add(NewsDateCountVO.builder().date(date.toString()).newsCategoryCounts(newsCategoryCountVOList).build());
+        }
+        return newsDateCountVoList;
+    }
+
+
+    @Override
+    public Integer countWeekNews() {
+        return summaryService.countWeekNews();
     }
 
     /**
@@ -77,6 +153,7 @@ public class NewsServiceMongoImpl implements NewsService {
      * @param title 新标题
      */
     @Override
+    @Modified
     public void modifyNewsTitle(Long id, String title) {
         int result = newsDAOMongo.updateNewsTitle(id, title);
         if (result == -1) {
@@ -92,6 +169,7 @@ public class NewsServiceMongoImpl implements NewsService {
      * @param content 新内容
      */
     @Override
+    @Modified
     public void modifyNewsContent(Long id, String content) {
         int result = newsDAOMongo.updateNewsContent(id, content);
         if (result == -1) {
@@ -107,6 +185,7 @@ public class NewsServiceMongoImpl implements NewsService {
      * @param source 新来源
      */
     @Override
+    @Modified
     public void modifyNewsSource(Long id, String source) {
         int result = newsDAOMongo.updateNewsSource(id, source);
         if (result == -1) {
@@ -121,6 +200,7 @@ public class NewsServiceMongoImpl implements NewsService {
      * @param id 新闻id
      */
     @Override
+    @Modified
     public void deleteNews(Long id) {
         int result = newsDAOMongo.deleteById(id);
         if (result == -1) {
@@ -135,9 +215,11 @@ public class NewsServiceMongoImpl implements NewsService {
      * @param idList 新闻id列表
      */
     @Override
+    @Modified
     public void deleteMultipleNews(List<Long> idList) {
         newsDAOMongo.batchDeleteNews(idList);
     }
+
 
     /**
      * 新增新闻
@@ -145,6 +227,7 @@ public class NewsServiceMongoImpl implements NewsService {
      * @param newNews 新增的新闻对象
      */
     @Override
+    @Modified
     public long addNews(NewNews newNews) {
         return newsDAOMongo.insert(NewsUtil.toNewsPO(newNews));
     }
