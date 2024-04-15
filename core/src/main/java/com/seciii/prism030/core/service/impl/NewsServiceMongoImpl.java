@@ -3,7 +3,6 @@ package com.seciii.prism030.core.service.impl;
 import com.seciii.prism030.common.exception.NewsException;
 import com.seciii.prism030.common.exception.error.ErrorType;
 import com.seciii.prism030.core.aspect.annotation.Modified;
-import com.seciii.prism030.core.classifier.Classifier;
 import com.seciii.prism030.core.dao.news.NewsDAOMongo;
 import com.seciii.prism030.core.enums.CategoryType;
 import com.seciii.prism030.core.decorator.classifier.Classifier;
