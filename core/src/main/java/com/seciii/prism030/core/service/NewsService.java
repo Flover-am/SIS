@@ -6,6 +6,7 @@ import com.seciii.prism030.core.pojo.vo.news.ClassifyResultVO;
 import com.seciii.prism030.core.pojo.vo.news.NewNews;
 import com.seciii.prism030.core.pojo.vo.news.NewsSegmentVO;
 import com.seciii.prism030.core.pojo.vo.news.NewsVO;
+import com.seciii.prism030.core.pojo.vo.news.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,6 +18,45 @@ import java.util.List;
  * @date 2024.02.29
  */
 public interface NewsService {
+
+    /**
+     * 获取所有新闻
+     *
+     * @return 所有新闻列表
+     */
+    Integer countDateNews();
+    /**
+     * 获取所有新闻
+     *
+     * @return 所有新闻列表
+     */
+    String getLastModified();
+    /**
+     * 获取所有新闻
+     *
+     * @return 所有新闻列表
+     */
+
+    Integer countCategoryNews(int category);
+
+    /**
+     * 获取所有新闻
+     *
+     * @return 所有新闻列表
+     */
+    List<NewsCategoryCountVO> countAllCategoryNews();
+    /**
+     * 获取所有新闻
+     *
+     * @return 所有新闻列表
+     */
+    List<NewsDateCountVO> countPeriodNews(String startTime, String endTime);
+    /**
+     * 获取所有新闻
+     *
+     * @return 所有新闻列表
+     */
+    Integer countWeekNews();
     /**
      * 获取新闻详情
      *
