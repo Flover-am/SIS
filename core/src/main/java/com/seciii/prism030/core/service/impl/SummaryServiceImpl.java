@@ -1,5 +1,6 @@
 package com.seciii.prism030.core.service.impl;
 
+import com.seciii.prism030.core.service.SummaryService;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,12 +15,12 @@ import java.time.LocalDate;
  */
 @Service
 @Transactional
-public class SummaryService {
+public class SummaryServiceImpl implements SummaryService {
 
     private static final String lastModifiedKey = "lastModified";
     private final RedisTemplate<String, Object> redisTemplate;
 
-    public SummaryService(RedisTemplate<String, Object> redisTemplate) {
+    public SummaryServiceImpl(RedisTemplate<String, Object> redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
 
