@@ -20,6 +20,14 @@ rabbitmq_port=${14}
 rabbitmq_username=${15}
 rabbitmq_password=${16}
 
+spark_appid=${17}
+spark_apisecret=${18}
+spark_apiKey=${19}
+
+neo4j_uri=${20}
+neo4j_authentication_username=${21}
+neo4j_authentication_password=${22}
+
 version=1.0.0
 
 # 构建 Docker 镜像
@@ -50,6 +58,12 @@ docker run --name=prism030-backend -itd -p 8080:8080 --restart=on-failure:3 \
 -e RABBITMQ_PORT=$rabbitmq_port \
 -e RABBITMQ_USERNAME=$rabbitmq_username \
 -e RABBITMQ_PASSWORD=$rabbitmq_password \
+-e SPARK_APPID=$spark_appid \
+-e SPARK_APISECRET=$spark_spark_apisecret \
+-e SPARK_APIKEY=$spark_apiKey \
+-e NEO4J_URI=$neo4j_uri \
+-e NEO4J_AUTHENTICATION_USERNAME=$neo4j_authentication_username \
+-e NEO4J_AUTHENTICATION_PASSWORD=$neo4j_authentication_password \
 -e version=$version \
 prism030-backend:$version
 
