@@ -1,4 +1,4 @@
-# 版本号
+#!/bin/bash
 
 mysql_url=$1
 mysql_user=$2
@@ -21,32 +21,36 @@ rabbitmq_username=${15}
 rabbitmq_password=${16}
 
 version=1.0.0
-# shellcheck disable=SC2086
-docker build --build-arg MYSQL_URL=$mysql_url \
-      --build-arg MYSQL_USER=$mysql_user \
-      --build-arg MYSQL_PASSWORD=$mysql_password \
-      --build-arg MONGO_HOST=$mongo_host \
-      --build-arg MONGO_PORT=$mogo_port \
-      --build-arg MONGO_DATABASE=$mongo_database \
-      --build-arg MONGO_USER=$mongo_user \
-      --build-arg MONGO_PASSWORD=$mongo_password \
-      --build-arg MONGO_AUTHENTICATION_DATABASE=$mongo_authentication_database \
-      --build-arg REDIS_HOST=$redis_host \
-      --build-arg REDIS_PORT=$redis_port \
-      --build-arg REDIS_PASSWORD=$redis_password \
-      --build-arg RABBITMQ_HOST=$rabbitmq_host \
-      --build-arg RABBITMQ_PORT=$rabbitmq_port \
-      --build-arg RABBITMQ_USERNAME=$rabbitmq_username \
-      --build-arg RABBITMQ_PASSWORD=$rabbitmq_password \
-       -t prism030-backend:$version .
+
+# 构建 Docker 镜像
+docker build -t prism030-backend:$version .
 
 echo "prism030-backend:$version is built successfully!"
-pwd
-whoami
-tree
-# 允许prism030-backend不存在而报错
+
+# 停止并删除容器
 docker stop prism030-backend || true
 docker rm prism030-backend || true
 echo "prism030-backend is stopped and removed successfully!"
-docker run --name=prism030-backend -itd -p 8080:8080 -e MYSQL_URL=$mysql_url -e MYSQL_USER=$mysql_user -e MYSQL_PASSWORD=$mysql_password --restart=on-failure:3 prism030-backend:$version
+
+# 运行容器，并传递环境变量
+docker run --name=prism030-backend -itd -p 8080:8080 --restart=on-failure:3 \
+-e MYSQL_URL=$mysql_url \
+-e MYSQL_USER=$mysql_user \
+-e MYSQL_PASSWORD=$mysql_password \
+-e MONGO_HOST=$mongo_host \
+-e MONGO_PORT=$mongo_port \
+-e MONGO_DATABASE=$mongo_database \
+-e MONGO_USER=$mongo_user \
+-e MONGO_PASSWORD=$mongo_password \
+-e MONGO_AUTHENTICATION_DATABASE=$mongo_authentication_database \
+-e REDIS_HOST=$redis_host \
+-e REDIS_PORT=$redis_port \
+-e REDIS_PASSWORD=$redis_password \
+-e RABBITMQ_HOST=$rabbitmq_host \
+-e RABBITMQ_PORT=$rabbitmq_port \
+-e RABBITMQ_USERNAME=$rabbitmq_username \
+-e RABBITMQ_PASSWORD=$rabbitmq_password \
+-e version=$version \
+prism030-backend:$version
+
 echo "prism030-backend is running successfully!"
