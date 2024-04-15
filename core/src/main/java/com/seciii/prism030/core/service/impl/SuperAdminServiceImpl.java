@@ -102,7 +102,7 @@ public class SuperAdminServiceImpl implements SuperAdminService {
         }
         if (roleType.equals(RoleType.SUPER_ADMIN)) {
             log.error("Can not modify role to super admin.");
-            throw new UserException(ErrorType.UNAUTHORIZED, "无法修改为超级管理员");
+            throw new UserException(ErrorType.FORBIDDEN, "无法修改为超级管理员");
         }
         userRoleMapper.updateRoleByUserId(user.getId(), roleType.getRoleId());
     }
