@@ -11,6 +11,7 @@ import lombok.Data;
 @Data
 @Builder
 public class NewsCategoryCountVO {
+
     private String category;
     private Integer count;
 

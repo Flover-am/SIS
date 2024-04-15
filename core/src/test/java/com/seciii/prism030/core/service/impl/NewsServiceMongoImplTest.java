@@ -182,7 +182,9 @@ public class NewsServiceMongoImplTest {
         Mockito.when(newsDAOMongoMock.batchDeleteNews(Mockito.any())).thenReturn((long) idList.size());
         newsServiceMongoImpl.deleteMultipleNews(idList);
     }
-
+    /**
+     * 测试获取新闻数量
+     */
     @Test
     void filterNewsPagedTest() {
         Mockito.when(newsDAOMongoMock.getFilteredNewsCount(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any())).thenReturn((long) fakeNewsPOList.size());
@@ -199,7 +201,9 @@ public class NewsServiceMongoImplTest {
             assertTrue(newsItemVOsEqual(result.get(i), fakeNewsItemList.get(i)));
         }
     }
-
+    /**
+     * 测试获取新闻数量
+     */
     @Test
     void searchNewsByTitleFilteredTest() {
         Mockito.when(newsDAOMongoMock.searchFilteredNewsByPage(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any()))
@@ -217,7 +221,9 @@ public class NewsServiceMongoImplTest {
             assertTrue(newsItemVOsEqual(result.get(i), fakeNewsItemList.get(i)));
         }
     }
-
+    /**
+     * 测试获取新闻数量
+     */
     @Test
     void topNClassifyTest() {
         Mockito.when(classifier.topNClassify(Mockito.anyString(), Mockito.anyInt())).thenReturn(fakeClassifyResult);
@@ -228,14 +234,20 @@ public class NewsServiceMongoImplTest {
         }
     }
 
+    /**
+     * 测试获取新闻数量
+     */
     @Test
     void countPeriod() {
         assertDoesNotThrow(() -> newsServiceMongoImpl.countPeriodNews("2022-01-01", "2022-01-03"));
         assertEquals(0, newsServiceMongoImpl.countPeriodNews("2022-01-04", "2022-01-03").size());
     }
 
+    /**
+     * 测试获取新闻数量
+     */
     @Test
-    void c() {
+    void countAllCategoryNews() {
         assertDoesNotThrow(() -> newsServiceMongoImpl.countAllCategoryNews());
     }
 }

@@ -14,17 +14,44 @@ import java.util.List;
  */
 public interface NewsService {
 
+    /**
+     * 获取所有新闻
+     *
+     * @return 所有新闻列表
+     */
     Integer countDateNews();
+    /**
+     * 获取所有新闻
+     *
+     * @return 所有新闻列表
+     */
     String getLastModified();
+    /**
+     * 获取所有新闻
+     *
+     * @return 所有新闻列表
+     */
 
     Integer countCategoryNews(int category);
 
+    /**
+     * 获取所有新闻
+     *
+     * @return 所有新闻列表
+     */
     List<NewsCategoryCountVO> countAllCategoryNews();
-
+    /**
+     * 获取所有新闻
+     *
+     * @return 所有新闻列表
+     */
     List<NewsDateCountVO> countPeriodNews(String startTime, String endTime);
-
+    /**
+     * 获取所有新闻
+     *
+     * @return 所有新闻列表
+     */
     Integer countWeekNews();
-
     /**
      * 获取新闻详情
      *
