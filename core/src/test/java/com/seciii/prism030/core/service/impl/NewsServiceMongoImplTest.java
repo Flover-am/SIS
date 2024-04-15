@@ -146,7 +146,7 @@ public class NewsServiceMongoImplTest {
 
     @Test
     void addNewsTest() {
-        Mockito.when(newsDAOMongoMock.insert(Mockito.any())).thenReturn(fakeNewsPO);
+        Mockito.when(newsDAOMongoMock.insert(Mockito.any())).thenReturn(fakeNewsPO.getId());
         newsServiceMongoImpl.addNews(fakeNewNews);
     }
 

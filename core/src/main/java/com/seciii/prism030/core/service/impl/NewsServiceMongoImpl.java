@@ -182,7 +182,6 @@ public class NewsServiceMongoImpl implements NewsService {
             log.error(String.format("News with id %d not found", id));
             throw new NewsException(ErrorType.NEWS_NOT_FOUND);
         }
-        redisService.deleteNews(newsDAOMongo.getNewsById(id).getCategory());
     }
 
     /**
@@ -204,11 +203,11 @@ public class NewsServiceMongoImpl implements NewsService {
      * @param newNews 新增的新闻对象
      */
     @Override
-    public void addNews(NewNews newNews) {
-        NewsPO newsPO = newsDAOMongo.insert(NewsUtil.toNewsPO(newNews));
-        redisService.addNews(newsPO.getCategory());
+    public long addNews(NewNews newNews) {
+        long res = newsDAOMongo.insert(NewsUtil.toNewsPO(newNews));
+        redisService.addNews(NewsUtil.toNewsPO(newNews).getCategory());
+        return res;
     }
-
 
     /**
      * 分页获取过滤后的新闻列表
