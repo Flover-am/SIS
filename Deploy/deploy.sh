@@ -22,7 +22,7 @@ rabbitmq_password=${16}
 
 spark_appid=${17}
 spark_apisecret=${18}
-spark_apiKey=${19}
+spark_apikey=${19}
 
 neo4j_uri=${20}
 neo4j_authentication_username=${21}
