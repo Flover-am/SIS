@@ -1,4 +1,4 @@
-package com.seciii.prism030.core.classifier;
+package com.seciii.prism030.core.decorator.classifier;
 
 import com.seciii.prism030.core.enums.CategoryType;
 import org.springframework.data.util.Pair;

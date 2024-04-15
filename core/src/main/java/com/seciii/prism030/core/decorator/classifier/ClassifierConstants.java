@@ -1,4 +1,4 @@
-package com.seciii.prism030.core.classifier;
+package com.seciii.prism030.core.decorator.classifier;
 
 /**
  * 分类器常量类

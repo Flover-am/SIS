@@ -6,6 +6,7 @@ import com.seciii.prism030.core.pojo.po.news.NewsPO;
 
 import static com.seciii.prism030.core.utils.NewsUtil.*;
 
+import com.seciii.prism030.core.pojo.po.news.NewsSegmentPO;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,8 @@ import java.util.regex.Pattern;
 @Component
 public class NewsDAOMongoImpl implements NewsDAOMongo {
 
-    private static final String COLLECTION_NAME = "news";
+    private static final String COLLECTION_NEWS = "news";
+    private static final String COLLECTION_SEGMENT = "news_segment";
 
     private MongoTemplate mongoTemplate;
 
@@ -52,7 +54,7 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
     public NewsPO getNewsById(Long id) {
         Query query = new Query();
         query.addCriteria(Criteria.where(ID).is(id));
-        return mongoTemplate.findOne(query, NewsPO.class, COLLECTION_NAME);
+        return mongoTemplate.findOne(query, NewsPO.class, COLLECTION_NEWS);
     }
 
     /**
@@ -63,8 +65,8 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
      */
     @Override
     public long insert(NewsPO newsPO) {
-        mongoTemplate.insert(newsPO, COLLECTION_NAME);
-        return newsPO.getId();
+        NewsPO inserted = mongoTemplate.insert(newsPO, COLLECTION_NEWS);
+        return inserted.getId();
     }
 
     /**
@@ -75,7 +77,7 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
      */
     @Override
     public int delete(NewsPO newsPO) {
-        long deleteCount = mongoTemplate.remove(newsPO, COLLECTION_NAME).getDeletedCount();
+        long deleteCount = mongoTemplate.remove(newsPO, COLLECTION_NEWS).getDeletedCount();
         return deleteCount > 0 ? 0 : -1;
     }
 
@@ -87,7 +89,7 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
      */
     @Override
     public int deleteById(Long id) {
-        long deleteCount = mongoTemplate.remove(Query.query(Criteria.where(ID).is(id)), NewsPO.class, COLLECTION_NAME).getDeletedCount();
+        long deleteCount = mongoTemplate.remove(Query.query(Criteria.where(ID).is(id)), NewsPO.class, COLLECTION_NEWS).getDeletedCount();
         return deleteCount > 0 ? 0 : -1;
     }
 
@@ -216,12 +218,37 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
     public Long getNextNewsId() {
         GroupOperation groupMaxId = Aggregation.group().max(ID).as("maxId");
         Aggregation aggregation = Aggregation.newAggregation(groupMaxId);
-        MaxId result = mongoTemplate.aggregate(aggregation, COLLECTION_NAME, MaxId.class).getUniqueMappedResult();
+        MaxId result = mongoTemplate.aggregate(aggregation, COLLECTION_NEWS, MaxId.class).getUniqueMappedResult();
 
         if (result == null) {
             return 0L;
         }
         return result.getMaxId() + 1L;
+    }
+
+    /**
+     * 获取新闻分词词云
+     *
+     * @param id 新闻id
+     * @return 新闻分词词云
+     */
+    @Override
+    public NewsSegmentPO getNewsSegmentById(Long id) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where(ID).is(id));
+        return mongoTemplate.findOne(query, NewsSegmentPO.class, COLLECTION_SEGMENT);
+    }
+
+    /**
+     * 插入新闻分词词云
+     *
+     * @param newsSegmentPO 新闻分词词云
+     * @return 插入成功返回0，否则返回-1
+     */
+    @Override
+    public int insertSegment(NewsSegmentPO newsSegmentPO) {
+        NewsSegmentPO inserted = mongoTemplate.insert(newsSegmentPO, COLLECTION_SEGMENT);
+        return inserted == null ? -1 : 0;
     }
 
     /**
@@ -233,7 +260,7 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
      */
     private int modifyById(Long id, Update update) {
         update.set(UPDATE_TIME, LocalDateTime.now());
-        NewsPO newsPO = mongoTemplate.findAndModify(Query.query(Criteria.where(ID).is(id)), update, NewsPO.class, COLLECTION_NAME);
+        NewsPO newsPO = mongoTemplate.findAndModify(Query.query(Criteria.where(ID).is(id)), update, NewsPO.class, COLLECTION_NEWS);
         return newsPO == null ? -1 : 0;
     }
 
@@ -323,5 +350,6 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
         String regex = "^(?:.*[" + s + "]+).*" + String.join("?", s.split("")) + "?.*$";
         return Pattern.compile(regex);
     }
+
 
 }
