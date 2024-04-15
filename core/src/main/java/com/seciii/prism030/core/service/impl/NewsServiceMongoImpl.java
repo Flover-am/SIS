@@ -202,9 +202,6 @@ public class NewsServiceMongoImpl implements NewsService {
     @Modified
     public void deleteMultipleNews(List<Long> idList) {
         newsDAOMongo.batchDeleteNews(idList);
-        for (Long id : idList) {
-            redisService.deleteNews(newsDAOMongo.getNewsById(id).getCategory());
-        }
     }
 
 
