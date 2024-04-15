@@ -32,11 +32,11 @@ public class NewsServiceMongoImpl implements NewsService {
     private NewsDAOMongo newsDAOMongo;
     private Classifier classifier;
 
-    private RedisService redisService;
+    private SummaryService summaryService;
 
     @Autowired
-    public void setRedisService(RedisService redisService) {
-        this.redisService = redisService;
+    public void setRedisService(SummaryService summaryService) {
+        this.summaryService = summaryService;
     }
 
     @Autowired
@@ -52,7 +52,7 @@ public class NewsServiceMongoImpl implements NewsService {
 
     @Override
     public String getLastModified() {
-        return redisService.getLastModified();
+        return summaryService.getLastModified();
     }
 
     /**
@@ -62,7 +62,7 @@ public class NewsServiceMongoImpl implements NewsService {
      */
     @Override
     public Integer countDateNews() {
-        return redisService.countDateNews();
+        return summaryService.countDateNews();
     }
 
     /**
@@ -73,7 +73,7 @@ public class NewsServiceMongoImpl implements NewsService {
      */
     @Override
     public Integer countCategoryNews(int category) {
-        return redisService.countCategoryNews(category);
+        return summaryService.countCategoryNews(category);
     }
 
     /**
@@ -84,7 +84,7 @@ public class NewsServiceMongoImpl implements NewsService {
     public List<NewsCategoryCountVO> countAllCategoryNews() {
         List<NewsCategoryCountVO> newsCategoryCountVOList = new ArrayList<>();
         for (int i = 0; i < CategoryType.values().length; i++) {
-            newsCategoryCountVOList.add(NewsCategoryCountVO.builder().category(CategoryType.of(i).toString()).count(redisService.countCategoryNews(i)).build());
+            newsCategoryCountVOList.add(NewsCategoryCountVO.builder().category(CategoryType.of(i).toString()).count(summaryService.countCategoryNews(i)).build());
         }
         return newsCategoryCountVOList;
     }
@@ -101,7 +101,7 @@ public class NewsServiceMongoImpl implements NewsService {
         for (LocalDate date = startDate; date.isBefore(endDate); date = date.plusDays(1)) {
             List<NewsCategoryCountVO> newsCategoryCountVOList = new ArrayList<>();
             for (int i = 0; i < CategoryType.values().length; i++) {
-                newsCategoryCountVOList.add(NewsCategoryCountVO.builder().category(CategoryType.of(i).toString()).count(redisService.countCategoryNews(i, date)).build());
+                newsCategoryCountVOList.add(NewsCategoryCountVO.builder().category(CategoryType.of(i).toString()).count(summaryService.countCategoryNews(i, date)).build());
             }
             newsDateCountVoList.add(NewsDateCountVO.builder().date(date.toString()).newsCategoryCounts(newsCategoryCountVOList).build());
         }
@@ -111,7 +111,7 @@ public class NewsServiceMongoImpl implements NewsService {
 
     @Override
     public Integer countWeekNews() {
-        return redisService.countWeekNews();
+        return summaryService.countWeekNews();
     }
 
     /**

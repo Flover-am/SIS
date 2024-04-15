@@ -3,7 +3,7 @@ package com.seciii.prism030.core.aspect;
 import com.seciii.prism030.core.dao.news.NewsDAOMongo;
 import com.seciii.prism030.core.enums.CategoryType;
 import com.seciii.prism030.core.pojo.vo.news.NewNews;
-import com.seciii.prism030.core.service.impl.RedisService;
+import com.seciii.prism030.core.service.impl.SummaryService;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
@@ -20,13 +20,13 @@ import java.util.List;
 @Aspect
 @Component
 public class RedisAspect {
-    private final RedisService redisService;
+    private final SummaryService summaryService;
 
     private final NewsDAOMongo newsDAOMongo;
 
     @Autowired
-    public RedisAspect(RedisService redisService, NewsDAOMongo newsDAOMongo) {
-        this.redisService = redisService;
+    public RedisAspect(SummaryService summaryService, NewsDAOMongo newsDAOMongo) {
+        this.summaryService = summaryService;
         this.newsDAOMongo = newsDAOMongo;
     }
 
@@ -36,7 +36,7 @@ public class RedisAspect {
      */
     @AfterReturning("@annotation(com.seciii.prism030.core.aspect.annotation.Modified)")
     public void afterSuccessModify() {
-        redisService.modified();
+        summaryService.modified();
     }
 
 
@@ -47,7 +47,7 @@ public class RedisAspect {
     public void afterAdd(JoinPoint joinPoint) {
         Object[] args = joinPoint.getArgs();
         NewNews newNews = (NewNews) args[0];
-        redisService.addNews(CategoryType.of(newNews.getCategory()).toInt());
+        summaryService.addNews(CategoryType.of(newNews.getCategory()).toInt());
     }
 
 
@@ -58,7 +58,7 @@ public class RedisAspect {
     public void afterDelete(JoinPoint joinPoint) {
         Object[] args = joinPoint.getArgs();
         long id = (long) args[0];
-        redisService.deleteNews(newsDAOMongo.getNewsById(id).getCategory());
+        summaryService.deleteNews(newsDAOMongo.getNewsById(id).getCategory());
     }
 
     /**
@@ -69,7 +69,7 @@ public class RedisAspect {
         Object[] args = joinPoint.getArgs();
         List<Long> idList = (List<Long>) args[0];
         for (long id : idList) {
-            redisService.deleteNews(newsDAOMongo.getNewsById(id).getCategory());
+            summaryService.deleteNews(newsDAOMongo.getNewsById(id).getCategory());
         }
     }
 }

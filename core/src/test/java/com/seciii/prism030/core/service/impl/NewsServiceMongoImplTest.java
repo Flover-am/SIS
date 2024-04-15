@@ -33,7 +33,7 @@ public class NewsServiceMongoImplTest {
     @MockBean
     private Classifier classifier;
     @MockBean
-    private RedisService redisService;
+    private SummaryService summaryService;
 
     @InjectMocks
     private NewsServiceMongoImpl newsServiceMongoImpl = new NewsServiceMongoImpl();
@@ -115,9 +115,9 @@ public class NewsServiceMongoImplTest {
         for (int i = 0; i < 5; i++) {
             fakeClassifyResult.add(Pair.of(CategoryType.getCategoryType(i), 0.1 * i));
         }
-        Mockito.when(redisService.countCategoryNews(Mockito.anyInt(), Mockito.any())).thenReturn(1);
-        Mockito.when(redisService.countDateNews()).thenReturn(1);
-        Mockito.when(redisService.countDateNews(Mockito.any())).thenReturn(3);
+        Mockito.when(summaryService.countCategoryNews(Mockito.anyInt(), Mockito.any())).thenReturn(1);
+        Mockito.when(summaryService.countDateNews()).thenReturn(1);
+        Mockito.when(summaryService.countDateNews(Mockito.any())).thenReturn(3);
 
 
     }
