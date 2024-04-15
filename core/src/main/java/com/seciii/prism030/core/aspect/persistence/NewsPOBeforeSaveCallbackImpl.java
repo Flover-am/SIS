@@ -1,4 +1,4 @@
-package com.seciii.prism030.core.utils.persistence;
+package com.seciii.prism030.core.aspect.persistence;
 
 import com.seciii.prism030.core.pojo.po.news.NewsPO;
 import org.bson.Document;
@@ -33,7 +33,7 @@ public class NewsPOBeforeSaveCallbackImpl implements BeforeSaveCallback<NewsPO> 
         if (newsPO.getCreateTime() == null) {
             newsPO.setCreateTime(now);
         }
-        if(!document.containsKey(CREATE_TIME)){
+        if (!document.containsKey(CREATE_TIME)) {
             document.put(CREATE_TIME, now);
         }
         document.put(UPDATE_TIME, now);

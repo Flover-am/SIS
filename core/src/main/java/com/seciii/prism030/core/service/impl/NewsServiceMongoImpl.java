@@ -2,20 +2,27 @@ package com.seciii.prism030.core.service.impl;
 
 import com.seciii.prism030.common.exception.NewsException;
 import com.seciii.prism030.common.exception.error.ErrorType;
-import com.seciii.prism030.core.classifier.Classifier;
 import com.seciii.prism030.core.dao.news.NewsDAOMongo;
+import com.seciii.prism030.core.decorator.classifier.Classifier;
+import com.seciii.prism030.core.decorator.segment.TextSegment;
+import com.seciii.prism030.core.pojo.dto.NewsWordDetail;
 import com.seciii.prism030.core.pojo.dto.PagedNews;
 import com.seciii.prism030.core.pojo.po.news.NewsPO;
+import com.seciii.prism030.core.pojo.po.news.NewsSegmentPO;
+import com.seciii.prism030.core.pojo.po.news.NewsWordPO;
 import com.seciii.prism030.core.pojo.vo.news.ClassifyResultVO;
 import com.seciii.prism030.core.pojo.vo.news.NewNews;
+import com.seciii.prism030.core.pojo.vo.news.NewsSegmentVO;
 import com.seciii.prism030.core.pojo.vo.news.NewsVO;
 import com.seciii.prism030.core.service.NewsService;
 import com.seciii.prism030.core.utils.NewsUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.ResourceAccessException;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,6 +36,7 @@ import java.util.List;
 public class NewsServiceMongoImpl implements NewsService {
     private NewsDAOMongo newsDAOMongo;
     private Classifier classifier;
+    private TextSegment textSegment;
 
     @Autowired
     public void setNewsDAOMongo(NewsDAOMongo newsDAOMongo) {
@@ -40,6 +48,10 @@ public class NewsServiceMongoImpl implements NewsService {
         this.classifier = classifier;
     }
 
+    @Autowired
+    public void setTextSegment(TextSegment textSegment) {
+        this.textSegment = textSegment;
+    }
 
     /**
      * 获取新闻详情
@@ -224,4 +236,78 @@ public class NewsServiceMongoImpl implements NewsService {
                 pair -> new ClassifyResultVO(pair.getFirst().toString(), pair.getSecond())
         ).toList();
     }
+
+    /**
+     * 获取新闻词云
+     *
+     * @param id 新闻id
+     * @return 词云结果
+     */
+    @Override
+    public NewsSegmentVO getNewsWordCloud(long id) {
+
+        //检查该id的新闻是否存在
+        if (newsDAOMongo.getNewsById(id) == null) {
+            throw new NewsException(ErrorType.NEWS_NOT_FOUND);
+        }
+
+        //检查所查词云是否已持久化
+        NewsSegmentPO newsSegmentPO = newsDAOMongo.getNewsSegmentById(id);
+        if (newsSegmentPO != null) {
+            return NewsUtil.toNewsSegmentVO(newsSegmentPO);
+        }
+
+        //调用分词服务并持久化
+        try {
+            NewsSegmentPO newNewsSegmentPO = generateAndSaveWordCloud(id, newsDAOMongo.getNewsById(id).getContent());
+            return NewsUtil.toNewsSegmentVO(newNewsSegmentPO);
+        } catch (ResourceAccessException e) {
+            log.error(e.getMessage());
+            throw new NewsException(ErrorType.NEWS_SEGMENT_SERVICE_UNAVAILABLE);
+        }
+
+    }
+
+    /**
+     * 生成并保存新闻词云
+     *
+     * @param id   新闻id
+     * @param text 新闻内容
+     * @return 词云结果
+     */
+    @Override
+    public NewsSegmentPO generateAndSaveWordCloud(long id, String text) {
+        NewsWordDetail[] newsWordDetails = textSegment.rank(newsDAOMongo.getNewsById(id).getContent());
+        List<NewsWordDetail> filteredNewsWordDetail = NewsUtil.filterNewsWordDetail(newsWordDetails);
+        List<NewsWordPO> newsWordPOList = new ArrayList<>();
+        for (NewsWordDetail newsWordDetail : filteredNewsWordDetail) {
+            boolean isContained = false;
+            for (NewsWordPO newsWordPO : newsWordPOList) {
+                if (newsWordPO.getText().equals(newsWordDetail.getText())) {
+                    newsWordPO.setCount(newsWordPO.getCount() + 1);
+                    isContained = true;
+                    break;
+                }
+            }
+            if (!isContained) {
+                newsWordPOList.add(NewsWordPO.builder()
+                        .text(newsWordDetail.getText())
+                        .count(1)
+                        .build());
+            }
+        }
+        NewsSegmentPO newNewsSegmentPO = NewsSegmentPO.builder()
+                .id(id)
+                .content(newsWordPOList.toArray(new NewsWordPO[0]))
+                .build();
+
+        //插入新生成的词云到数据库
+        int code = newsDAOMongo.insertSegment(newNewsSegmentPO);
+        if (code != 0) {
+            // 插入到数据库失败，但已得到分词结果
+            log.error(String.format("Failed to insert news segment with id %d. ", id));
+        }
+        return newNewsSegmentPO;
+    }
+
 }
