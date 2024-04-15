@@ -21,7 +21,7 @@ public interface NewsService {
 
     List<NewsCategoryCountVO> countAllCategoryNews();
 
-    List<NewsDateCountVo> countPeriodNews(String startTime, String endTime);
+    List<NewsDateCountVO> countPeriodNews(String startTime, String endTime);
 
     Integer countWeekNews();
 

@@ -94,16 +94,16 @@ public class NewsServiceMongoImpl implements NewsService {
      * @return 每天每种新闻数量
      */
     @Override
-    public List<NewsDateCountVo> countPeriodNews(String startTime, String endTime) {
+    public List<NewsDateCountVO> countPeriodNews(String startTime, String endTime) {
         LocalDate startDate = LocalDate.parse(startTime);
         LocalDate endDate = LocalDate.parse(endTime);
-        List<NewsDateCountVo> newsDateCountVoList = new ArrayList<>();
+        List<NewsDateCountVO> newsDateCountVoList = new ArrayList<>();
         for (LocalDate date = startDate; date.isBefore(endDate); date = date.plusDays(1)) {
             List<NewsCategoryCountVO> newsCategoryCountVOList = new ArrayList<>();
             for (int i = 0; i < CategoryType.values().length; i++) {
                 newsCategoryCountVOList.add(NewsCategoryCountVO.builder().category(CategoryType.of(i).toString()).count(redisService.countCategoryNews(i, date)).build());
             }
-            newsDateCountVoList.add(NewsDateCountVo.builder().date(date.toString()).newsCategoryCounts(newsCategoryCountVOList).build());
+            newsDateCountVoList.add(NewsDateCountVO.builder().date(date.toString()).newsCategoryCounts(newsCategoryCountVOList).build());
         }
         return newsDateCountVoList;
     }

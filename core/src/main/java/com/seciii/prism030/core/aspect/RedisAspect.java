@@ -19,13 +19,13 @@ import java.util.List;
  */
 @Aspect
 @Component
-public class redisAspect {
+public class RedisAspect {
     private final RedisService redisService;
 
     private final NewsDAOMongo newsDAOMongo;
 
     @Autowired
-    public redisAspect(RedisService redisService, NewsDAOMongo newsDAOMongo) {
+    public RedisAspect(RedisService redisService, NewsDAOMongo newsDAOMongo) {
         this.redisService = redisService;
         this.newsDAOMongo = newsDAOMongo;
     }

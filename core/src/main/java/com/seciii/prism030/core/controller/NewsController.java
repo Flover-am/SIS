@@ -37,7 +37,7 @@ public class NewsController {
      * 获取一段时间内每天每种的新闻数量
      */
     @GetMapping("/news/countPeriod")
-    public Result<List<NewsDateCountVo>> countPeriodNews(@RequestParam String startTime, @RequestParam String endTime) {
+    public Result<List<NewsDateCountVO>> countPeriodNews(@RequestParam String startTime, @RequestParam String endTime) {
         return Result.success(newsService.countPeriodNews(startTime, endTime));
     }
 
