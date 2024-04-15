@@ -190,6 +190,7 @@ public class NewsController {
         List<ClassifyResultVO> result = newsService.topNClassify(text, topN);
         return Result.success(result);
     }
+
     /**
      * 词云统计
      *

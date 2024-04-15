@@ -23,6 +23,7 @@ public class NewsPOBeforeConvertCallbackImpl implements BeforeConvertCallback<Ne
     public void setNewsDAOMongo(NewsDAOMongo newsDAOMongo) {
         this.newsDAOMongo = newsDAOMongo;
     }
+
     @Autowired
     public void setClassifier(Classifier classifier) {
         this.classifier = classifier;
@@ -41,7 +42,7 @@ public class NewsPOBeforeConvertCallbackImpl implements BeforeConvertCallback<Ne
         if (newsPO.getId() == null) {
             newsPO.setId(newsDAOMongo.getNextNewsId());
         }
-        if(newsPO.getCategory() == null||newsPO.getCategory()==CategoryType.OTHER.ordinal()){
+        if (newsPO.getCategory() == null || newsPO.getCategory() == CategoryType.OTHER.ordinal()) {
             newsPO.setCategory(classifier.classify(newsPO.getTitle()).toInt());
         }
         return newsPO;

@@ -65,7 +65,7 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
      */
     @Override
     public long insert(NewsPO newsPO) {
-        NewsPO inserted=mongoTemplate.insert(newsPO, COLLECTION_NEWS);
+        NewsPO inserted = mongoTemplate.insert(newsPO, COLLECTION_NEWS);
         return inserted.getId();
     }
 
@@ -248,7 +248,7 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
     @Override
     public int insertSegment(NewsSegmentPO newsSegmentPO) {
         NewsSegmentPO inserted = mongoTemplate.insert(newsSegmentPO, COLLECTION_SEGMENT);
-        return inserted==null?-1:0;
+        return inserted == null ? -1 : 0;
     }
 
     /**

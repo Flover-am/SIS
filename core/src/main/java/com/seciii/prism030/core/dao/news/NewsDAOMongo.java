@@ -92,6 +92,7 @@ public interface NewsDAOMongo extends NewsMapper {
 
     /**
      * 获取新闻分词词云
+     *
      * @param id 新闻id
      * @return 新闻分词词云
      */
@@ -99,6 +100,7 @@ public interface NewsDAOMongo extends NewsMapper {
 
     /**
      * 插入新闻分词词云
+     *
      * @param newsSegmentPO 新闻分词词云
      * @return 插入成功返回0，否则返回-1
      */

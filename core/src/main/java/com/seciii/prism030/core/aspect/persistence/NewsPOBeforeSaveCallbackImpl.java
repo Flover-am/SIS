@@ -33,7 +33,7 @@ public class NewsPOBeforeSaveCallbackImpl implements BeforeSaveCallback<NewsPO> 
         if (newsPO.getCreateTime() == null) {
             newsPO.setCreateTime(now);
         }
-        if(!document.containsKey(CREATE_TIME)){
+        if (!document.containsKey(CREATE_TIME)) {
             document.put(CREATE_TIME, now);
         }
         document.put(UPDATE_TIME, now);
