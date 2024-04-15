@@ -52,7 +52,11 @@ public enum ErrorType {
     /**
      * 图数据库模块错误码
      */
-    LLM_RESULT_ERROR(400000, "LLM result error", 500); /* LLM返回结果错误 */
+    LLM_RESULT_ERROR(400000, "LLM result error", 500), /* LLM返回结果错误 */
+
+    GRAPH_GENERATING(400001, "Graph is generating", 400), /* 知识图谱正在生成中 */
+
+    GRAPH_NODE_EXISTS(400002, "Graph node exists", 400); /* 新闻节点已存在 */
 
     /**
      * 状态码

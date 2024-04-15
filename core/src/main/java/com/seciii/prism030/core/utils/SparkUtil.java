@@ -7,8 +7,7 @@ import com.unfbx.sparkdesk.entity.*;
 import com.unfbx.sparkdesk.listener.ChatListener;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -27,23 +26,42 @@ import java.util.concurrent.ExecutionException;
 @Slf4j
 public class SparkUtil {
     private static final String SPARK_API_HOST_WSS_V3 = "https://spark-api.xf-yun.com/v3.5/chat";
-    private static final String PROMPT = "给定以下文本，请分析并提取其中的关系三元组，数量不超过10个。\n" +
-            "每个三元组应该包括主体（人物、地点、组织或物体）、关系（少于8个字）和客体（人物、地点、组织或物体）。\n" +
-            "如果文本中没有明显的关系，输出NULL。\n" +
-            "\n" +
-            "文本： “%s”\n" +
-            "\n" +
-            "请按照以下格式提取关系三元组列表：\n" +
+    private static final String PROMPT = "你是一名从新闻提取实体关系的信息专家，请你先从后面的input中提取关键事件，再分析其中的实体关系三元组（如果很多则只留取最重要的十条）\n" +
+            " 按照以下格式返回实体关系三元组列表：(主体 | 关系 | 客体）\n" +
             "(主体 | 关系 | 客体)\n" +
-            "(主体 | 关系 | 客体)\n" +
-            "如果没有可识别的关系，请输出空字符串。不允许输出其他任何内容！\n" +
-            "请注意，主体和客体只包括人物、地点、组织或物体，必须是一个名次，不允许出现包括动词、行为、事件在内的其他内容。\n" +
-            "请注意，输出的关系必须少于8个字。";
-//    private static Environment environment;
-    public static String chat(String content) {
-        String appid = "";
-        String apiSecret = "";
-        String apiKey = "";
+            " 请注意，实体为（人物、地点、组织或物体等，可附带描述），实体关系要清晰明确无歧义。如果文本中没有明显的三元组或者任务失败，请返回NULL\n" +
+            " 例子如下：\n" +
+            "exampleinput:\n" +
+            " 4月14日，第42届香港电影金像奖举行颁奖典礼，梁朝伟凭借《金手指》第六次拿到影帝！\n" +
+            "此前五次分别是：第14届《重庆森林》（1995年），第17届《春光乍泄》（1998年），第20届《花样年华》（2001年），第22届《无间道》（2003年），第24届《2046》（2005年）。\n" +
+            "不过，梁朝伟因为忙于排片，没能现场领奖。\n" +
+            "对于这一史无前例的成就，不少网友大赞梁朝伟封神，但也有网友质疑梁朝伟在这个大烂片里演技浮夸，简直是生涯最差演技时刻。\n" +
+            "另外，《毒舌律师》获得最佳影片奖，郑保瑞以《命案》获得最佳导演奖，余香凝、姜大卫以《白日之下》分别获得最佳女主角奖、最佳男配角奖。\n" +
+            " exampleoutput:(第42届香港电影金像奖 | 举行时间 | 4月14日)\n" +
+            "(梁朝伟 | 获奖作品 | 《金手指》\n" +
+            "(梁朝伟 | 获得 | 金像奖影帝) | (梁朝伟 | 曾获得 | 第14届《重庆森林》影帝)\n" +
+            "(梁朝伟 | 曾获得 | 第17届《春光乍泄》影帝)\n" +
+            "(梁朝伟 | 曾获得 | 第20届《花样年华》影帝)\n" +
+            "(梁朝伟 | 曾获得 | 第22届《无间道》影帝)\n" +
+            "(梁朝伟 | 因为 | 忙于排片没能现场领奖) \n" +
+            "(《毒舌律师》 | 获得 | 最佳影片奖)\n" +
+            "(郑保瑞 | 获得 | 最佳导演奖) \n" +
+            " input：\n" +
+            "%s";
+    @Value("${spark.appid}")
+    private String APP_ID;
+    @Value("${spark.apisecret}")
+    private String API_SECRET;
+    @Value("${spark.apikey}")
+    private String API_KEY;
+
+    public String chat(String content) {
+        String appid = APP_ID;
+        String apiSecret = API_SECRET;
+        String apiKey = API_KEY;
+        System.out.println(appid);
+        System.out.println(apiSecret);
+        System.out.println(apiKey);
         SparkDeskClient sparkDeskClient = SparkDeskClient.builder()
                 .host(SPARK_API_HOST_WSS_V3)
                 .appid(appid)

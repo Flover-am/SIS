@@ -2,6 +2,7 @@ package com.seciii.prism030.core.service;
 
 import com.seciii.prism030.core.pojo.po.graph.node.EntityNode;
 import com.seciii.prism030.core.pojo.po.graph.node.NewsNode;
+import com.seciii.prism030.core.pojo.vo.graph.GraphVO;
 
 /**
  * 知识图谱服务接口
@@ -49,6 +50,15 @@ public interface GraphService {
      * 抽取新闻实体关系并持久化
      *
      * @param newsId 新闻id
+     * @return 知识图谱
      */
-    void analyzeNews(Long newsId);
+    GraphVO analyzeNews(Long newsId);
+
+    /**
+     * 获取知识图谱
+     *
+     * @param newsId 新闻id
+     * @return 知识图谱
+     */
+    GraphVO getGraph(Long newsId);
 }
