@@ -19,6 +19,7 @@ import com.seciii.prism030.core.utils.NewsUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.ResourceAccessException;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -244,13 +245,38 @@ public class NewsServiceMongoImpl implements NewsService {
      */
     @Override
     public NewsSegmentVO getNewsWordCloud(long id) {
+
+        //检查该id的新闻是否存在
         if (newsDAOMongo.getNewsById(id) == null) {
             throw new NewsException(ErrorType.NEWS_NOT_FOUND);
         }
+
+        //检查所查词云是否已持久化
         NewsSegmentPO newsSegmentPO = newsDAOMongo.getNewsSegmentById(id);
         if (newsSegmentPO != null) {
             return NewsUtil.toNewsSegmentVO(newsSegmentPO);
         }
+
+        //调用分词服务并持久化
+        try {
+            NewsSegmentPO newNewsSegmentPO = generateAndSaveWordCloud(id, newsDAOMongo.getNewsById(id).getContent());
+            return NewsUtil.toNewsSegmentVO(newNewsSegmentPO);
+        } catch (ResourceAccessException e) {
+            log.error(e.getMessage());
+            throw new NewsException(ErrorType.NEWS_SEGMENT_SERVICE_UNAVAILABLE);
+        }
+
+    }
+
+    /**
+     * 生成并保存新闻词云
+     *
+     * @param id   新闻id
+     * @param text 新闻内容
+     * @return 词云结果
+     */
+    @Override
+    public NewsSegmentPO generateAndSaveWordCloud(long id, String text) {
         NewsWordDetail[] newsWordDetails = textSegment.rank(newsDAOMongo.getNewsById(id).getContent());
         List<NewsWordDetail> filteredNewsWordDetail = NewsUtil.filterNewsWordDetail(newsWordDetails);
         List<NewsWordPO> newsWordPOList = new ArrayList<>();
@@ -274,11 +300,14 @@ public class NewsServiceMongoImpl implements NewsService {
                 .id(id)
                 .content(newsWordPOList.toArray(new NewsWordPO[0]))
                 .build();
+
+        //插入新生成的词云到数据库
         int code = newsDAOMongo.insertSegment(newNewsSegmentPO);
         if (code != 0) {
-            throw new NewsException(ErrorType.UNKNOWN_ERROR);
+            // 插入到数据库失败，但已得到分词结果
+            log.error(String.format("Failed to insert news segment with id %d. ", id));
         }
-        return NewsUtil.toNewsSegmentVO(newNewsSegmentPO);
+        return newNewsSegmentPO;
     }
 
 }
