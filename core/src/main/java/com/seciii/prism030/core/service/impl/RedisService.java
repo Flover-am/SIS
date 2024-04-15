@@ -1,15 +1,10 @@
 package com.seciii.prism030.core.service.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.ObjectError;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.Date;
 
 /**
  * Redis服务
@@ -21,10 +16,36 @@ import java.util.Date;
 @Transactional
 public class RedisService {
 
+    private static final String lastModifiedKey = "lastModified";
     private final RedisTemplate<String, Object> redisTemplate;
 
     public RedisService(RedisTemplate<String, Object> redisTemplate) {
         this.redisTemplate = redisTemplate;
+    }
+
+    private String categoryKey(String date, int category) {
+        return "newsDate:" + date + ":category:" + category;
+    }
+
+    private String categoryCountKey(String date, int category) {
+        return "newsDate:" + date + ":category:" + category + ":count";
+    }
+
+    private String dayKey(String date) {
+        return "newsDate:" + date;
+    }
+
+    private String dayCountKey(String date) {
+        return "newsDate:" + date + ":count";
+    }
+
+    public void modified() {
+        LocalDate now = LocalDate.now();
+        String date = now.toString();
+        redisTemplate.opsForValue().set(lastModifiedKey, date);
+    }
+    public String getLastModified() {
+        return (String) redisTemplate.opsForValue().get(lastModifiedKey);
     }
 
     /**
@@ -34,10 +55,10 @@ public class RedisService {
         LocalDate now = LocalDate.now();
         String date = now.toString();
         // newsDate:2024-03-11:category:1:count
-        String categoryCountKey = "newsDate:" + date + ":category:" + category + ":count";
+        String categoryCountKey = categoryCountKey(date, category);
         // newsDate:2024-03-11:count
-        String dateCountKey = "newsDate:" + date + ":count";
-        redisTemplate.opsForValue().increment(String.valueOf(categoryCountKey));
+        String dateCountKey = dayKey(date);
+        redisTemplate.opsForValue().increment(categoryCountKey);
         redisTemplate.opsForValue().increment(dateCountKey);
 
 //        // newsDate:2024-03-11:category:1
@@ -51,17 +72,23 @@ public class RedisService {
 
     }
 
+    /**
+     * 删除新闻
+     *
+     * @param category 新闻类别
+     */
     public void deleteNews(int category/*, int id*/) {
         LocalDate now = LocalDate.now();
         String date = now.toString();
         // newsDate:2024-03-11:category:1:count
-        String categoryCountKey = "newsDate:" + date + ":category:" + category + ":count";
+        String categoryCountKey = categoryCountKey(date, category);
         // newsDate:2024-03-11:count
-        String dateCountKey = "newsDate:" + date + ":count";
+        String dateCountKey = dayCountKey(date);
 
         redisTemplate.opsForValue().decrement(categoryCountKey);
         redisTemplate.opsForValue().decrement(dateCountKey);
     }
+
     /**
      * 今日新闻数量
      *
@@ -70,6 +97,7 @@ public class RedisService {
     public Integer countDateNews() {
         return countDateNews(LocalDate.now());
     }
+
     /**
      * 某一天新闻数量
      *
@@ -79,7 +107,7 @@ public class RedisService {
     public Integer countDateNews(LocalDate date) {
         String dateStr = date.toString();
         // newsDate:2024-03-11:count
-        String dateCountKey = "newsDate:" + dateStr + ":count";
+        String dateCountKey = dayCountKey(dateStr);
         Object res = redisTemplate.opsForValue().get(dateCountKey);
         if (res != null) {
             return (Integer) res > 0 ? (Integer) res : 0;
@@ -107,7 +135,7 @@ public class RedisService {
     public int countCategoryNews(int category, LocalDate date) {
         String dateStr = date.toString();
         // newsDate:2024-03-11:category:1:count
-        String categoryCountKey = "newsDate:" + dateStr + ":category:" + category + ":count";
+        String categoryCountKey = categoryCountKey(dateStr, category);
         Object res = redisTemplate.opsForValue().get(categoryCountKey);
         if (res != null) {
             return (Integer) res > 0 ? (Integer) res : 0;
@@ -129,7 +157,7 @@ public class RedisService {
             LocalDate datePtr = now.minusDays(i);
             String dateStr = datePtr.toString();
             // newsDate:2024-03-11:count
-            String dateCountKey = "newsDate:" + dateStr + ":count";
+            String dateCountKey = dayCountKey(dateStr);
             Object res = redisTemplate.opsForValue().get(dateCountKey);
             int count = 0;
             if (res != null) {

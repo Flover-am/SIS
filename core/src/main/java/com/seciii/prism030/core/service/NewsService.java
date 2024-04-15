@@ -15,6 +15,7 @@ import java.util.List;
 public interface NewsService {
 
     Integer countDateNews();
+    String getLastModified();
 
     Integer countCategoryNews(int category);
 

@@ -58,6 +58,11 @@ public class NewsController {
         return Result.success(newsService.countCategoryNews(category));
     }
 
+    @GetMapping("/news/lastModify")
+    public Result<String> lastModify() {
+        return Result.success(newsService.getLastModified());
+    }
+
     /**
      * 获取一周内新闻数量
      */

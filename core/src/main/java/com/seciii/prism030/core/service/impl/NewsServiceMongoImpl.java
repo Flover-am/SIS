@@ -2,6 +2,7 @@ package com.seciii.prism030.core.service.impl;
 
 import com.seciii.prism030.common.exception.NewsException;
 import com.seciii.prism030.common.exception.error.ErrorType;
+import com.seciii.prism030.core.aspect.annotation.Modified;
 import com.seciii.prism030.core.classifier.Classifier;
 import com.seciii.prism030.core.dao.news.NewsDAOMongo;
 import com.seciii.prism030.core.enums.CategoryType;
@@ -49,12 +50,16 @@ public class NewsServiceMongoImpl implements NewsService {
     }
 
 
+    @Override
+    public String getLastModified() {
+        return redisService.getLastModified();
+    }
+
     /**
      *
      * 今日新闻数量
      * @return 新闻数量
      */
-
     @Override
     public Integer countDateNews() {
         return redisService.countDateNews();
@@ -132,6 +137,7 @@ public class NewsServiceMongoImpl implements NewsService {
      * @param title 新标题
      */
     @Override
+    @Modified
     public void modifyNewsTitle(Long id, String title) {
         int result = newsDAOMongo.updateNewsTitle(id, title);
         if (result == -1) {
@@ -147,6 +153,7 @@ public class NewsServiceMongoImpl implements NewsService {
      * @param content 新内容
      */
     @Override
+    @Modified
     public void modifyNewsContent(Long id, String content) {
         int result = newsDAOMongo.updateNewsContent(id, content);
         if (result == -1) {
@@ -162,6 +169,7 @@ public class NewsServiceMongoImpl implements NewsService {
      * @param source 新来源
      */
     @Override
+    @Modified
     public void modifyNewsSource(Long id, String source) {
         int result = newsDAOMongo.updateNewsSource(id, source);
         if (result == -1) {
@@ -176,6 +184,7 @@ public class NewsServiceMongoImpl implements NewsService {
      * @param id 新闻id
      */
     @Override
+    @Modified
     public void deleteNews(Long id) {
         int result = newsDAOMongo.deleteById(id);
         if (result == -1) {
@@ -190,6 +199,7 @@ public class NewsServiceMongoImpl implements NewsService {
      * @param idList 新闻id列表
      */
     @Override
+    @Modified
     public void deleteMultipleNews(List<Long> idList) {
         newsDAOMongo.batchDeleteNews(idList);
         for (Long id : idList) {
@@ -197,16 +207,16 @@ public class NewsServiceMongoImpl implements NewsService {
         }
     }
 
+
     /**
      * 新增新闻
      *
      * @param newNews 新增的新闻对象
      */
     @Override
+    @Modified
     public long addNews(NewNews newNews) {
-        long res = newsDAOMongo.insert(NewsUtil.toNewsPO(newNews));
-        redisService.addNews(NewsUtil.toNewsPO(newNews).getCategory());
-        return res;
+        return newsDAOMongo.insert(NewsUtil.toNewsPO(newNews));
     }
 
     /**
