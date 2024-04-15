@@ -51,8 +51,14 @@ public class SuperAdminController {
             @RequestParam(required = false) String role,
             @RequestParam int pageSize,
             @RequestParam int pageOffset) {
-        List<UserVO> res = superAdminService.getUsers(RoleType.getRoleType(role), pageSize, pageOffset);
-        long count = superAdminService.getUsersCount(RoleType.getRoleType(role));
+        RoleType roleType;
+        if (role == null) {
+            roleType = null;
+        } else {
+            roleType = RoleType.getRoleType(role);
+        }
+        List<UserVO> res = superAdminService.getUsers(roleType, pageSize, pageOffset);
+        long count = superAdminService.getUsersCount(roleType);
         return Result.success(new UserListVO(count, res));
     }
 

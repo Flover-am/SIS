@@ -7,3 +7,5 @@ mybatis-plus:
     map-underscore-to-camel-case: true
   type-aliases-package: com.seciii.prism030.core.pojo.po
   mapper-locations: classpath:mapper/*.xml
+segment:
+  baseurl: "21"

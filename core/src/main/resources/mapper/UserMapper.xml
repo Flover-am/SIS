@@ -19,18 +19,24 @@
             </if>
         </where>
     </select>
-    <!--    查找对应权限的用户   -->
+    <!--    查找所有的用户   -->
     <select id="getUsers" resultType="com.seciii.prism030.core.pojo.po.auth.UserRolePO">
         SELECT *
         FROM prism030.t_auth_user_role
+        <include refid="byPage"></include>
+    </select>
+    <!--    查找对应权限的用户   -->
+
+    <select id="getUsersByRoleId" resultType="com.seciii.prism030.core.pojo.po.auth.UserRolePO">
+        SELECT *
+        FROM prism030.t_auth_user_role
         <where>
-            <if test="roleId != null and roleId != 0">
+            <if test="roleId != null">
                 AND role_id = #{roleId}
             </if>
         </where>
         <include refid="byPage"></include>
     </select>
-
     <!--    删除用户角色表中，有关用户的表项-->
     <delete id="deleteUserRole" parameterType="Long">
         DELETE
