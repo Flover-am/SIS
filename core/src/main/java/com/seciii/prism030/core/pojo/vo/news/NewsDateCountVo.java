@@ -5,7 +5,11 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.util.List;
-
+/**
+ * @author : LiDongSheng
+ * @date : 2024.4.15
+ * 新闻日期统计VO
+ */
 @Data
 @Builder
 public class NewsDateCountVo {

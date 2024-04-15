@@ -23,33 +23,45 @@ public class RedisService {
         this.redisTemplate = redisTemplate;
     }
 
+    @Deprecated
     private String categoryKey(String date, int category) {
         return "newsDate:" + date + ":category:" + category;
+    }
+
+    @Deprecated
+    private String dayKey(String date) {
+        return "newsDate:" + date;
     }
 
     private String categoryCountKey(String date, int category) {
         return "newsDate:" + date + ":category:" + category + ":count";
     }
 
-    private String dayKey(String date) {
-        return "newsDate:" + date;
-    }
 
     private String dayCountKey(String date) {
         return "newsDate:" + date + ":count";
     }
 
+    /**
+     * 修改最后一次修改时间
+     */
     public void modified() {
         LocalDate now = LocalDate.now();
         String date = now.toString();
         redisTemplate.opsForValue().set(lastModifiedKey, date);
     }
+
+    /**
+     * 获取最后一次修改时间
+     *
+     * @return 最后一次修改时间
+     */
     public String getLastModified() {
         return (String) redisTemplate.opsForValue().get(lastModifiedKey);
     }
 
     /**
-     *
+     * 添加新闻
      */
     public void addNews(int category/*, int id*/) {
         LocalDate now = LocalDate.now();
@@ -57,7 +69,7 @@ public class RedisService {
         // newsDate:2024-03-11:category:1:count
         String categoryCountKey = categoryCountKey(date, category);
         // newsDate:2024-03-11:count
-        String dateCountKey = dayKey(date);
+        String dateCountKey = dayCountKey(date);
         redisTemplate.opsForValue().increment(categoryCountKey);
         redisTemplate.opsForValue().increment(dateCountKey);
 
