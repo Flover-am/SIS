@@ -75,7 +75,7 @@ public class SuperAdminServiceImplTest {
         Mockito.doNothing().when(userMapper).deleteUserRole(existUser.getId());
 
         // 获取用户列表
-        Mockito.when(userMapper.getUsers(1, 0, null)).thenReturn(List.of(UserRolePO.builder().userId(1L).roleId(1L).build()));
+        Mockito.when(userMapper.getUsers(1, 0)).thenReturn(List.of(UserRolePO.builder().userId(1L).roleId(1L).build()));
 
         // 获取用户数量
         Mockito.when(userMapper.getUsersCount(null)).thenReturn(1L);
