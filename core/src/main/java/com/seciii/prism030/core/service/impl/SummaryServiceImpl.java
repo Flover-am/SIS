@@ -180,4 +180,26 @@ public class SummaryServiceImpl implements SummaryService {
         }
         return all;
     }
+
+    @Override
+    public Integer diffTodayAndYesterday() {
+        LocalDate now = LocalDate.now();
+        String today = now.toString();
+        String yesterday = now.minusDays(1).toString();
+        // newsDate:2024-03-11:count
+        String todayCountKey = dayCountKey(today);
+        // newsDate:2024-03-10:count
+        String yesterdayCountKey = dayCountKey(yesterday);
+        Object resToday = redisTemplate.opsForValue().get(todayCountKey);
+        Object resYesterday = redisTemplate.opsForValue().get(yesterdayCountKey);
+        int todayCount = 0;
+        int yesterdayCount = 0;
+        if (resToday != null) {
+            todayCount = (Integer) resToday > 0 ? (Integer) resToday : 0;
+        }
+        if (resYesterday != null) {
+            yesterdayCount = (Integer) resYesterday > 0 ? (Integer) resYesterday : 0;
+        }
+        return todayCount - yesterdayCount;
+    }
 }

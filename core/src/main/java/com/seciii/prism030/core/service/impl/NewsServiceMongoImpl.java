@@ -397,4 +397,9 @@ public class NewsServiceMongoImpl implements NewsService {
         return newNewsSegmentPO;
     }
 
+    @Override
+    public Integer diffTodayAndYesterday() {
+return summaryService.diffTodayAndYesterday();
+    }
+
 }

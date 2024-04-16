@@ -162,4 +162,6 @@ public interface NewsService {
      * @return 词云结果
      */
     NewsSegmentPO generateAndSaveWordCloud(long id, String text);
+
+    Integer diffTodayAndYesterday();
 }
