@@ -58,7 +58,9 @@ public enum ErrorType {
 
     GRAPH_GENERATING(400001, "Graph is generating", 400), /* 知识图谱正在生成中 */
 
-    GRAPH_NODE_EXISTS(400002, "Graph node exists", 400); /* 新闻节点已存在 */
+    GRAPH_NODE_EXISTS(400002, "Graph node exists", 400), /* 新闻节点已存在 */
+
+    NODE_SAVE_FAILED(400003, "Node save failed", 400); /* 节点存储失败 */
 
     /**
      * 状态码

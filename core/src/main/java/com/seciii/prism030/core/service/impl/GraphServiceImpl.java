@@ -158,7 +158,11 @@ public class GraphServiceImpl implements GraphService {
             }
         }
 
-        return getGraph(newsId);
+        NewsNode newsNode = getNewsNodeByNewsId(newsId);
+        if (newsNode == null) {
+            throw new GraphException(ErrorType.NODE_SAVE_FAILED, "新闻分析失败");
+        }
+        return mapGraph(newsNode);
     }
 
     @Override
