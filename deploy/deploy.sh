@@ -27,7 +27,7 @@ spark_apikey=${19}
 neo4j_uri=${20}
 neo4j_authentication_username=${21}
 neo4j_authentication_password=${22}
-
+segment_baseurl=${23}
 version=1.0.0
 
 # 构建 Docker 镜像
@@ -64,6 +64,7 @@ docker run --name=prism030-backend -itd -p 8080:8080 --restart=on-failure:3 \
 -e NEO4J_URI=$neo4j_uri \
 -e NEO4J_AUTHENTICATION_USERNAME=$neo4j_authentication_username \
 -e NEO4J_AUTHENTICATION_PASSWORD=$neo4j_authentication_password \
+-e SEGMENT_BASEURL=$segment_baseurl \
 -e version=$version \
 prism030-backend:$version
 
