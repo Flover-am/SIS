@@ -59,8 +59,8 @@ docker run --name=prism030-backend -itd -p 8080:8080 --restart=on-failure:3 \
 -e RABBITMQ_USERNAME=$rabbitmq_username \
 -e RABBITMQ_PASSWORD=$rabbitmq_password \
 -e SPARK_APPID=$spark_appid \
--e SPARK_APISECRET=$spark_spark_apisecret \
--e SPARK_APIKEY=$spark_apiKey \
+-e SPARK_APISECRET=$spark_apisecret \
+-e SPARK_APIKEY=$spark_apikey \
 -e NEO4J_URI=$neo4j_uri \
 -e NEO4J_AUTHENTICATION_USERNAME=$neo4j_authentication_username \
 -e NEO4J_AUTHENTICATION_PASSWORD=$neo4j_authentication_password \
