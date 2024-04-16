@@ -15,12 +15,12 @@ import java.time.LocalDate;
  */
 @Service
 @Transactional
-public class SummaryServiceImpl implements SummaryService {
+public class SummaryServiceRedisImpl implements SummaryService {
 
     private static final String lastModifiedKey = "lastModified";
     private final RedisTemplate<String, Object> redisTemplate;
 
-    public SummaryServiceImpl(RedisTemplate<String, Object> redisTemplate) {
+    public SummaryServiceRedisImpl(RedisTemplate<String, Object> redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
 
