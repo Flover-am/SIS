@@ -16,6 +16,7 @@ import com.seciii.prism030.core.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -66,7 +67,13 @@ public class SuperAdminServiceImpl implements SuperAdminService {
 
     @Override
     public List<UserVO> getUsers(RoleType roleType, int pageSize, int pageOffset) {
-        List<UserRolePO> res = userMapper.getUsers(pageSize, pageOffset, roleType == null ? null : roleType.getRoleId());
+        pageOffset--;
+        List<UserRolePO> res = new ArrayList<>();
+        if (roleType == null) {
+            res = userMapper.getUsers(pageSize, pageOffset);
+        } else {
+            res = userMapper.getUsersByRoleId(pageSize, pageOffset, roleType.getRoleId());
+        }
         return toUserVo(res);
     }
 
@@ -88,13 +95,14 @@ public class SuperAdminServiceImpl implements SuperAdminService {
     @Override
     public void modifyRole(String username, RoleType roleType) {
         UserPO user = userMapper.getUserByUsername(username);
+
         if (user == null) {
             log.error(String.format("User: %s not exist.", username));
             throw new UserException(ErrorType.USER_NOT_EXISTS, "用户不存在");
         }
         if (roleType.equals(RoleType.SUPER_ADMIN)) {
             log.error("Can not modify role to super admin.");
-            throw new UserException(ErrorType.UNAUTHORIZED, "无法修改为超级管理员");
+            throw new UserException(ErrorType.FORBIDDEN, "无法修改为超级管理员");
         }
         userRoleMapper.updateRoleByUserId(user.getId(), roleType.getRoleId());
     }

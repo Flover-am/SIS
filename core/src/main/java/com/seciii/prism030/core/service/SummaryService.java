@@ -62,4 +62,6 @@ public interface SummaryService {
      * @return 一周内新闻数量
      */
     public int countWeekNews();
+
+    Integer diffTodayAndYesterday();
 }

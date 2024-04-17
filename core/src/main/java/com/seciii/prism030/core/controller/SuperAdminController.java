@@ -42,7 +42,7 @@ public class SuperAdminController {
      * 获取用户列表
      * @param role 用户角色
      * @param pageSize 页面大小
-     * @param pageOffset 页面偏移量
+     * @param current 页面偏移量
      * @return 用户列表
      * @date 2024.03.27
      */
@@ -50,9 +50,15 @@ public class SuperAdminController {
     public Result<UserListVO> getUsers(
             @RequestParam(required = false) String role,
             @RequestParam int pageSize,
-            @RequestParam int pageOffset) {
-        List<UserVO> res = superAdminService.getUsers(RoleType.getRoleType(role), pageSize, pageOffset);
-        long count = superAdminService.getUsersCount(RoleType.getRoleType(role));
+            @RequestParam int current) {
+        RoleType roleType;
+        if (role == null) {
+            roleType = null;
+        } else {
+            roleType = RoleType.getRoleType(role);
+        }
+        List<UserVO> res = superAdminService.getUsers(roleType, pageSize, current);
+        long count = superAdminService.getUsersCount(roleType);
         return Result.success(new UserListVO(count, res));
     }
 

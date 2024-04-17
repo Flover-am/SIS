@@ -31,6 +31,6 @@ public class NewUserVO {
      * 用户角色
      */
     @NotNull
-    @Pattern(regexp = "super-admin|admin|user", message = "请输入正确格式的角色")
+    @Pattern(regexp = "super-admin|news-admin|user", message = "请输入正确格式的角色")
     private String role;
 }
