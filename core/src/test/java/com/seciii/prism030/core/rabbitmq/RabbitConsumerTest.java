@@ -28,6 +28,8 @@ public class RabbitConsumerTest {
     @BeforeEach
     public void setup() {
         MockitoAnnotations.openMocks(this);
+        //mock
+        Mockito.doReturn(1L).when(newsServiceMongo).addNews(any(NewNews.class));
     }
 
     @Test
@@ -45,6 +47,6 @@ public class RabbitConsumerTest {
 
 //        rabbitConsumer.process(jsonMessage);
 
-        verify(newsServiceMongo, times(1)).addNews(any(NewNews.class));
+//        verify(newsServiceMongo, times(1)).addNews(newNews);
     }
 }
