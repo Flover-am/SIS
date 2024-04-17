@@ -26,7 +26,17 @@ public class NewsController {
     }
 
     /**
+     * 获取今日新闻数量与昨日新闻数量的差值
+     * @return 今日新闻数量与昨日新闻数量的差值
+     */
+    @GetMapping("/news/diffDays")
+    public Result<Integer> diffTodayAndYesterday() {
+        return Result.success(newsService.diffTodayAndYesterday());
+    }
+
+    /**
      * 今日每种新闻的新闻数量
+     * @return 今日每种新闻的新闻数量
      */
     @GetMapping("/news/countAllCategory")
     public Result<List<NewsCategoryCountVO>> countAllCategoryNews() {

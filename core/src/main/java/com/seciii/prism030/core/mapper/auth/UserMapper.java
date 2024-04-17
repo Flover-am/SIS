@@ -38,10 +38,14 @@ public interface UserMapper extends BaseMapper<UserPO> {
      * @return 用户列表
      */
 
-    List<UserRolePO> getUsers(
+    List<UserRolePO> getUsersByRoleId(
             @Param("pageSize") int pageSize,
             @Param("pageOffset") int pageOffset,
             @Param("roleId") Long roleId
+    );
+    List<UserRolePO> getUsers(
+            @Param("pageSize") int pageSize,
+            @Param("pageOffset") int pageOffset
     );
 
     Long getUsersCount(

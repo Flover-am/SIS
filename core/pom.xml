@@ -57,12 +57,16 @@
             <artifactId>commons-text</artifactId>
             <version>${common.text.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.unfbx</groupId>
+            <artifactId>SparkDesk-Java</artifactId>
+        </dependency>
 
     </dependencies>
 
     <repositories>
         <repository>
-            <id>github-ctc</id>
+            <id>github</id>
             <url>https://maven.pkg.github.com/mas233/thuctc-trimmed</url>
             <snapshots>
                 <enabled>true</enabled>
