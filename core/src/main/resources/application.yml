@@ -17,6 +17,7 @@ mybatis-plus:
   type-aliases-package: com.seciii.prism030.core.pojo.po
   mapper-locations: classpath:mapper/*.xml
 
+
 segment:
   baseurl: http://localhost:8080
 
