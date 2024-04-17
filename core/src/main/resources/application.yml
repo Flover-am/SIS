@@ -19,3 +19,8 @@ mybatis-plus:
 
 segment:
   baseurl: http://localhost:8080
+
+spark:
+  apikey: apikey
+  apisecret: apisecret
+  appid: appid
