@@ -17,6 +17,11 @@ mybatis-plus:
   type-aliases-package: com.seciii.prism030.core.pojo.po
   mapper-locations: classpath:mapper/*.xml
 
+  spark:
+    apikey: apikey
+    apisecret: apisecret
+    appid: appid
+
 segment:
   baseurl: http://localhost:8080
 
