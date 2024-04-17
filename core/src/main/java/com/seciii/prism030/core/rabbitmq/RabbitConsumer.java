@@ -15,7 +15,6 @@ import java.nio.charset.StandardCharsets;
  * RabbitMQ消费者类，实现获取并处理消息队列中的信息，存入mongoDB
  * @author：windloong
  */
-
 @Component
 @RabbitListener(queues = "news_queue")
 public class RabbitConsumer {
