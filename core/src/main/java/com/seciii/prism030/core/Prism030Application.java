@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * @author xueruichen
+ *
  * @date 2024.03.14
  */
 @SpringBootApplication(scanBasePackages = "com.seciii.prism030")
