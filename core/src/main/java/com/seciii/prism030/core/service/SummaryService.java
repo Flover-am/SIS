@@ -1,6 +1,9 @@
 package com.seciii.prism030.core.service;
 
+import com.seciii.prism030.core.pojo.po.news.NewsWordPO;
+
 import java.time.LocalDate;
+import java.util.List;
 
 public interface SummaryService {
     public void modified();
@@ -62,4 +65,20 @@ public interface SummaryService {
      * @return 一周内新闻数量
      */
     public int countWeekNews();
+
+    /**
+     * 获取当日词云
+     *
+     * @param count 词云数量
+     * @return 词云列表
+     */
+    List<NewsWordPO> getTopNWordCloudToday(int count);
+
+    /**
+     * 更新当日词云
+     *
+     * @param wordCloud 词云列表
+     */
+    void updateWordCloudToday(List<NewsWordPO> wordCloud);
+
 }

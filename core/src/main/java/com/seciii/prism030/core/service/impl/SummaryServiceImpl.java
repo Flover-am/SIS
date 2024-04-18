@@ -1,11 +1,13 @@
 package com.seciii.prism030.core.service.impl;
 
+import com.seciii.prism030.core.pojo.po.news.NewsWordPO;
 import com.seciii.prism030.core.service.SummaryService;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * Redis服务
@@ -18,6 +20,8 @@ import java.time.LocalDate;
 public class SummaryServiceImpl implements SummaryService {
 
     private static final String lastModifiedKey = "lastModified";
+
+    private static final String wordCloudKey = "wordCloud";
     private final RedisTemplate<String, Object> redisTemplate;
 
     public SummaryServiceImpl(RedisTemplate<String, Object> redisTemplate) {
@@ -179,5 +183,42 @@ public class SummaryServiceImpl implements SummaryService {
             all += count;
         }
         return all;
+    }
+
+    /**
+     * 获取当日词云
+     *
+     * @param count 词云数量
+     * @return 词云列表
+     */
+    @Override
+    public List<NewsWordPO> getTopNWordCloudToday(int count) {
+        var resSet = redisTemplate.opsForZSet().reverseRangeWithScores(
+                wordCloudKey, 0, count - 1
+        );
+        if (resSet == null) {
+            return null;
+        }
+        return resSet.stream().map(
+                x -> NewsWordPO.builder()
+                        .text((String) x.getValue())
+                        .count((int) Math.floor(x.getScore()))
+                        .build()
+        ).toList();
+    }
+
+    /**
+     * 更新当日词云
+     *
+     * @param wordCloud 词云列表
+     */
+    @Override
+    public void updateWordCloudToday(List<NewsWordPO> wordCloud) {
+        redisTemplate.delete(wordCloudKey);
+        wordCloud.forEach(
+                x -> redisTemplate.opsForZSet().add(
+                        wordCloudKey, x.getText(), x.getCount()
+                )
+        );
     }
 }

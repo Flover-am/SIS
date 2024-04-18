@@ -1,5 +1,6 @@
 package com.seciii.prism030.core.service.impl;
 
+import com.seciii.prism030.common.exception.NewsException;
 import com.seciii.prism030.core.decorator.classifier.Classifier;
 import com.seciii.prism030.core.dao.news.impl.NewsDAOMongoImpl;
 import com.seciii.prism030.core.decorator.segment.TextSegment;
@@ -10,6 +11,7 @@ import com.seciii.prism030.core.pojo.po.news.NewsPO;
 import com.seciii.prism030.core.pojo.po.news.NewsSegmentPO;
 import com.seciii.prism030.core.pojo.po.news.NewsWordPO;
 import com.seciii.prism030.core.pojo.vo.news.*;
+import com.seciii.prism030.core.service.SummaryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +20,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.util.Pair;
 
 import java.time.LocalDateTime;
@@ -25,22 +28,28 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @ExtendWith(MockitoExtension.class)
+@ComponentScan(
+        basePackages = {
+                "com.seciii.prism030.core.aspect",
+                "com.seciii.prism030.core.aspect.persistence",
+                "com.seciii.prism030.core.config"
+        })
 public class NewsServiceMongoImplTest {
     @MockBean
     private NewsDAOMongoImpl newsDAOMongoMock;
     @MockBean
-    private Classifier classifier;
+    private Classifier classifierMock;
     @MockBean
-    private TextSegment textSegment;
+    private TextSegment textSegmentMock;
+    @MockBean
+    private SummaryService summaryServiceMock;
 
     @InjectMocks
     private NewsServiceMongoImpl newsServiceMongoImpl = new NewsServiceMongoImpl();
-
     private List<NewsItemVO> fakeNewsItemList;
     private List<NewsPO> fakeNewsPOList;
     private NewsPO fakeNewsPO;
@@ -144,7 +153,9 @@ public class NewsServiceMongoImplTest {
     @Test
     void addNewsTest() {
         Mockito.when(newsDAOMongoMock.insert(Mockito.any())).thenReturn(fakeNewsPO.getId());
-        newsServiceMongoImpl.addNews(fakeNewNews);
+        Mockito.when(newsDAOMongoMock.getNextNewsId()).thenReturn(fakeNewsPO.getId());
+        long id=newsServiceMongoImpl.addNews(fakeNewNews);
+        assertEquals(id,512L);
     }
 
     @Test
@@ -217,7 +228,7 @@ public class NewsServiceMongoImplTest {
 
     @Test
     void topNClassifyTest() {
-        Mockito.when(classifier.topNClassify(Mockito.anyString(), Mockito.anyInt())).thenReturn(fakeClassifyResult);
+        Mockito.when(classifierMock.topNClassify(Mockito.anyString(), Mockito.anyInt())).thenReturn(fakeClassifyResult);
         List<ClassifyResultVO> result = newsServiceMongoImpl.topNClassify("test", 5);
         for (int i = 0; i < 5; i++) {
             assertTrue(CategoryType.of(i).equals(result.get(i).getCategory()));
@@ -264,7 +275,7 @@ public class NewsServiceMongoImplTest {
         Mockito.when(newsDAOMongoMock.getNewsById(Mockito.anyLong())).thenReturn(fakeNewsPO);
         Mockito.when(newsDAOMongoMock.getNewsSegmentById(Mockito.anyLong())).thenReturn(null);
         Mockito.when(newsDAOMongoMock.insertSegment(Mockito.any())).thenReturn(0);
-        Mockito.when(textSegment.rank(Mockito.anyString())).thenReturn(new NewsWordDetail[]{
+        Mockito.when(textSegmentMock.rank(Mockito.anyString())).thenReturn(new NewsWordDetail[]{
                 NewsWordDetail.builder()
                         .text("test1")
                         .partOfSpeech(SpeechPart.ofTag("n"))
@@ -293,5 +304,35 @@ public class NewsServiceMongoImplTest {
             assertEquals("test"+(i+3), result.getContent()[i].getText());
             assertEquals(1, result.getContent()[i].getCount());
         }
+    }
+    @Test
+    public void updateWordCloudTodayTest(){
+        Mockito.when(newsDAOMongoMock.getWordCloudToday()).thenReturn(null);
+
+        newsServiceMongoImpl.updateWordCloudToday();
+    }
+    @Test
+    public void getNewsWordCloudTodayTest0(){
+        //Redis returns null
+        Mockito.when(summaryServiceMock.getTopNWordCloudToday(Mockito.anyInt())).thenThrow(new RuntimeException("Test Exception"));
+        Mockito.when(newsDAOMongoMock.getTopNWordCloudToday(Mockito.anyInt())).thenReturn(new ArrayList<>());
+        Mockito.when(newsDAOMongoMock.getWordCloudToday()).thenReturn(null);
+
+        assertArrayEquals(new NewsWordVO[0], newsServiceMongoImpl.getNewsWordCloudToday(10).toArray());
+    }
+    @Test
+    public void getNewsWordCloudTodayTest1(){
+        //Redis and Mongo returns null
+        Mockito.when(summaryServiceMock.getTopNWordCloudToday(Mockito.anyInt())).thenThrow(new RuntimeException("Test Exception"));
+        Mockito.when(newsDAOMongoMock.getTopNWordCloudToday(Mockito.anyInt())).thenReturn(null);
+
+        assertThrows(NewsException.class,()->newsServiceMongoImpl.getNewsWordCloudToday(10));
+    }
+    @Test
+    public void getNewsWordCloudTodayTest2(){
+        //Redis hit
+        Mockito.when(summaryServiceMock.getTopNWordCloudToday(Mockito.anyInt())).thenReturn(new ArrayList<>());
+
+        assertArrayEquals(new NewsWordVO[0], newsServiceMongoImpl.getNewsWordCloudToday(10).toArray());
     }
 }

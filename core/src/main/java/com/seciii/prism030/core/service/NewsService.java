@@ -25,12 +25,14 @@ public interface NewsService {
      * @return 所有新闻列表
      */
     Integer countDateNews();
+
     /**
      * 获取所有新闻
      *
      * @return 所有新闻列表
      */
     String getLastModified();
+
     /**
      * 获取所有新闻
      *
@@ -45,18 +47,21 @@ public interface NewsService {
      * @return 所有新闻列表
      */
     List<NewsCategoryCountVO> countAllCategoryNews();
+
     /**
      * 获取所有新闻
      *
      * @return 所有新闻列表
      */
     List<NewsDateCountVO> countPeriodNews(String startTime, String endTime);
+
     /**
      * 获取所有新闻
      *
      * @return 所有新闻列表
      */
     Integer countWeekNews();
+
     /**
      * 获取新闻详情
      *
@@ -157,9 +162,23 @@ public interface NewsService {
 
     /**
      * 生成并保存新闻词云
-     * @param id 新闻id
+     *
+     * @param id   新闻id
      * @param text 新闻内容
      * @return 词云结果
      */
     NewsSegmentPO generateAndSaveWordCloud(long id, String text);
+
+    /**
+     * 获取今日新闻词云
+     *
+     * @param count 词语数量
+     * @return 词云结果
+     */
+    List<NewsWordVO> getNewsWordCloudToday(int count);
+
+    /**
+     * 更新当日词云到Redis中
+     */
+    void updateWordCloudToday();
 }

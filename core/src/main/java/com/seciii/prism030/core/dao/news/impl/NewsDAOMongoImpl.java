@@ -7,6 +7,7 @@ import com.seciii.prism030.core.pojo.po.news.NewsPO;
 import static com.seciii.prism030.core.utils.NewsUtil.*;
 
 import com.seciii.prism030.core.pojo.po.news.NewsSegmentPO;
+import com.seciii.prism030.core.pojo.po.news.NewsWordPO;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -61,7 +62,7 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
      * 插入新闻
      *
      * @param newsPO 新闻PO
-     * @return 插入成功返回新闻PO，否则返回null
+     * @return 返回插入的新闻id
      */
     @Override
     public long insert(NewsPO newsPO) {
@@ -249,6 +250,73 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
     public int insertSegment(NewsSegmentPO newsSegmentPO) {
         NewsSegmentPO inserted = mongoTemplate.insert(newsSegmentPO, COLLECTION_SEGMENT);
         return inserted == null ? -1 : 0;
+    }
+
+    /**
+     * 获取今日词云
+     *
+     * @param count 词云数量
+     * @return 词云列表
+     */
+    @Override
+    public List<NewsWordPO> getTopNWordCloudToday(int count) {
+        List<Map.Entry<String, Integer>> sortedMap = getSortedWordCloud();
+
+        return sortedMap.stream()
+                .limit(count)
+                .map(
+                        entry -> NewsWordPO.builder()
+                                .text(entry.getKey())
+                                .count(entry.getValue())
+                                .build()
+                )
+                .toList();
+    }
+
+    /**
+     * 获取今日词云
+     *
+     * @return 词云列表
+     */
+    @Override
+    public List<NewsWordPO> getWordCloudToday() {
+        List<Map.Entry<String, Integer>> wordCountMap = getSortedWordCloud();
+        return wordCountMap.stream().map(
+                entry -> NewsWordPO.builder()
+                        .text(entry.getKey())
+                        .count(entry.getValue())
+                        .build()
+        ).toList();
+    }
+
+    /**
+     * 获取排序后的词云
+     *
+     * @return 排序后的词云列表
+     */
+    private List<Map.Entry<String, Integer>> getSortedWordCloud() {
+        List<Long> todayNewsIdList = mongoTemplate.find(new Query(Criteria.where(SOURCE_TIME)
+                        .gte(LocalDateTime.now().withHour(0).withMinute(0).withSecond(0))
+                        .lte(LocalDateTime.now())),
+                Long.class,
+                COLLECTION_NEWS
+        );
+        Map<String, Integer> wordCountMap = new HashMap<>();
+        for (Long id : todayNewsIdList) {
+            NewsSegmentPO newsSegmentPO = getNewsSegmentById(id);
+            if (newsSegmentPO == null) {
+                continue;
+            }
+            for (NewsWordPO newsWordPO : newsSegmentPO.getContent()) {
+                String word = newsWordPO.getText();
+                if (wordCountMap.containsKey(word)) {
+                    wordCountMap.put(word, wordCountMap.get(word) + newsWordPO.getCount());
+                } else {
+                    wordCountMap.put(word, newsWordPO.getCount());
+                }
+            }
+        }
+        return wordCountMap.entrySet().stream().sorted(Map.Entry.comparingByValue()).toList();
     }
 
     /**

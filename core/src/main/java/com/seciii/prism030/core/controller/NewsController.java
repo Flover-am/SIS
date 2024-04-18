@@ -43,6 +43,7 @@ public class NewsController {
 
     /**
      * 获取今日新闻数量
+     *
      * @return 今日新闻数量
      */
     @GetMapping("/news/countDay")
@@ -60,6 +61,7 @@ public class NewsController {
 
     /**
      * 获取最后一次修改时间
+     *
      * @return 最后一次修改时间
      */
     @GetMapping("/news/lastModify")
@@ -251,5 +253,17 @@ public class NewsController {
     public Result<NewsSegmentVO> getWordCloud(@RequestParam Long id) {
         NewsSegmentVO newsSegmentVO = newsService.getNewsWordCloud(id);
         return Result.success(newsSegmentVO);
+    }
+
+    /**
+     * 获取今日词云
+     *
+     * @param count 词云数量
+     * @return 词云列表
+     */
+    @GetMapping("/news/wordCloudToday")
+    public Result<List<NewsWordVO>> getWordCloudToday(@RequestParam Integer count) {
+        List<NewsWordVO> resultList = newsService.getNewsWordCloudToday(count);
+        return Result.success(resultList);
     }
 }

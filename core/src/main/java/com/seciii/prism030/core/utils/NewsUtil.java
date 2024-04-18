@@ -33,7 +33,10 @@ public class NewsUtil {
             SpeechPart.CONJUNCTION,
             SpeechPart.AUXILIARY,
             SpeechPart.FUNCTION,
-            SpeechPart.PUNCTUATION
+            SpeechPart.PUNCTUATION,
+            SpeechPart.AMOUNT,
+            SpeechPart.QUANTIFIER,
+            SpeechPart.TIME
     );
 
     private NewsUtil() {
@@ -160,7 +163,9 @@ public class NewsUtil {
      */
     public static List<NewsWordDetail> filterNewsWordDetail(NewsWordDetail[] newsWordDetails) {
         return Arrays.stream(newsWordDetails).filter(
-                word -> word.getRank() > 1
+                word -> !word.getText().contains("\n")
+                        && word.getRank() > 1
+                        && word.getPartOfSpeech() != null
                         && !ignoredParts.contains(word.getPartOfSpeech())
         ).toList();
     }
