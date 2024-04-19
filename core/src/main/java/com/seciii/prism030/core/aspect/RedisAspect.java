@@ -8,8 +8,6 @@ import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 
@@ -19,8 +17,6 @@ import java.util.List;
  * redis切面，切新闻增删改操作
  */
 @Aspect
-@Component
-@Order(2)
 public class RedisAspect {
     private final SummaryService summaryService;
 
