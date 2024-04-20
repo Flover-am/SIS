@@ -1,9 +1,15 @@
 package com.seciii.prism030.core.service;
 
+import com.seciii.prism030.core.pojo.vo.news.NewNews;
+import com.seciii.prism030.core.pojo.vo.news.NewsSourceCountVO;
+
 import java.time.LocalDate;
+import java.util.List;
 
 public interface SummaryService {
-    public void modified();
+    List<NewsSourceCountVO> getSourceRank();
+
+    public void modify();
 
     /**
      * 获取最后一次修改时间
@@ -15,7 +21,7 @@ public interface SummaryService {
     /**
      * 添加新闻
      */
-    public void addNews(int category/*, int id*/);
+    public void addNews(NewNews newNews);
 
     /**
      * 删除新闻
@@ -55,6 +61,8 @@ public interface SummaryService {
      * @return 新闻数量
      */
     public int countCategoryNews(int category, LocalDate date);
+
+    List<Integer> countAllCategoryOfDateNews(LocalDate date);
 
     /**
      * 一周内新闻数量

@@ -23,6 +23,7 @@ import com.seciii.prism030.core.utils.NewsUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.data.mongodb.core.aggregation.ArrayOperators;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 
@@ -66,6 +67,8 @@ public class NewsServiceMongoImpl implements NewsService {
         this.textSegment = textSegment;
     }
 
+
+
     @Override
     public String getLastModified() {
         return summaryService.getLastModified();
@@ -77,7 +80,7 @@ public class NewsServiceMongoImpl implements NewsService {
      * @return 新闻数量
      */
     @Override
-    public Integer countDateNews() {
+    public Integer countTodayNews() {
         return summaryService.countDateNews();
     }
 
@@ -88,7 +91,7 @@ public class NewsServiceMongoImpl implements NewsService {
      * @return 新闻数量
      */
     @Override
-    public Integer countCategoryNews(int category) {
+    public Integer countCategoryOfToday(int category) {
         return summaryService.countCategoryNews(category);
     }
 
@@ -97,10 +100,10 @@ public class NewsServiceMongoImpl implements NewsService {
      * @return 每个种类的新闻数量
      */
     @Override
-    public List<NewsCategoryCountVO> countAllCategoryNews() {
+    public List<NewsCategoryCountVO> countAllCategoryOfTodayNews() {
         List<NewsCategoryCountVO> newsCategoryCountVOList = new ArrayList<>();
         for (int i = 0; i < CategoryType.values().length; i++) {
-            if (CategoryType.of(i) != CategoryType.OTHER){
+            if (CategoryType.of(i) != CategoryType.OTHER) {
                 newsCategoryCountVOList.add(NewsCategoryCountVO.builder().category(CategoryType.of(i).toString()).count(summaryService.countCategoryNews(i)).build());
             }
         }
@@ -118,9 +121,11 @@ public class NewsServiceMongoImpl implements NewsService {
         List<NewsDateCountVO> newsDateCountVoList = new ArrayList<>();
         for (LocalDate date = startDate; date.isBefore(endDate) || date.isEqual(endDate); date = date.plusDays(1)) {
             List<NewsCategoryCountVO> newsCategoryCountVOList = new ArrayList<>();
-            for (int i = 0; i < CategoryType.values().length; i++) {
-                if (CategoryType.of(i) != CategoryType.OTHER){
-                    newsCategoryCountVOList.add(NewsCategoryCountVO.builder().category(CategoryType.of(i).toString()).count(summaryService.countCategoryNews(i, date)).build());
+            // 用countAllCategoryOfDateNews
+            List<Integer> get = summaryService.countAllCategoryOfDateNews(date);
+            for (int i = 0; i < get.size(); i++) {
+                if (CategoryType.of(i) != CategoryType.OTHER) {
+                    newsCategoryCountVOList.add(NewsCategoryCountVO.builder().category(CategoryType.of(i).toString()).count(get.get(i)).build());
                 }
             }
             newsDateCountVoList.add(NewsDateCountVO.builder().date(date.toString()).newsCategoryCounts(newsCategoryCountVOList).build());
@@ -400,7 +405,11 @@ public class NewsServiceMongoImpl implements NewsService {
 
     @Override
     public Integer diffTodayAndYesterday() {
-return summaryService.diffTodayAndYesterday();
+        return summaryService.diffTodayAndYesterday();
     }
 
+    @Override
+    public List<NewsSourceCountVO> countAllSourceNews() {
+        return summaryService.getSourceRank();
+    }
 }

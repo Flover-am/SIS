@@ -8,8 +8,6 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 
-import java.time.LocalDate;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
@@ -32,7 +30,7 @@ public class SummaryServiceRedisImplTest {
 
     @Test
     public void testModified() {
-        summaryService.modified();
+        summaryService.modify();
         verify(valueOperations, times(1)).set(anyString(), anyString());
     }
 

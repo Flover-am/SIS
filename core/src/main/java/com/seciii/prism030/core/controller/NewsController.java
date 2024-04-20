@@ -25,6 +25,17 @@ public class NewsController {
         this.newsService = newsService;
     }
 
+
+
+    /**
+     * 获取新闻来源与数量
+     * @return 新闻来源与数量
+     */
+    @GetMapping("/news/sourceCount")
+    public Result<List<NewsSourceCountVO>> countAllSourceNews() {
+        return Result.success(newsService.countAllSourceNews());
+    }
+
     /**
      * 获取今日新闻数量与昨日新闻数量的差值
      * @return 今日新闻数量与昨日新闻数量的差值
@@ -40,7 +51,7 @@ public class NewsController {
      */
     @GetMapping("/news/countAllCategory")
     public Result<List<NewsCategoryCountVO>> countAllCategoryNews() {
-        return Result.success(newsService.countAllCategoryNews());
+        return Result.success(newsService.countAllCategoryOfTodayNews());
     }
 
     /**
@@ -57,7 +68,7 @@ public class NewsController {
      */
     @GetMapping("/news/countDay")
     public Result<Integer> countDateNews() {
-        return Result.success(newsService.countDateNews());
+        return Result.success(newsService.countTodayNews());
     }
 
     /**
@@ -65,7 +76,7 @@ public class NewsController {
      */
     @GetMapping("/news/countCategory")
     public Result<Integer> countCategoryNews(@RequestParam int category) {
-        return Result.success(newsService.countCategoryNews(category));
+        return Result.success(newsService.countCategoryOfToday(category));
     }
 
     /**

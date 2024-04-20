@@ -24,7 +24,7 @@ public interface NewsService {
      *
      * @return 所有新闻列表
      */
-    Integer countDateNews();
+    Integer countTodayNews();
     /**
      * 获取所有新闻
      *
@@ -37,14 +37,14 @@ public interface NewsService {
      * @return 所有新闻列表
      */
 
-    Integer countCategoryNews(int category);
+    Integer countCategoryOfToday(int category);
 
     /**
      * 获取所有新闻
      *
      * @return 所有新闻列表
      */
-    List<NewsCategoryCountVO> countAllCategoryNews();
+    List<NewsCategoryCountVO> countAllCategoryOfTodayNews();
     /**
      * 获取所有新闻
      *
@@ -164,4 +164,6 @@ public interface NewsService {
     NewsSegmentPO generateAndSaveWordCloud(long id, String text);
 
     Integer diffTodayAndYesterday();
+
+    List<NewsSourceCountVO> countAllSourceNews();
 }
