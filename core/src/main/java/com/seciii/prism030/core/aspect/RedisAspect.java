@@ -1,7 +1,6 @@
 package com.seciii.prism030.core.aspect;
 
 import com.seciii.prism030.core.dao.news.NewsDAOMongo;
-import com.seciii.prism030.core.enums.CategoryType;
 import com.seciii.prism030.core.pojo.vo.news.NewNews;
 import com.seciii.prism030.core.service.SummaryService;
 import org.aspectj.lang.JoinPoint;
