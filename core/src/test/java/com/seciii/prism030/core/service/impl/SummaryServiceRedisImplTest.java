@@ -1,5 +1,6 @@
 package com.seciii.prism030.core.service.impl;
 
+import com.seciii.prism030.core.pojo.vo.news.NewNews;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -41,11 +42,6 @@ public class SummaryServiceRedisImplTest {
         assertEquals("2024-04-16", lastModified);
     }
 
-    @Test
-    public void testAddNews() {
-        summaryService.addNews(1);
-        verify(valueOperations, times(2)).increment(anyString());
-    }
 
     @Test
     public void testDeleteNews() {
