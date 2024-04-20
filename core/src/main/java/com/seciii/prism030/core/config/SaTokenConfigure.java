@@ -48,6 +48,8 @@ public class SaTokenConfigure {
                             .check(() -> StpUtil.checkRoleOr("super-admin", "news-admin"));
                     SaRouter.match("/**/superAdmin/**")
                             .check(() -> StpUtil.checkRoleOr("super-admin"));
+                    SaRouter.match("/**/graph/**")
+                            .check(StpUtil::checkLogin);
                 })
                 // 返回异常结果
                 .setError(e -> {

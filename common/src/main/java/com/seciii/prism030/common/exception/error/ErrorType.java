@@ -49,8 +49,18 @@ public enum ErrorType {
 
     NEWS_PAGE_OVERFLOW(300001, "News page overflow", 400), /* 新闻页码溢出 */
 
-    NEWS_SEGMENT_SERVICE_UNAVAILABLE(300002, "News segment service unavailable", 500); /* 新闻分词服务不可用 */
+    NEWS_SEGMENT_SERVICE_UNAVAILABLE(300002, "News segment service unavailable", 500), /* 新闻分词服务不可用 */
 
+    /**
+     * 图数据库模块错误码
+     */
+    LLM_RESULT_ERROR(400000, "LLM result error", 500), /* LLM返回结果错误 */
+
+    GRAPH_GENERATING(400001, "Graph is generating", 400), /* 知识图谱正在生成中 */
+
+    GRAPH_NODE_EXISTS(400002, "Graph node exists", 400), /* 新闻节点已存在 */
+
+    NODE_SAVE_FAILED(400003, "Node save failed", 400); /* 节点存储失败 */
 
     /**
      * 状态码

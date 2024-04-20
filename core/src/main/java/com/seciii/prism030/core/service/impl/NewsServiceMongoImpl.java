@@ -99,7 +99,9 @@ public class NewsServiceMongoImpl implements NewsService {
     public List<NewsCategoryCountVO> countAllCategoryNews() {
         List<NewsCategoryCountVO> newsCategoryCountVOList = new ArrayList<>();
         for (int i = 0; i < CategoryType.values().length; i++) {
-            newsCategoryCountVOList.add(NewsCategoryCountVO.builder().category(CategoryType.of(i).toString()).count(summaryService.countCategoryNews(i)).build());
+            if (CategoryType.of(i) != CategoryType.OTHER){
+                newsCategoryCountVOList.add(NewsCategoryCountVO.builder().category(CategoryType.of(i).toString()).count(summaryService.countCategoryNews(i)).build());
+            }
         }
         return newsCategoryCountVOList;
     }
@@ -114,10 +116,12 @@ public class NewsServiceMongoImpl implements NewsService {
         LocalDate startDate = LocalDate.parse(startTime);
         LocalDate endDate = LocalDate.parse(endTime);
         List<NewsDateCountVO> newsDateCountVoList = new ArrayList<>();
-        for (LocalDate date = startDate; date.isBefore(endDate); date = date.plusDays(1)) {
+        for (LocalDate date = startDate; date.isBefore(endDate) || date.isEqual(endDate); date = date.plusDays(1)) {
             List<NewsCategoryCountVO> newsCategoryCountVOList = new ArrayList<>();
             for (int i = 0; i < CategoryType.values().length; i++) {
-                newsCategoryCountVOList.add(NewsCategoryCountVO.builder().category(CategoryType.of(i).toString()).count(summaryService.countCategoryNews(i, date)).build());
+                if (CategoryType.of(i) != CategoryType.OTHER){
+                    newsCategoryCountVOList.add(NewsCategoryCountVO.builder().category(CategoryType.of(i).toString()).count(summaryService.countCategoryNews(i, date)).build());
+                }
             }
             newsDateCountVoList.add(NewsDateCountVO.builder().date(date.toString()).newsCategoryCounts(newsCategoryCountVOList).build());
         }
@@ -230,8 +234,7 @@ public class NewsServiceMongoImpl implements NewsService {
     @Modified
     @Add
     public long addNews(NewNews newNews) {
-        NewsPO newsPO = NewsUtil.toNewsPO(newNews);
-        return newsDAOMongo.insert(newsPO);
+        return newsDAOMongo.insert(NewsUtil.toNewsPO(newNews));
     }
 
     /**
@@ -441,6 +444,11 @@ public class NewsServiceMongoImpl implements NewsService {
     public void updateWordCloudToday() {
         List<NewsWordPO> wordCloud = newsDAOMongo.getWordCloudToday();
         summaryService.updateWordCloudToday(wordCloud);
+    }
+
+    @Override
+    public Integer diffTodayAndYesterday() {
+return summaryService.diffTodayAndYesterday();
     }
 
 }

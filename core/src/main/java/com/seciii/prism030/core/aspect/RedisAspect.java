@@ -41,11 +41,13 @@ public class RedisAspect {
     /**
      * 添加新闻后更新redis的新闻数量，提取参数,并调用afterAdd方法
      */
-    @AfterReturning(value = "execution(* com.seciii.prism030.core.service.impl.NewsServiceMongoImpl.addNews(..))")
-    public void afterAdd(JoinPoint joinPoint) {
+    @AfterReturning(value = "execution(* com.seciii.prism030.core.service.impl.NewsServiceMongoImpl.addNews(..))", returning = "methodResult")
+    public void afterAdd(JoinPoint joinPoint, Object methodResult) {
+        long id = (long) methodResult;
         Object[] args = joinPoint.getArgs();
         NewNews newNews = (NewNews) args[0];
-        summaryService.addNews(CategoryType.of(newNews.getCategory()).toInt());
+
+        summaryService.addNews(newsDAOMongo.getNewsById(id).getCategory());
     }
 
 

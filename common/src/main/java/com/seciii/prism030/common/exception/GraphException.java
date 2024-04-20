@@ -1,19 +1,21 @@
 package com.seciii.prism030.common.exception;
 
 import com.seciii.prism030.common.exception.error.ErrorType;
+import lombok.Getter;
 
 /**
- * 用户业务异常类
+ * 图数据库业务异常类
  *
  * @author xueruichen
  * @date 2024.04.10
  */
-public class UserException extends BaseException {
-    public UserException(ErrorType type) {
+@Getter
+public class GraphException extends BaseException{
+    public GraphException(ErrorType type) {
         super(type);
     }
 
-    public UserException(ErrorType type, String message) {
+    public GraphException(ErrorType type, String message) {
         super(type, message);
     }
 }

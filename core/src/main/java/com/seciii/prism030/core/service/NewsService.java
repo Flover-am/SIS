@@ -181,4 +181,6 @@ public interface NewsService {
      * 更新当日词云到Redis中
      */
     void updateWordCloudToday();
+
+    Integer diffTodayAndYesterday();
 }

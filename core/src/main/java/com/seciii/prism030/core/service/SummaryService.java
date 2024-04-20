@@ -66,6 +66,8 @@ public interface SummaryService {
      */
     public int countWeekNews();
 
+    Integer diffTodayAndYesterday();
+
     /**
      * 获取当日词云
      *

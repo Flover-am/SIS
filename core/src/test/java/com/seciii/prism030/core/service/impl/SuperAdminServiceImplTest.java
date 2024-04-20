@@ -75,7 +75,9 @@ public class SuperAdminServiceImplTest {
         Mockito.doNothing().when(userMapper).deleteUserRole(existUser.getId());
 
         // 获取用户列表
-        Mockito.when(userMapper.getUsers(1, 0, null)).thenReturn(List.of(UserRolePO.builder().userId(1L).roleId(1L).build()));
+        Mockito.when(userMapper.getUsers(1, 0)).thenReturn(List.of(UserRolePO.builder().userId(1L).roleId(1L).build()));
+        Mockito.when(userMapper.getUsers(1, 0)).thenReturn(List.of(UserRolePO.builder().userId(1L).roleId(1L).build()));
+        Mockito.when(userMapper.getUsersByRoleId(1, 0, null)).thenReturn(List.of(UserRolePO.builder().userId(1L).roleId(1L).build()));
 
         // 获取用户数量
         Mockito.when(userMapper.getUsersCount(null)).thenReturn(1L);
@@ -126,7 +128,7 @@ public class SuperAdminServiceImplTest {
         // 测试添加超级管理员
         Assertions.assertThrows(SaTokenException.class, () -> superAdminService.addUser("admin", "admin123", RoleType.USER));
 
-        StpUtil.login(12L);
+        StpUtil.login(2L);
         Assertions.assertThrows(SaTokenException.class, () -> superAdminService.addUser("existUser", "existUserPasswd", RoleType.USER));
         // 测试添加用户
         Assertions.assertThrows(SaTokenException.class, () -> superAdminService.addUser("newUser", "newUserPasswd", RoleType.USER));
@@ -152,11 +154,12 @@ public class SuperAdminServiceImplTest {
     @Test
     void getUsersTest() {
         // 测试获取用户列表
-        Assertions.assertEquals(1, superAdminService.getUsers(null, 1, 0).size());
+        Assertions.assertEquals(1, superAdminService.getUsers(null, 1, 1).size());
         // 测试获取用户数量
         Assertions.assertEquals(1, superAdminService.getUsersCount(null));
         Assertions.assertEquals(30, superAdminService.getUsersCount(RoleType.USER));
     }
+
     @Test
     void modifyRoleTest() {
         // 测试修改不存在用户角色
