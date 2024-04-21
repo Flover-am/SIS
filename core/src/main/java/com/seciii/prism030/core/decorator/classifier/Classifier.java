@@ -65,7 +65,15 @@ public class Classifier {
         if (this.classifier == null) {
             this.classifier = new BasicTextClassifier();
             String modelPath = Classifier.class.getClassLoader().getResource(ClassifierConstants.MODEL_PATH).getPath();
-
+            System.out.println(modelPath);
+            // 调用命令行tree modelPath ，看里面有什么
+            ProcessBuilder pb = new ProcessBuilder("tree", modelPath);
+            try {
+                Process p = pb.start();
+                p.waitFor();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             // 设置分类种类，并读取模型
             assert(classifier.loadCategoryListFromFile(modelPath + System.getProperty("file.separator") + ClassifierConstants.CATEGORY_PATH));
             classifier.setTextClassifier(new LinearBigramChineseTextClassifier(classifier.getCategorySize()));
