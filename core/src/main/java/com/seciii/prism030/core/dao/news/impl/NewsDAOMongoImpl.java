@@ -301,17 +301,14 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
      * @return 排序后的词云列表
      */
     private List<Map.Entry<String, Integer>> getSortedWordCloud() {
-//        Query query = new Query(Criteria.where(CREATE_TIME)
-//                .gte(DateTimeUtil.toIsoDateString(LocalDateTime.of(LocalDate.now(), LocalTime.MIN)))
-//                .lte(DateTimeUtil.toIsoDateString(LocalDateTime.now()))
-//        );
-//        List<NewsPO> todayNewsIdList = mongoTemplate.find(query, NewsPO.class, COLLECTION_NEWS);
-        List<NewsPO> todayNewsIdList=selectByTime(LocalDateTime.of(LocalDate.now(), LocalTime.MIN),LocalDateTime.now());
+
+        List<NewsPO> todayNewsIdList = selectByTime(LocalDateTime.of(LocalDate.now(), LocalTime.MIN), LocalDateTime.now());
         Map<String, Integer> wordCountMap = new HashMap<>();
         for (NewsPO newsPO : todayNewsIdList) {
-            long id=newsPO.getId();
+            long id = newsPO.getId();
             NewsSegmentPO newsSegmentPO = getNewsSegmentById(id);
             if (newsSegmentPO == null) {
+                //TODO:生成词云
                 continue;
             }
             for (NewsWordPO newsWordPO : newsSegmentPO.getContent()) {
@@ -382,18 +379,24 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
         }
         return query;
     }
-    private List<NewsPO> selectByTime(LocalDateTime startTime,LocalDateTime endTime){
-        String startTimeString=DateTimeUtil.onlyDateFormat(startTime);
-        String endTimeString=DateTimeUtil.onlyDateFormat(endTime);
-        AggregationOperation project=Aggregation.project().and(UPDATE_TIME)
+
+    /**
+     * 根据时间筛选新闻
+     * @param startTime 开始时间
+     * @param endTime 结束时间
+     * @return 新闻列表
+     */
+    private List<NewsPO> selectByTime(LocalDateTime startTime, LocalDateTime endTime) {
+        String startTimeString = DateTimeUtil.onlyDateFormat(startTime);
+        String endTimeString = DateTimeUtil.onlyDateFormat(endTime);
+        AggregationOperation project = Aggregation.project().and(SOURCE_TIME)
                 .dateAsFormattedString("%Y-%m-%d").as(FORMALIZED_DATE);
-        AggregationOperation match= Aggregation.match(
+        AggregationOperation match = Aggregation.match(
                 Criteria.where(FORMALIZED_DATE)
                         .gte(startTimeString)
                         .andOperator(Criteria.where(FORMALIZED_DATE).lte(endTimeString)));
-        Aggregation aggregation=Aggregation.newAggregation(project,match);
-        var res=mongoTemplate.aggregate(aggregation,COLLECTION_NEWS,NewsPO.class);
-        System.out.println(res.getRawResults());
+        Aggregation aggregation = Aggregation.newAggregation(project, match);
+        var res = mongoTemplate.aggregate(aggregation, COLLECTION_NEWS, NewsPO.class);
         return res.getMappedResults();
     }
 
