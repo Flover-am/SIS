@@ -108,6 +108,13 @@ public interface NewsDAOMongo extends NewsMapper {
     int insertSegment(NewsSegmentPO newsSegmentPO);
 
     /**
+     * 获取今日新闻id列表
+     *
+     * @return 今日新闻id列表
+     */
+    List<Long> getTodayNewsList();
+
+    /**
      * 获取今日前n词云
      *
      * @param count 词云数量

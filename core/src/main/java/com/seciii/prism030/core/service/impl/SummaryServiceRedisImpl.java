@@ -1,8 +1,8 @@
 package com.seciii.prism030.core.service.impl;
 
+import com.seciii.prism030.core.pojo.po.news.NewsWordPO;
 import com.seciii.prism030.core.pojo.vo.news.NewNews;
 import com.seciii.prism030.core.pojo.vo.news.NewsSourceCountVO;
-import com.seciii.prism030.core.pojo.po.news.NewsWordPO;
 import com.seciii.prism030.core.service.SummaryService;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -13,13 +13,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Redis服务
  *
- * @author: lidongsheng
- * @date: 2024.4.2
+ * @author lidongsheng
+ * @date 2024.4.2
  */
 @Service
 @Transactional
@@ -27,7 +27,7 @@ public class SummaryServiceRedisImpl implements SummaryService {
 
     private static final String lastModifiedKey = "lastModified";
 
-    private static final String wordCloudKey = "wordCloud";
+    private static final String wordCloudKey = "wordCloudToday";
     private final RedisTemplate<String, Object> redisTemplate;
 
     public SummaryServiceRedisImpl(RedisTemplate<String, Object> redisTemplate) {
@@ -225,6 +225,7 @@ public class SummaryServiceRedisImpl implements SummaryService {
 
     /**
      * 今日和昨日新闻数量差
+     *
      * @return
      */
     @Override
@@ -301,7 +302,6 @@ public class SummaryServiceRedisImpl implements SummaryService {
     }
 
 
-
     /**
      * 获取当日词云
      *
@@ -337,5 +337,6 @@ public class SummaryServiceRedisImpl implements SummaryService {
                         wordCloudKey, x.getText(), x.getCount()
                 )
         );
+        redisTemplate.expire(wordCloudKey, 1, TimeUnit.HOURS);
     }
 }
