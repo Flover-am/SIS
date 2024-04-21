@@ -1,5 +1,6 @@
 package com.seciii.prism030.core.utils;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -41,6 +42,12 @@ public class DateTimeUtil {
         }
         return date.format(DateTimeFormatter.ofPattern(DEFAULT_FORMAT));
     }
+    public static String onlyDateFormat(LocalDateTime date) {
+        if (date == null) {
+            return "";
+        }
+        return date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+    }
 
     public static LocalDateTime parseBeginOfDay(String date) {
         if (date == null || date.isEmpty()) {
@@ -54,6 +61,13 @@ public class DateTimeUtil {
             return null;
         }
         return LocalDateTime.parse(date + " " + END_TIME_OF_DAY, DateTimeFormatter.ofPattern(DEFAULT_FORMAT));
+    }
+
+    public static String toIsoDateString(LocalDateTime date) {
+        if (date == null) {
+            return "";
+        }
+        return date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'"));
     }
 
 }

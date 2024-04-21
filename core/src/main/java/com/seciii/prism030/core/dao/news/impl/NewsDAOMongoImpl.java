@@ -8,6 +8,7 @@ import static com.seciii.prism030.core.utils.NewsUtil.*;
 
 import com.seciii.prism030.core.pojo.po.news.NewsSegmentPO;
 import com.seciii.prism030.core.pojo.po.news.NewsWordPO;
+import com.seciii.prism030.core.utils.DateTimeUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,13 +16,16 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.GroupOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -36,6 +40,8 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
 
     private static final String COLLECTION_NEWS = "news";
     private static final String COLLECTION_SEGMENT = "news_segment";
+
+    private static final String FORMALIZED_DATE = "formalized_date";
 
     private MongoTemplate mongoTemplate;
 
@@ -295,14 +301,15 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
      * @return 排序后的词云列表
      */
     private List<Map.Entry<String, Integer>> getSortedWordCloud() {
-        List<Long> todayNewsIdList = mongoTemplate.find(new Query(Criteria.where(SOURCE_TIME)
-                        .gte(LocalDateTime.now().withHour(0).withMinute(0).withSecond(0))
-                        .lte(LocalDateTime.now())),
-                Long.class,
-                COLLECTION_NEWS
-        );
+//        Query query = new Query(Criteria.where(CREATE_TIME)
+//                .gte(DateTimeUtil.toIsoDateString(LocalDateTime.of(LocalDate.now(), LocalTime.MIN)))
+//                .lte(DateTimeUtil.toIsoDateString(LocalDateTime.now()))
+//        );
+//        List<NewsPO> todayNewsIdList = mongoTemplate.find(query, NewsPO.class, COLLECTION_NEWS);
+        List<NewsPO> todayNewsIdList=selectByTime(LocalDateTime.of(LocalDate.now(), LocalTime.MIN),LocalDateTime.now());
         Map<String, Integer> wordCountMap = new HashMap<>();
-        for (Long id : todayNewsIdList) {
+        for (NewsPO newsPO : todayNewsIdList) {
+            long id=newsPO.getId();
             NewsSegmentPO newsSegmentPO = getNewsSegmentById(id);
             if (newsSegmentPO == null) {
                 continue;
@@ -374,6 +381,20 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
             query.skip(pageOffset).limit(pageSize);
         }
         return query;
+    }
+    private List<NewsPO> selectByTime(LocalDateTime startTime,LocalDateTime endTime){
+        String startTimeString=DateTimeUtil.onlyDateFormat(startTime);
+        String endTimeString=DateTimeUtil.onlyDateFormat(endTime);
+        AggregationOperation project=Aggregation.project().and(UPDATE_TIME)
+                .dateAsFormattedString("%Y-%m-%d").as(FORMALIZED_DATE);
+        AggregationOperation match= Aggregation.match(
+                Criteria.where(FORMALIZED_DATE)
+                        .gte(startTimeString)
+                        .andOperator(Criteria.where(FORMALIZED_DATE).lte(endTimeString)));
+        Aggregation aggregation=Aggregation.newAggregation(project,match);
+        var res=mongoTemplate.aggregate(aggregation,COLLECTION_NEWS,NewsPO.class);
+        System.out.println(res.getRawResults());
+        return res.getMappedResults();
     }
 
     /**

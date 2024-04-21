@@ -417,13 +417,13 @@ public class NewsServiceMongoImpl implements NewsService {
         } catch (Exception e) {
             log.error(e.getMessage());
         }
-        boolean isRedisAvailable = redisResultList != null;
+        boolean isRedisAvailable = redisResultList != null && !redisResultList.isEmpty();
         if (isRedisAvailable) {
             resultList = redisResultList;
         } else {
             resultList = newsDAOMongo.getTopNWordCloudToday(count);
         }
-        if (resultList == null) {
+        if (resultList == null){
             throw new NewsException(ErrorType.NEWS_SEGMENT_SERVICE_UNAVAILABLE);
         }
         if (!isRedisAvailable) {
