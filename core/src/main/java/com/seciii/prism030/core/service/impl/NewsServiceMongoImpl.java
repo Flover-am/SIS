@@ -405,10 +405,14 @@ public class NewsServiceMongoImpl implements NewsService {
                 .build();
 
         //插入新生成的词云到数据库
-        int code = newsDAOMongo.insertSegment(newNewsSegmentPO);
-        if (code != 0) {
-            // 插入到数据库失败，但已得到分词结果
-            log.error(String.format("Failed to insert news segment with id %d. ", id));
+        try {
+            int code = newsDAOMongo.insertSegment(newNewsSegmentPO);
+            if (code != 0) {
+                // 插入到数据库失败，但已得到分词结果
+                log.error(String.format("Failed to insert news segment with id %d. ", id));
+            }
+        } catch (RuntimeException e) {
+            log.error(String.format("Failed to insert news segment with id %d:%s ", id, e.getMessage()));
         }
         return newNewsSegmentPO;
     }
@@ -466,13 +470,13 @@ public class NewsServiceMongoImpl implements NewsService {
         List<Long> todayNewsList = newsDAOMongo.getTodayNewsList();
         for (long id : todayNewsList) {
             NewsSegmentPO newsSegmentPO = newsDAOMongo.getNewsSegmentById(id);
-            if (force||newsSegmentPO == null) {
+            if (force || newsSegmentPO == null) {
                 NewsPO newsPO = newsDAOMongo.getNewsById(id);
                 if (newsPO == null) {
                     log.error(String.format("News with id %d not found. ", id));
                     continue;
                 }
-                if(newsPO.getCategory()==CategoryType.LOTTERY.ordinal()||newsPO.getCategory()==CategoryType.SPORTS.ordinal()){
+                if (newsPO.getCategory() == CategoryType.LOTTERY.ordinal() || newsPO.getCategory() == CategoryType.SPORTS.ordinal()) {
                     generateAndSaveWordCloud(id, newsPO.getTitle());
                     continue;
                 }

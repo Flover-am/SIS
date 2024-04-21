@@ -25,12 +25,14 @@ public interface NewsService {
      * @return 所有新闻列表
      */
     Integer countTodayNews();
+
     /**
      * 获取所有新闻
      *
      * @return 所有新闻列表
      */
     String getLastModified();
+
     /**
      * 获取所有新闻
      *
@@ -45,18 +47,21 @@ public interface NewsService {
      * @return 所有新闻列表
      */
     List<NewsCategoryCountVO> countAllCategoryOfTodayNews();
+
     /**
      * 获取所有新闻
      *
      * @return 所有新闻列表
      */
     List<NewsDateCountVO> countPeriodNews(String startTime, String endTime);
+
     /**
      * 获取所有新闻
      *
      * @return 所有新闻列表
      */
     Integer countWeekNews();
+
     /**
      * 获取新闻详情
      *

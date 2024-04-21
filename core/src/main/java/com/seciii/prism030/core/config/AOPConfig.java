@@ -10,7 +10,6 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 @Configuration
 @EnableAspectJAutoProxy
 public class AOPConfig {
-
     @Bean
     RedisAspect redisAspect(SummaryService summaryService, NewsDAOMongo newsDAOMongo) {
         return new RedisAspect(summaryService, newsDAOMongo);

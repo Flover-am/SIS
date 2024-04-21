@@ -1,6 +1,5 @@
 package com.seciii.prism030.core.utils;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -15,7 +14,8 @@ public class DateTimeUtil {
     private static final String BEGIN_TIME_OF_DAY = "00:00:00";
     private static final String END_TIME_OF_DAY = "23:59:59";
 
-    private DateTimeUtil() {}
+    private DateTimeUtil() {
+    }
 
     /**
      * 默认解析日期时间，格式为yyyy-MM-dd HH:mm:ss
@@ -42,6 +42,7 @@ public class DateTimeUtil {
         }
         return date.format(DateTimeFormatter.ofPattern(DEFAULT_FORMAT));
     }
+
     public static String onlyDateFormat(LocalDateTime date) {
         if (date == null) {
             return "";
@@ -61,13 +62,6 @@ public class DateTimeUtil {
             return null;
         }
         return LocalDateTime.parse(date + " " + END_TIME_OF_DAY, DateTimeFormatter.ofPattern(DEFAULT_FORMAT));
-    }
-
-    public static String toIsoDateString(LocalDateTime date) {
-        if (date == null) {
-            return "";
-        }
-        return date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'"));
     }
 
 }
