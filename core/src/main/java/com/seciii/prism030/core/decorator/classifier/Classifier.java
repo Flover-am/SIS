@@ -67,7 +67,7 @@ public class Classifier {
             String modelPath = Classifier.class.getClassLoader().getResource(ClassifierConstants.MODEL_PATH).getPath();
 
             // 设置分类种类，并读取模型
-            classifier.loadCategoryListFromFile(modelPath + '/' + ClassifierConstants.CATEGORY_PATH);
+            assert(classifier.loadCategoryListFromFile(modelPath + System.getProperty("file.separator") + ClassifierConstants.CATEGORY_PATH));
             classifier.setTextClassifier(new LinearBigramChineseTextClassifier(classifier.getCategorySize()));
             classifier.getTextClassifier().loadModel(modelPath);
         }
