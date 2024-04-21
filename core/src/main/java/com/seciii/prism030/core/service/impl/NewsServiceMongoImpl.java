@@ -99,7 +99,7 @@ public class NewsServiceMongoImpl implements NewsService {
     public List<NewsCategoryCountVO> countAllCategoryNews() {
         List<NewsCategoryCountVO> newsCategoryCountVOList = new ArrayList<>();
         for (int i = 0; i < CategoryType.values().length; i++) {
-            if (CategoryType.of(i) != CategoryType.OTHER){
+            if (CategoryType.of(i) != CategoryType.OTHER) {
                 newsCategoryCountVOList.add(NewsCategoryCountVO.builder().category(CategoryType.of(i).toString()).count(summaryService.countCategoryNews(i)).build());
             }
         }
@@ -119,7 +119,7 @@ public class NewsServiceMongoImpl implements NewsService {
         for (LocalDate date = startDate; date.isBefore(endDate) || date.isEqual(endDate); date = date.plusDays(1)) {
             List<NewsCategoryCountVO> newsCategoryCountVOList = new ArrayList<>();
             for (int i = 0; i < CategoryType.values().length; i++) {
-                if (CategoryType.of(i) != CategoryType.OTHER){
+                if (CategoryType.of(i) != CategoryType.OTHER) {
                     newsCategoryCountVOList.add(NewsCategoryCountVO.builder().category(CategoryType.of(i).toString()).count(summaryService.countCategoryNews(i, date)).build());
                 }
             }
@@ -413,7 +413,8 @@ public class NewsServiceMongoImpl implements NewsService {
         List<NewsWordPO> resultList = null;
         List<NewsWordPO> redisResultList = null;
         try {
-            redisResultList = summaryService.getTopNWordCloudToday(count);
+            //TODO: 从Redis中获取词云
+//            redisResultList = summaryService.getTopNWordCloudToday(count);
         } catch (Exception e) {
             log.error(e.getMessage());
         }
@@ -423,11 +424,12 @@ public class NewsServiceMongoImpl implements NewsService {
         } else {
             resultList = newsDAOMongo.getTopNWordCloudToday(count);
         }
-        if (resultList == null){
+        if (resultList == null) {
             throw new NewsException(ErrorType.NEWS_SEGMENT_SERVICE_UNAVAILABLE);
         }
         if (!isRedisAvailable) {
-            updateWordCloudToday();
+            //TODO: 更新Redis中的词云
+//            updateWordCloudToday();
         }
         return resultList.stream().map(
                 x -> NewsWordVO.builder()
@@ -448,7 +450,7 @@ public class NewsServiceMongoImpl implements NewsService {
 
     @Override
     public Integer diffTodayAndYesterday() {
-return summaryService.diffTodayAndYesterday();
+        return summaryService.diffTodayAndYesterday();
     }
 
 }
