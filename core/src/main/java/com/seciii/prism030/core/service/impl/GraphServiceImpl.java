@@ -16,6 +16,7 @@ import com.seciii.prism030.core.pojo.vo.graph.GraphVO;
 import com.seciii.prism030.core.pojo.vo.graph.NewsEntityRelationVO;
 import com.seciii.prism030.core.service.GraphService;
 import com.seciii.prism030.core.utils.SparkUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +33,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @date 2024.04.01
  */
 @Service
+@Slf4j
 public class GraphServiceImpl implements GraphService {
     private final EntityNodeDAO entityNodeDAO;
     private final NewsNodeDAO newsNodeDAO;
@@ -133,7 +135,7 @@ public class GraphServiceImpl implements GraphService {
                                         .relationship(tuple[1])
                                         .build());
                     } else {
-                        throw new GraphException(ErrorType.LLM_RESULT_ERROR, "大模型返回结果异常");
+                        log.warn("大模型返回结果异常，忽略该三元组");
                     }
                 }
             }
