@@ -1,5 +1,7 @@
 package com.seciii.prism030.core.service.impl;
 
+import com.seciii.prism030.core.pojo.vo.news.NewNews;
+import com.seciii.prism030.core.pojo.vo.news.NewsSourceCountVO;
 import com.seciii.prism030.core.pojo.po.news.NewsWordPO;
 import com.seciii.prism030.core.service.SummaryService;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -7,6 +9,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.List;
 
 /**
@@ -28,6 +34,12 @@ public class SummaryServiceRedisImpl implements SummaryService {
         this.redisTemplate = redisTemplate;
     }
 
+    //----------------------------------------key------------------------------------------------//
+    private String sourceKey(String date) {
+        return "newsDate:" + date + ":sources";
+    }
+
+
     @Deprecated
     private String categoryKey(String date, int category) {
         return "newsDate:" + date + ":category:" + category;
@@ -43,14 +55,59 @@ public class SummaryServiceRedisImpl implements SummaryService {
     }
 
 
+    private List<String> categoriesCountKey(String date) {
+        // 0-13
+        List<String> res = new ArrayList<>();
+        for (int i = 0; i < 13; i++) {
+            res.add(categoryCountKey(date, i));
+        }
+        return res;
+
+    }
+
+
     private String dayCountKey(String date) {
         return "newsDate:" + date + ":count";
     }
+    //----------------------------------------一周来源 数量------------------------------------------------//
+    // 计划用Zset存来源，value为来源，score为数量，每次添加来源时，score+1
+
+    @Override
+    public List<NewsSourceCountVO> getSourceRank() {
+        Map<String, Integer> rank = new HashMap<>();
+        LocalDate now = LocalDate.now();
+        int week = 7;
+        for (int i = 0; i < week; i++) {
+            LocalDate datePtr = now.minusDays(i);
+            String dateStr = datePtr.toString();
+            // newsDate:2024-03-11:sources
+            String sourceKey = sourceKey(dateStr);
+            // 获取来源数量
+            var sourceCount = redisTemplate.opsForZSet().rangeWithScores(sourceKey, 0, -1);
+            if (sourceCount != null) {
+                for (var source : sourceCount) {
+                    String sourceName = (String) source.getValue();
+                    double count = source.getScore();
+                    rank.put(sourceName, rank.getOrDefault(sourceName, 0) + (int) count);
+                }
+            }
+        }
+        // 排序
+        List<Map.Entry<String, Integer>> list = new ArrayList<>(rank.entrySet());
+        list.sort((o1, o2) -> o2.getValue().compareTo(o1.getValue()));
+        List<NewsSourceCountVO> res = new ArrayList<>();
+        for (var entry : list) {
+            res.add(NewsSourceCountVO.builder().source(entry.getKey()).count(entry.getValue()).build());
+        }
+        return res;
+    }
+
+//----------------------------------------修改时间------------------------------------------------//
 
     /**
      * 修改最后一次修改时间
      */
-    public void modified() {
+    public void modify() {
         LocalDate now = LocalDate.now();
         String date = now.toString();
         redisTemplate.opsForValue().set(lastModifiedKey, date);
@@ -68,15 +125,20 @@ public class SummaryServiceRedisImpl implements SummaryService {
     /**
      * 添加新闻
      */
-    public void addNews(int category/*, int id*/) {
+    public void addNews(NewNews newNews) {
+        int category = Integer.parseInt(newNews.getCategory());
+        String source = newNews.getOriginSource();
         LocalDate now = LocalDate.now();
-        String date = now.toString();
+        // 今日新闻数量+1
         // newsDate:2024-03-11:category:1:count
-        String categoryCountKey = categoryCountKey(date, category);
-        // newsDate:2024-03-11:count
+        String date = now.toString();
         String dateCountKey = dayCountKey(date);
-        redisTemplate.opsForValue().increment(categoryCountKey);
         redisTemplate.opsForValue().increment(dateCountKey);
+        // 今日种类新闻数量+1
+        // newsDate:2024-03-11:count
+        String categoryCountKey = categoryCountKey(date, category);
+        redisTemplate.opsForValue().increment(categoryCountKey);
+        redisTemplate.opsForZSet().incrementScore(sourceKey(date), source, 1);
 
 //        // newsDate:2024-03-11:category:1
 //        String categoryKey = "newsDate:" + date + ":category:" + category;
@@ -106,11 +168,14 @@ public class SummaryServiceRedisImpl implements SummaryService {
         redisTemplate.opsForValue().decrement(dateCountKey);
     }
 
+//----------------------------------------新闻数量------------------------------------------------//
+
     /**
      * 今日新闻数量
      *
      * @return 新闻数量
      */
+    @Override
     public Integer countDateNews() {
         return countDateNews(LocalDate.now());
     }
@@ -133,38 +198,11 @@ public class SummaryServiceRedisImpl implements SummaryService {
     }
 
     /**
-     * 某一类新闻数量
-     *
-     * @param category 新闻类别
-     * @return 新闻数量
-     */
-    public int countCategoryNews(int category) {
-        return countCategoryNews(category, LocalDate.now());
-    }
-
-    /**
-     * 某一天某一类新闻数量
-     *
-     * @param category 新闻类别
-     * @param date     日期
-     * @return 新闻数量
-     */
-    public int countCategoryNews(int category, LocalDate date) {
-        String dateStr = date.toString();
-        // newsDate:2024-03-11:category:1:count
-        String categoryCountKey = categoryCountKey(dateStr, category);
-        Object res = redisTemplate.opsForValue().get(categoryCountKey);
-        if (res != null) {
-            return (Integer) res > 0 ? (Integer) res : 0;
-        }
-        return 0;
-    }
-
-    /**
      * 一周内新闻数量
      *
      * @return 一周内新闻数量
      */
+    @Override
     public int countWeekNews() {
         LocalDate now = LocalDate.now();
         String date = now.toString();
@@ -185,6 +223,10 @@ public class SummaryServiceRedisImpl implements SummaryService {
         return all;
     }
 
+    /**
+     * 今日和昨日新闻数量差
+     * @return
+     */
     @Override
     public Integer diffTodayAndYesterday() {
         LocalDate now = LocalDate.now();
@@ -206,6 +248,59 @@ public class SummaryServiceRedisImpl implements SummaryService {
         }
         return todayCount - yesterdayCount;
     }
+
+
+//----------------------------------------新闻分类数量------------------------------------------------//
+
+    /**
+     * 今天某一类新闻数量
+     *
+     * @param category 新闻类别
+     * @return 新闻数量
+     */
+    @Override
+    public int countCategoryNews(int category) {
+        return countCategoryNews(category, LocalDate.now());
+    }
+
+    /**
+     * 某一天某一类新闻数量
+     *
+     * @param category 新闻类别
+     * @param date     日期
+     * @return 新闻数量
+     */
+    @Override
+    public int countCategoryNews(int category, LocalDate date) {
+        String dateStr = date.toString();
+        // newsDate:2024-03-11:category:1:count
+        String categoryCountKey = categoryCountKey(dateStr, category);
+        Object res = redisTemplate.opsForValue().get(categoryCountKey);
+        if (res != null) {
+            return (Integer) res > 0 ? (Integer) res : 0;
+        }
+        return 0;
+    }
+
+    @Override
+    public List<Integer> countAllCategoryOfDateNews(LocalDate date) {
+        // 使用mutiGet，一次性获取多个key的值
+        // 0-13
+        List<Integer> res = new ArrayList<>();
+        var multiedGet = redisTemplate.opsForValue().multiGet(categoriesCountKey(date.toString()));
+        if (multiedGet != null) {
+            for (Object o : multiedGet) {
+                if (o != null) {
+                    res.add((Integer) o);
+                } else {
+                    res.add(0);
+                }
+            }
+        }
+        return res;
+    }
+
+
 
     /**
      * 获取当日词云

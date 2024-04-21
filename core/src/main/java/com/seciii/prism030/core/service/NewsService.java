@@ -24,44 +24,39 @@ public interface NewsService {
      *
      * @return 所有新闻列表
      */
-    Integer countDateNews();
-
+    Integer countTodayNews();
     /**
      * 获取所有新闻
      *
      * @return 所有新闻列表
      */
     String getLastModified();
-
     /**
      * 获取所有新闻
      *
      * @return 所有新闻列表
      */
 
-    Integer countCategoryNews(int category);
+    Integer countCategoryOfToday(int category);
 
     /**
      * 获取所有新闻
      *
      * @return 所有新闻列表
      */
-    List<NewsCategoryCountVO> countAllCategoryNews();
-
+    List<NewsCategoryCountVO> countAllCategoryOfTodayNews();
     /**
      * 获取所有新闻
      *
      * @return 所有新闻列表
      */
     List<NewsDateCountVO> countPeriodNews(String startTime, String endTime);
-
     /**
      * 获取所有新闻
      *
      * @return 所有新闻列表
      */
     Integer countWeekNews();
-
     /**
      * 获取新闻详情
      *
@@ -183,4 +178,6 @@ public interface NewsService {
     void updateWordCloudToday();
 
     Integer diffTodayAndYesterday();
+
+    List<NewsSourceCountVO> countAllSourceNews();
 }
