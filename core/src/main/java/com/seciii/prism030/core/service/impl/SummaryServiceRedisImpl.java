@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import static com.seciii.prism030.core.utils.RedisKeyUtil.*;
+
 /**
  * Redis服务
  *
@@ -37,41 +39,7 @@ public class SummaryServiceRedisImpl implements SummaryService {
         this.redisTemplate = redisTemplate;
     }
 
-    //----------------------------------------key------------------------------------------------//
-    private String sourceKey(String date) {
-        return "newsDate:" + date + ":sources";
-    }
 
-
-    @Deprecated
-    private String categoryKey(String date, int category) {
-        return "newsDate:" + date + ":category:" + category;
-    }
-
-    @Deprecated
-    private String dayKey(String date) {
-        return "newsDate:" + date;
-    }
-
-    private String categoryCountKey(String date, int category) {
-        return "newsDate:" + date + ":category:" + category + ":count";
-    }
-
-
-    private List<String> categoriesCountKey(String date) {
-        // 0-13
-        List<String> res = new ArrayList<>();
-        for (int i = 0; i < 13; i++) {
-            res.add(categoryCountKey(date, i));
-        }
-        return res;
-
-    }
-
-
-    private String dayCountKey(String date) {
-        return "newsDate:" + date + ":count";
-    }
     //----------------------------------------一周来源 数量------------------------------------------------//
     // 计划用Zset存来源，value为来源，score为数量，每次添加来源时，score+1
 
