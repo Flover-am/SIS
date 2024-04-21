@@ -8,12 +8,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Redis服务
  *
- * @author: lidongsheng
- * @date: 2024.4.2
+ * @author lidongsheng
+ * @date 2024.4.2
  */
 @Service
 @Transactional
@@ -21,21 +22,11 @@ public class SummaryServiceRedisImpl implements SummaryService {
 
     private static final String lastModifiedKey = "lastModified";
 
-    private static final String wordCloudKey = "wordCloud";
+    private static final String wordCloudKey = "wordCloudToday";
     private final RedisTemplate<String, Object> redisTemplate;
 
     public SummaryServiceRedisImpl(RedisTemplate<String, Object> redisTemplate) {
         this.redisTemplate = redisTemplate;
-    }
-
-    @Deprecated
-    private String categoryKey(String date, int category) {
-        return "newsDate:" + date + ":category:" + category;
-    }
-
-    @Deprecated
-    private String dayKey(String date) {
-        return "newsDate:" + date;
     }
 
     private String categoryCountKey(String date, int category) {
@@ -185,6 +176,7 @@ public class SummaryServiceRedisImpl implements SummaryService {
         return all;
     }
 
+
     @Override
     public Integer diffTodayAndYesterday() {
         LocalDate now = LocalDate.now();
@@ -242,5 +234,6 @@ public class SummaryServiceRedisImpl implements SummaryService {
                         wordCloudKey, x.getText(), x.getCount()
                 )
         );
+        redisTemplate.expire(wordCloudKey, 1, TimeUnit.HOURS);
     }
 }

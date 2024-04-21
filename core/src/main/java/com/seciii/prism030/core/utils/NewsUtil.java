@@ -7,8 +7,10 @@ import com.seciii.prism030.core.pojo.po.news.NewsPO;
 import com.seciii.prism030.core.pojo.po.news.NewsSegmentPO;
 import com.seciii.prism030.core.pojo.vo.news.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * 新闻工具类
@@ -162,11 +164,21 @@ public class NewsUtil {
      * @return 过滤后的新闻分词结果
      */
     public static List<NewsWordDetail> filterNewsWordDetail(NewsWordDetail[] newsWordDetails) {
-        return Arrays.stream(newsWordDetails).filter(
-                word -> !word.getText().contains("\n")
-                        && word.getRank() > 1
-                        && word.getPartOfSpeech() != null
-                        && !ignoredParts.contains(word.getPartOfSpeech())
-        ).toList();
+        List<NewsWordDetail> resultList = new ArrayList<>();
+        for(NewsWordDetail newsWordDetail : newsWordDetails) {
+            if (!(newsWordDetail.getText().contains("\n") // 含有换行符
+                    || Pattern.compile("[\\p{P}\\p{S}]").matcher(newsWordDetail.getText()).find() // 含有标点符号
+                    || newsWordDetail.getRank() <= 1 // 词语重要性小于等于1
+                    || newsWordDetail.getPartOfSpeech() == null // 词性为空
+                    || ignoredParts.contains(newsWordDetail.getPartOfSpeech()) // 词性为忽略词性
+                )
+            ){
+                newsWordDetail.setText(newsWordDetail.getText().replaceAll("\\s", ""));
+                if(newsWordDetail.getText().length() > 1) {
+                    resultList.add(newsWordDetail);
+                }
+            }
+        }
+        return resultList;
     }
 }

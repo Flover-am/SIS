@@ -366,11 +366,20 @@ public class NewsServiceMongoImpl implements NewsService {
      */
     @Override
     public NewsSegmentPO generateAndSaveWordCloud(long id, String text) {
+
+        // 字符串合法
+        if (text == null || text.isEmpty()) {
+            return null;
+        }
         if (text.contains("责任编辑")) {
             text = text.substring(0, text.indexOf("责任编辑"));
         }
+
+        // 获取并过滤分词结果
         NewsWordDetail[] newsWordDetails = textSegment.rank(text);
         List<NewsWordDetail> filteredNewsWordDetail = NewsUtil.filterNewsWordDetail(newsWordDetails);
+
+        // 获取词云
         List<NewsWordPO> newsWordPOList = new ArrayList<>();
         for (NewsWordDetail newsWordDetail : filteredNewsWordDetail) {
             boolean isContained = false;
@@ -413,8 +422,7 @@ public class NewsServiceMongoImpl implements NewsService {
         List<NewsWordPO> resultList = null;
         List<NewsWordPO> redisResultList = null;
         try {
-            //TODO: 从Redis中获取词云
-//            redisResultList = summaryService.getTopNWordCloudToday(count);
+            redisResultList = summaryService.getTopNWordCloudToday(count);
         } catch (Exception e) {
             log.error(e.getMessage());
         }
@@ -428,8 +436,7 @@ public class NewsServiceMongoImpl implements NewsService {
             throw new NewsException(ErrorType.NEWS_SEGMENT_SERVICE_UNAVAILABLE);
         }
         if (!isRedisAvailable) {
-            //TODO: 更新Redis中的词云
-//            updateWordCloudToday();
+            updateRedisWordCloudToday();
         }
         return resultList.stream().map(
                 x -> NewsWordVO.builder()
@@ -440,17 +447,58 @@ public class NewsServiceMongoImpl implements NewsService {
     }
 
     /**
-     * 更新当日词云到Redis中
+     * 更新当日词云
      */
     @Override
     public void updateWordCloudToday() {
+        // MongoDB更新
+        updateMongoWordCloudToday(false);
+        // Redis更新
+        updateRedisWordCloudToday();
+    }
+
+    /**
+     * 更新当日新闻词云到MongoDB中
+     */
+    private void updateMongoWordCloudToday(boolean force) {
+        List<Long> todayNewsList = newsDAOMongo.getTodayNewsList();
+        for (long id : todayNewsList) {
+            NewsSegmentPO newsSegmentPO = newsDAOMongo.getNewsSegmentById(id);
+            if (force||newsSegmentPO == null) {
+                NewsPO newsPO = newsDAOMongo.getNewsById(id);
+                if (newsPO == null) {
+                    log.error(String.format("News with id %d not found. ", id));
+                    continue;
+                }
+                if(newsPO.getCategory()==CategoryType.LOTTERY.ordinal()||newsPO.getCategory()==CategoryType.SPORTS.ordinal()){
+                    generateAndSaveWordCloud(id, newsPO.getTitle());
+                    continue;
+                }
+                if (null == generateAndSaveWordCloud(id, newsPO.getContent())) {
+                    log.error(String.format("News with id %d has no content. Use title instead. ", id));
+                    generateAndSaveWordCloud(id, newsPO.getTitle());
+                }
+
+            }
+        }
+    }
+
+    /**
+     * 更新当日新闻词云到Redis中
+     */
+    private void updateRedisWordCloudToday() {
         List<NewsWordPO> wordCloud = newsDAOMongo.getWordCloudToday();
         summaryService.updateWordCloudToday(wordCloud);
     }
 
+
+    /**
+     * 获取今日相较昨日新闻数量差
+     *
+     * @return 新闻数量差
+     */
     @Override
     public Integer diffTodayAndYesterday() {
         return summaryService.diffTodayAndYesterday();
     }
-
 }

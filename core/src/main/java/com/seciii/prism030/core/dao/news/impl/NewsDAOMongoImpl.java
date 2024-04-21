@@ -3,9 +3,6 @@ package com.seciii.prism030.core.dao.news.impl;
 
 import com.seciii.prism030.core.dao.news.NewsDAOMongo;
 import com.seciii.prism030.core.pojo.po.news.NewsPO;
-
-import static com.seciii.prism030.core.utils.NewsUtil.*;
-
 import com.seciii.prism030.core.pojo.po.news.NewsSegmentPO;
 import com.seciii.prism030.core.pojo.po.news.NewsWordPO;
 import com.seciii.prism030.core.utils.DateTimeUtil;
@@ -26,8 +23,13 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
+
+import static com.seciii.prism030.core.utils.NewsUtil.*;
 
 /**
  * MongoDB的新闻DAO接口实现类
@@ -72,6 +74,10 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
      */
     @Override
     public long insert(NewsPO newsPO) {
+        Query query=new Query(Criteria.where(ID).is(newsPO.getId()));
+        if(mongoTemplate.exists(query,COLLECTION_NEWS)){
+            mongoTemplate.remove(query,COLLECTION_NEWS);
+        }
         NewsPO inserted = mongoTemplate.insert(newsPO, COLLECTION_NEWS);
         return inserted.getId();
     }
@@ -145,7 +151,7 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
      */
     @Override
     public Long batchDeleteNews(List<Long> ids) {
-        Query query = Query.query(Criteria.where("id").in(ids));
+        Query query = Query.query(Criteria.where(ID).in(ids));
         return mongoTemplate.remove(query, NewsPO.class).getDeletedCount();
     }
 
@@ -254,8 +260,25 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
      */
     @Override
     public int insertSegment(NewsSegmentPO newsSegmentPO) {
+        Query query = new Query(Criteria.where(ID).is(newsSegmentPO.getId()));
+        if (mongoTemplate.exists(query, COLLECTION_SEGMENT)) {
+            mongoTemplate.remove(query, COLLECTION_SEGMENT);
+        }
         NewsSegmentPO inserted = mongoTemplate.insert(newsSegmentPO, COLLECTION_SEGMENT);
         return inserted == null ? -1 : 0;
+    }
+
+    /**
+     * 获取今日新闻id列表
+     *
+     * @return 今日新闻id列表
+     */
+    @Override
+    public List<Long> getTodayNewsList() {
+        return selectByTime(LocalDateTime.of(LocalDate.now(), LocalTime.MIN), LocalDateTime.now())
+                .stream()
+                .map(NewsPO::getId)
+                .toList();
     }
 
     /**
@@ -266,8 +289,13 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
      */
     @Override
     public List<NewsWordPO> getTopNWordCloudToday(int count) {
-        List<Map.Entry<String, Integer>> sortedMap = getSortedWordCloud();
-
+        ArrayList<Map.Entry<String, Integer>> sortedMap = new ArrayList<>(getSortedWordCloud());
+        sortedMap.sort((e1,e2)->{
+            if(e1.getValue().equals(e2.getValue())){
+                return e1.getKey().compareTo(e2.getKey());
+            }
+            return e2.getValue()-e1.getValue();
+        });
         return sortedMap.stream()
                 .limit(count)
                 .map(
@@ -308,7 +336,6 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
             long id = newsPO.getId();
             NewsSegmentPO newsSegmentPO = getNewsSegmentById(id);
             if (newsSegmentPO == null) {
-                //TODO:生成词云
                 continue;
             }
             for (NewsWordPO newsWordPO : newsSegmentPO.getContent()) {

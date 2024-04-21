@@ -27,6 +27,7 @@ public class NewsController {
 
     /**
      * 获取今日新闻数量与昨日新闻数量的差值
+     *
      * @return 今日新闻数量与昨日新闻数量的差值
      */
     @GetMapping("/news/diffDays")
@@ -36,6 +37,7 @@ public class NewsController {
 
     /**
      * 今日每种新闻的新闻数量
+     *
      * @return 今日每种新闻的新闻数量
      */
     @GetMapping("/news/countAllCategory")
@@ -90,6 +92,7 @@ public class NewsController {
 
     /**
      * 新增新闻
+     *
      */
     @PostMapping("/news")
     public Result<Void> addNews(@RequestBody NewNews newNews) {

@@ -51,6 +51,8 @@ public enum ErrorType {
 
     NEWS_SEGMENT_SERVICE_UNAVAILABLE(300002, "News segment service unavailable", 500), /* 新闻分词服务不可用 */
 
+    NEWS_INSERT_DUPLICATE(300003, "News insert duplicate", 400), /* 新闻插入重复 */
+
     /**
      * 图数据库模块错误码
      */
