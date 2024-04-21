@@ -2,6 +2,7 @@ package com.seciii.prism030.core.service.impl;
 
 import com.seciii.prism030.core.pojo.vo.news.NewNews;
 import com.seciii.prism030.core.pojo.vo.news.NewsSourceCountVO;
+import com.seciii.prism030.core.pojo.po.news.NewsWordPO;
 import com.seciii.prism030.core.service.SummaryService;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.List;
 
 /**
  * Redis服务
@@ -24,9 +26,8 @@ import java.util.Map;
 public class SummaryServiceRedisImpl implements SummaryService {
 
     private static final String lastModifiedKey = "lastModified";
-//    static final String sourceCountKey = "sourceCountWeek";
 
-
+    private static final String wordCloudKey = "wordCloud";
     private final RedisTemplate<String, Object> redisTemplate;
 
     public SummaryServiceRedisImpl(RedisTemplate<String, Object> redisTemplate) {
@@ -300,4 +301,41 @@ public class SummaryServiceRedisImpl implements SummaryService {
     }
 
 
+
+    /**
+     * 获取当日词云
+     *
+     * @param count 词云数量
+     * @return 词云列表
+     */
+    @Override
+    public List<NewsWordPO> getTopNWordCloudToday(int count) {
+        var resSet = redisTemplate.opsForZSet().reverseRangeWithScores(
+                wordCloudKey, 0, count - 1
+        );
+        if (resSet == null) {
+            return null;
+        }
+        return resSet.stream().map(
+                x -> NewsWordPO.builder()
+                        .text((String) x.getValue())
+                        .count((int) Math.floor(x.getScore()))
+                        .build()
+        ).toList();
+    }
+
+    /**
+     * 更新当日词云
+     *
+     * @param wordCloud 词云列表
+     */
+    @Override
+    public void updateWordCloudToday(List<NewsWordPO> wordCloud) {
+        redisTemplate.delete(wordCloudKey);
+        wordCloud.forEach(
+                x -> redisTemplate.opsForZSet().add(
+                        wordCloudKey, x.getText(), x.getCount()
+                )
+        );
+    }
 }

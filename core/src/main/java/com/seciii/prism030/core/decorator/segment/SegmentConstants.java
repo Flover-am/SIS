@@ -11,7 +11,7 @@ public class SegmentConstants {
     }
 
     /* 分词服务前缀 */
-    public final static String urlAffix = "/v2";
+    public final static String urlAffix = "/v1";
     /* 分词服务方法 */
     public final static String segMethod = "/segment";
     /* 分词+实体识别方法 */

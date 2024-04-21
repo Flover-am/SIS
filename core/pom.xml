@@ -57,6 +57,10 @@
             <artifactId>commons-text</artifactId>
             <version>${common.text.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.unfbx</groupId>
+            <artifactId>SparkDesk-Java</artifactId>
+        </dependency>
 
     </dependencies>
 
@@ -85,7 +89,36 @@
                     </excludes>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                        <configuration>
+                            <includes>
+                                <!-- 只包含特定路径下的*Impl类 -->
+                                <include>**/com/seciii/prism030/core/service/impl/*Impl.class</include>
+                            </includes>
+                            <!-- 如果需要排除某些类，可以在这里配置excludes -->
+                            <!-- <excludes>
+                                <exclude>**/SomeClassToExclude.class</exclude>
+                            </excludes> -->
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
+
     </build>
 
 </project>

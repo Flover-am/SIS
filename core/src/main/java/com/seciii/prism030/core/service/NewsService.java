@@ -157,11 +157,25 @@ public interface NewsService {
 
     /**
      * 生成并保存新闻词云
-     * @param id 新闻id
+     *
+     * @param id   新闻id
      * @param text 新闻内容
      * @return 词云结果
      */
     NewsSegmentPO generateAndSaveWordCloud(long id, String text);
+
+    /**
+     * 获取今日新闻词云
+     *
+     * @param count 词语数量
+     * @return 词云结果
+     */
+    List<NewsWordVO> getNewsWordCloudToday(int count);
+
+    /**
+     * 更新当日词云到Redis中
+     */
+    void updateWordCloudToday();
 
     Integer diffTodayAndYesterday();
 

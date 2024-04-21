@@ -20,7 +20,46 @@ rabbitmq_port=${14}
 rabbitmq_username=${15}
 rabbitmq_password=${16}
 
+spark_appid=${17}
+spark_apisecret=${18}
+spark_apikey=${19}
+
+neo4j_uri=${20}
+neo4j_authentication_username=${21}
+neo4j_authentication_password=${22}
+segment_baseurl=${23}
 version=1.0.0
+
+# echo 所有的环境变量
+echo "mysql_url: $mysql_url"
+echo "mysql_user: $mysql_user"
+echo "mysql_password: $mysql_password"
+
+echo "mongo_host: $mongo_host"
+echo "mongo_port: $mongo_port"
+echo "mongo_database: $mongo_database"
+echo "mongo_user: $mongo_user"
+echo "mongo_password: $mongo_password"
+echo "mongo_authentication_database: $mongo_authentication_database"
+
+echo "redis_host: $redis_host"
+echo "redis_port: $redis_port"
+echo "redis_password: $redis_password"
+
+echo "rabbitmq_host: $rabbitmq_host"
+echo "rabbitmq_port: $rabbitmq_port"
+echo "rabbitmq_username: $rabbitmq_username"
+echo "rabbitmq_password: $rabbitmq_password"
+
+echo "spark_appid: $spark_appid"
+echo "spark_apisecret: $spark_apisecret"
+echo "spark_apikey: $spark_apikey"
+
+echo "neo4j_uri: $neo4j_uri"
+echo "neo4j_authentication_username: $neo4j_authentication_username"
+echo "neo4j_authentication_password: $neo4j_authentication_password"
+echo "segment_baseurl: $segment_baseurl"
+echo "version: $version"
 
 # 构建 Docker 镜像
 docker build -t prism030-backend:$version .
@@ -50,6 +89,13 @@ docker run --name=prism030-backend -itd -p 8080:8080 --restart=on-failure:3 \
 -e RABBITMQ_PORT=$rabbitmq_port \
 -e RABBITMQ_USERNAME=$rabbitmq_username \
 -e RABBITMQ_PASSWORD=$rabbitmq_password \
+-e SPARK_APPID=$spark_appid \
+-e SPARK_APISECRET=$spark_apisecret \
+-e SPARK_APIKEY=$spark_apikey \
+-e NEO4J_URI=$neo4j_uri \
+-e NEO4J_AUTHENTICATION_USERNAME=$neo4j_authentication_username \
+-e NEO4J_AUTHENTICATION_PASSWORD=$neo4j_authentication_password \
+-e SEGMENT_BASEURL=$segment_baseurl \
 -e version=$version \
 prism030-backend:$version
 

@@ -1,4 +1,4 @@
-package com.seciii.prism030.core.aspect.persistence;
+package com.seciii.prism030.core.decorator.hook;
 
 import com.seciii.prism030.core.decorator.classifier.Classifier;
 import com.seciii.prism030.core.dao.news.NewsDAOMongo;

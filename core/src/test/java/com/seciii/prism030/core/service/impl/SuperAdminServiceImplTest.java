@@ -128,7 +128,7 @@ public class SuperAdminServiceImplTest {
         // 测试添加超级管理员
         Assertions.assertThrows(SaTokenException.class, () -> superAdminService.addUser("admin", "admin123", RoleType.USER));
 
-        StpUtil.login(12L);
+        StpUtil.login(2L);
         Assertions.assertThrows(SaTokenException.class, () -> superAdminService.addUser("existUser", "existUserPasswd", RoleType.USER));
         // 测试添加用户
         Assertions.assertThrows(SaTokenException.class, () -> superAdminService.addUser("newUser", "newUserPasswd", RoleType.USER));
