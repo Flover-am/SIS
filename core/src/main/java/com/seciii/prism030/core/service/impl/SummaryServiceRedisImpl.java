@@ -4,11 +4,13 @@ import com.seciii.prism030.core.pojo.po.news.NewsWordPO;
 import com.seciii.prism030.core.pojo.vo.news.NewNews;
 import com.seciii.prism030.core.pojo.vo.news.NewsSourceCountVO;
 import com.seciii.prism030.core.service.SummaryService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +24,7 @@ import java.util.concurrent.TimeUnit;
  * @date 2024.4.2
  */
 @Service
+@Slf4j
 @Transactional
 public class SummaryServiceRedisImpl implements SummaryService {
 
@@ -108,9 +111,9 @@ public class SummaryServiceRedisImpl implements SummaryService {
      * 修改最后一次修改时间
      */
     public void modify() {
-        LocalDate now = LocalDate.now();
-        String date = now.toString();
-        redisTemplate.opsForValue().set(lastModifiedKey, date);
+        // 时间，格式：2024-03-11 12:00:00
+        String time = LocalDateTime.now().toString();
+        redisTemplate.opsForValue().set(lastModifiedKey, time);
     }
 
     /**
@@ -138,7 +141,9 @@ public class SummaryServiceRedisImpl implements SummaryService {
         // newsDate:2024-03-11:count
         String categoryCountKey = categoryCountKey(date, category);
         redisTemplate.opsForValue().increment(categoryCountKey);
-        redisTemplate.opsForZSet().incrementScore(sourceKey(date), source, 1);
+        String sourceKey = sourceKey(date);
+        log.info("<----------sourceKey: {} -------->", sourceKey);
+        redisTemplate.opsForZSet().incrementScore(sourceKey, source, 1);
 
 //        // newsDate:2024-03-11:category:1
 //        String categoryKey = "newsDate:" + date + ":category:" + category;
