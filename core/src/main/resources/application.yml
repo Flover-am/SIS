@@ -9,7 +9,7 @@ spring:
       password:
 
   profiles:
-    active: dev # 在此选择需要的环境配置文件
+    active: prod # 在此选择需要的环境配置文件
 
 mybatis-plus:
   configuration:

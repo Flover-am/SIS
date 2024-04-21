@@ -4,6 +4,7 @@ package com.seciii.prism030.core.dao.news;
 import com.seciii.prism030.core.mapper.news.NewsMapper;
 import com.seciii.prism030.core.pojo.po.news.NewsPO;
 import com.seciii.prism030.core.pojo.po.news.NewsSegmentPO;
+import com.seciii.prism030.core.pojo.po.news.NewsWordPO;
 
 import java.util.List;
 
@@ -105,4 +106,20 @@ public interface NewsDAOMongo extends NewsMapper {
      * @return 插入成功返回0，否则返回-1
      */
     int insertSegment(NewsSegmentPO newsSegmentPO);
+
+    /**
+     * 获取今日前n词云
+     *
+     * @param count 词云数量
+     * @return 词云列表
+     */
+    List<NewsWordPO> getTopNWordCloudToday(int count);
+
+    /**
+     * 获取今日词云
+     *
+     * @return 词云列表
+     */
+    List<NewsWordPO> getWordCloudToday();
+
 }

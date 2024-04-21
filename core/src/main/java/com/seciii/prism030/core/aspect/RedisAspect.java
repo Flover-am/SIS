@@ -1,24 +1,21 @@
 package com.seciii.prism030.core.aspect;
 
 import com.seciii.prism030.core.dao.news.NewsDAOMongo;
-import com.seciii.prism030.core.enums.CategoryType;
 import com.seciii.prism030.core.pojo.vo.news.NewNews;
 import com.seciii.prism030.core.service.SummaryService;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 /**
- * @auther: LiDongSheng
- * @date: 2024.4.15
+ * @author LiDongSheng
+ * @date 2024.4.15
  * redis切面，切新闻增删改操作
  */
 @Aspect
-@Component
 public class RedisAspect {
     private final SummaryService summaryService;
 

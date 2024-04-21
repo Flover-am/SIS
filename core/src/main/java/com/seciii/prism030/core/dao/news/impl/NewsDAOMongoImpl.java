@@ -7,6 +7,8 @@ import com.seciii.prism030.core.pojo.po.news.NewsPO;
 import static com.seciii.prism030.core.utils.NewsUtil.*;
 
 import com.seciii.prism030.core.pojo.po.news.NewsSegmentPO;
+import com.seciii.prism030.core.pojo.po.news.NewsWordPO;
+import com.seciii.prism030.core.utils.DateTimeUtil;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,14 +16,17 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.GroupOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.time.LocalTime;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -35,6 +40,8 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
 
     private static final String COLLECTION_NEWS = "news";
     private static final String COLLECTION_SEGMENT = "news_segment";
+
+    private static final String FORMALIZED_DATE = "formalized_date";
 
     private MongoTemplate mongoTemplate;
 
@@ -61,7 +68,7 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
      * 插入新闻
      *
      * @param newsPO 新闻PO
-     * @return 插入成功返回新闻PO，否则返回null
+     * @return 返回插入的新闻id
      */
     @Override
     public long insert(NewsPO newsPO) {
@@ -252,6 +259,71 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
     }
 
     /**
+     * 获取今日词云
+     *
+     * @param count 词云数量
+     * @return 词云列表
+     */
+    @Override
+    public List<NewsWordPO> getTopNWordCloudToday(int count) {
+        List<Map.Entry<String, Integer>> sortedMap = getSortedWordCloud();
+
+        return sortedMap.stream()
+                .limit(count)
+                .map(
+                        entry -> NewsWordPO.builder()
+                                .text(entry.getKey())
+                                .count(entry.getValue())
+                                .build()
+                )
+                .toList();
+    }
+
+    /**
+     * 获取今日词云
+     *
+     * @return 词云列表
+     */
+    @Override
+    public List<NewsWordPO> getWordCloudToday() {
+        List<Map.Entry<String, Integer>> wordCountMap = getSortedWordCloud();
+        return wordCountMap.stream().map(
+                entry -> NewsWordPO.builder()
+                        .text(entry.getKey())
+                        .count(entry.getValue())
+                        .build()
+        ).toList();
+    }
+
+    /**
+     * 获取排序后的词云
+     *
+     * @return 排序后的词云列表
+     */
+    private List<Map.Entry<String, Integer>> getSortedWordCloud() {
+
+        List<NewsPO> todayNewsIdList = selectByTime(LocalDateTime.of(LocalDate.now(), LocalTime.MIN), LocalDateTime.now());
+        Map<String, Integer> wordCountMap = new HashMap<>();
+        for (NewsPO newsPO : todayNewsIdList) {
+            long id = newsPO.getId();
+            NewsSegmentPO newsSegmentPO = getNewsSegmentById(id);
+            if (newsSegmentPO == null) {
+                //TODO:生成词云
+                continue;
+            }
+            for (NewsWordPO newsWordPO : newsSegmentPO.getContent()) {
+                String word = newsWordPO.getText();
+                if (wordCountMap.containsKey(word)) {
+                    wordCountMap.put(word, wordCountMap.get(word) + newsWordPO.getCount());
+                } else {
+                    wordCountMap.put(word, newsWordPO.getCount());
+                }
+            }
+        }
+        return wordCountMap.entrySet().stream().sorted(Map.Entry.comparingByValue()).toList();
+    }
+
+    /**
      * 按id查找并由update修改新闻
      *
      * @param id     新闻id
@@ -306,6 +378,26 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
             query.skip(pageOffset).limit(pageSize);
         }
         return query;
+    }
+
+    /**
+     * 根据时间筛选新闻
+     * @param startTime 开始时间
+     * @param endTime 结束时间
+     * @return 新闻列表
+     */
+    private List<NewsPO> selectByTime(LocalDateTime startTime, LocalDateTime endTime) {
+        String startTimeString = DateTimeUtil.onlyDateFormat(startTime);
+        String endTimeString = DateTimeUtil.onlyDateFormat(endTime);
+        AggregationOperation project = Aggregation.project().and(SOURCE_TIME)
+                .dateAsFormattedString("%Y-%m-%d").as(FORMALIZED_DATE);
+        AggregationOperation match = Aggregation.match(
+                Criteria.where(FORMALIZED_DATE)
+                        .gte(startTimeString)
+                        .andOperator(Criteria.where(FORMALIZED_DATE).lte(endTimeString)));
+        Aggregation aggregation = Aggregation.newAggregation(project, match);
+        var res = mongoTemplate.aggregate(aggregation, COLLECTION_NEWS, NewsPO.class);
+        return res.getMappedResults();
     }
 
     /**

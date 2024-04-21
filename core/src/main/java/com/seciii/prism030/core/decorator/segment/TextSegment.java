@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.nio.charset.StandardCharsets;
@@ -41,9 +43,8 @@ public class TextSegment {
      * @return 分词结果
      */
     public String[] segment(String text) {
-        String url = segmentBaseUrl + urlAffix + segMethod + "?query=" + text;
-        restTemplate.getMessageConverters().set(1, new StringHttpMessageConverter(StandardCharsets.UTF_8));
-        String body = restTemplate.getForEntity(url, String.class).getBody();
+        String url = segmentBaseUrl + urlAffix + segMethod;
+        String body = postResponseJsonStr(url, text);
         Map<String, Object> map = JSON.parseObject(body);
         if (map == null) {
             return new String[0];
@@ -59,9 +60,8 @@ public class TextSegment {
      * @return 分词+实体识别+语义排名结果
      */
     public NewsWordDetail[] rank(String text) {
-        String url = segmentBaseUrl + urlAffix + rankMethod + "?query=" + text;
-        restTemplate.getMessageConverters().set(1, new StringHttpMessageConverter(StandardCharsets.UTF_8));
-        String body = restTemplate.getForEntity(url, String.class).getBody();
+        String url = segmentBaseUrl + urlAffix + rankMethod;
+        String body = postResponseJsonStr(url, text);
         Map<String, Object> map = JSON.parseObject(body);
         if (map == null) {
             return null;
@@ -76,6 +76,20 @@ public class TextSegment {
                     .build();
         }
         return res;
+    }
+
+    /**
+     * 获取分词Http结果
+     *
+     * @param url      访问
+     * @param queryStr 查询字符串
+     * @return Http结果
+     */
+    private String postResponseJsonStr(String url, String queryStr) {
+        restTemplate.getMessageConverters().set(1, new StringHttpMessageConverter(StandardCharsets.UTF_8));
+        MultiValueMap<String, String> queryParam = new LinkedMultiValueMap<>();
+        queryParam.set("query", queryStr);
+        return restTemplate.postForEntity(url, queryParam, String.class).getBody();
     }
 
 }

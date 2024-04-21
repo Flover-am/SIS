@@ -2,27 +2,24 @@ package com.seciii.prism030.core.service.impl;
 
 import com.seciii.prism030.common.exception.NewsException;
 import com.seciii.prism030.common.exception.error.ErrorType;
+import com.seciii.prism030.core.aspect.annotation.Add;
 import com.seciii.prism030.core.aspect.annotation.Modified;
 import com.seciii.prism030.core.dao.news.NewsDAOMongo;
-import com.seciii.prism030.core.enums.CategoryType;
 import com.seciii.prism030.core.decorator.classifier.Classifier;
 import com.seciii.prism030.core.decorator.segment.TextSegment;
+import com.seciii.prism030.core.enums.CategoryType;
 import com.seciii.prism030.core.pojo.dto.NewsWordDetail;
 import com.seciii.prism030.core.pojo.dto.PagedNews;
 import com.seciii.prism030.core.pojo.po.news.NewsPO;
-import com.seciii.prism030.core.pojo.vo.news.*;
 import com.seciii.prism030.core.pojo.po.news.NewsSegmentPO;
 import com.seciii.prism030.core.pojo.po.news.NewsWordPO;
-import com.seciii.prism030.core.pojo.vo.news.ClassifyResultVO;
-import com.seciii.prism030.core.pojo.vo.news.NewNews;
-import com.seciii.prism030.core.pojo.vo.news.NewsSegmentVO;
-import com.seciii.prism030.core.pojo.vo.news.NewsVO;
+import com.seciii.prism030.core.pojo.vo.news.*;
 import com.seciii.prism030.core.service.NewsService;
 import com.seciii.prism030.core.service.SummaryService;
 import com.seciii.prism030.core.utils.NewsUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 
@@ -39,6 +36,7 @@ import java.util.List;
  */
 @Slf4j
 @Service
+@EnableAspectJAutoProxy
 public class NewsServiceMongoImpl implements NewsService {
     private NewsDAOMongo newsDAOMongo;
     private Classifier classifier;
@@ -72,8 +70,8 @@ public class NewsServiceMongoImpl implements NewsService {
     }
 
     /**
-     *
      * 今日新闻数量
+     *
      * @return 新闻数量
      */
     @Override
@@ -94,13 +92,14 @@ public class NewsServiceMongoImpl implements NewsService {
 
     /**
      * 今日所有种类新闻数量
+     *
      * @return 每个种类的新闻数量
      */
     @Override
     public List<NewsCategoryCountVO> countAllCategoryNews() {
         List<NewsCategoryCountVO> newsCategoryCountVOList = new ArrayList<>();
         for (int i = 0; i < CategoryType.values().length; i++) {
-            if (CategoryType.of(i) != CategoryType.OTHER){
+            if (CategoryType.of(i) != CategoryType.OTHER) {
                 newsCategoryCountVOList.add(NewsCategoryCountVO.builder().category(CategoryType.of(i).toString()).count(summaryService.countCategoryNews(i)).build());
             }
         }
@@ -109,6 +108,7 @@ public class NewsServiceMongoImpl implements NewsService {
 
     /**
      * 一段时间内新闻数量
+     *
      * @return 每天每种新闻数量
      */
     @Override
@@ -119,7 +119,7 @@ public class NewsServiceMongoImpl implements NewsService {
         for (LocalDate date = startDate; date.isBefore(endDate) || date.isEqual(endDate); date = date.plusDays(1)) {
             List<NewsCategoryCountVO> newsCategoryCountVOList = new ArrayList<>();
             for (int i = 0; i < CategoryType.values().length; i++) {
-                if (CategoryType.of(i) != CategoryType.OTHER){
+                if (CategoryType.of(i) != CategoryType.OTHER) {
                     newsCategoryCountVOList.add(NewsCategoryCountVO.builder().category(CategoryType.of(i).toString()).count(summaryService.countCategoryNews(i, date)).build());
                 }
             }
@@ -232,6 +232,7 @@ public class NewsServiceMongoImpl implements NewsService {
      */
     @Override
     @Modified
+    @Add
     public long addNews(NewNews newNews) {
         return newsDAOMongo.insert(NewsUtil.toNewsPO(newNews));
     }
@@ -365,7 +366,10 @@ public class NewsServiceMongoImpl implements NewsService {
      */
     @Override
     public NewsSegmentPO generateAndSaveWordCloud(long id, String text) {
-        NewsWordDetail[] newsWordDetails = textSegment.rank(newsDAOMongo.getNewsById(id).getContent());
+        if (text.contains("责任编辑")) {
+            text = text.substring(0, text.indexOf("责任编辑"));
+        }
+        NewsWordDetail[] newsWordDetails = textSegment.rank(text);
         List<NewsWordDetail> filteredNewsWordDetail = NewsUtil.filterNewsWordDetail(newsWordDetails);
         List<NewsWordPO> newsWordPOList = new ArrayList<>();
         for (NewsWordDetail newsWordDetail : filteredNewsWordDetail) {
@@ -398,9 +402,55 @@ public class NewsServiceMongoImpl implements NewsService {
         return newNewsSegmentPO;
     }
 
+    /**
+     * 获取今日新闻词云
+     *
+     * @param count 词语数量
+     * @return 词云结果
+     */
+    @Override
+    public List<NewsWordVO> getNewsWordCloudToday(int count) {
+        List<NewsWordPO> resultList = null;
+        List<NewsWordPO> redisResultList = null;
+        try {
+            //TODO: 从Redis中获取词云
+//            redisResultList = summaryService.getTopNWordCloudToday(count);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+        boolean isRedisAvailable = redisResultList != null && !redisResultList.isEmpty();
+        if (isRedisAvailable) {
+            resultList = redisResultList;
+        } else {
+            resultList = newsDAOMongo.getTopNWordCloudToday(count);
+        }
+        if (resultList == null) {
+            throw new NewsException(ErrorType.NEWS_SEGMENT_SERVICE_UNAVAILABLE);
+        }
+        if (!isRedisAvailable) {
+            //TODO: 更新Redis中的词云
+//            updateWordCloudToday();
+        }
+        return resultList.stream().map(
+                x -> NewsWordVO.builder()
+                        .text(x.getText())
+                        .count(x.getCount())
+                        .build()
+        ).toList();
+    }
+
+    /**
+     * 更新当日词云到Redis中
+     */
+    @Override
+    public void updateWordCloudToday() {
+        List<NewsWordPO> wordCloud = newsDAOMongo.getWordCloudToday();
+        summaryService.updateWordCloudToday(wordCloud);
+    }
+
     @Override
     public Integer diffTodayAndYesterday() {
-return summaryService.diffTodayAndYesterday();
+        return summaryService.diffTodayAndYesterday();
     }
 
 }

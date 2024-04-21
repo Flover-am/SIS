@@ -1,20 +1,7 @@
 package com.seciii.prism030.core.rabbitmq;
 
-import com.seciii.prism030.core.enums.CategoryType;
 import com.seciii.prism030.core.pojo.vo.news.NewNews;
 import com.seciii.prism030.core.service.impl.NewsServiceMongoImpl;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.InjectMocks;
-import org.mockito.MockitoAnnotations;
-import org.springframework.amqp.rabbit.annotation.RabbitHandler;
-
-import java.nio.charset.StandardCharsets;
-import static org.mockito.Mockito.*;
-
-import com.seciii.prism030.core.rabbitmq.RabbitConsumer;
-import com.seciii.prism030.core.service.impl.NewsServiceMongoImpl;
-import com.seciii.prism030.core.pojo.vo.news.NewNews;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
