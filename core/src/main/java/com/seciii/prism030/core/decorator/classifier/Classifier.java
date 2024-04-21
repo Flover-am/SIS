@@ -1,12 +1,21 @@
 package com.seciii.prism030.core.decorator.classifier;
 
 import com.seciii.prism030.core.enums.CategoryType;
+
+import static com.seciii.prism030.core.decorator.classifier.ClassifierConstants.*;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 import org.thunlp.text.classifiers.BasicTextClassifier;
 import org.thunlp.text.classifiers.ClassifyResult;
 import org.thunlp.text.classifiers.LinearBigramChineseTextClassifier;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +26,7 @@ import java.util.List;
  * @date 2024.03.28
  */
 @Component
+@Slf4j
 public class Classifier {
     private BasicTextClassifier classifier = null;
 
@@ -64,20 +74,46 @@ public class Classifier {
     private void setClassifier() {
         if (this.classifier == null) {
             this.classifier = new BasicTextClassifier();
-            String modelPath = Classifier.class.getClassLoader().getResource(ClassifierConstants.MODEL_PATH).getPath();
-            System.out.println("modelPath: "+modelPath);
-            // 调用命令行tree modelPath ，看里面有什么
-            ProcessBuilder pb = new ProcessBuilder("tree", modelPath);
-            try {
-                Process p = pb.start();
-                p.waitFor();
-            } catch (Exception e) {
-                e.printStackTrace();
+            File modelFile = getFileFromResource(MODEL);
+            System.out.println();
+            if (modelFile == null) {
+                log.error("Model loading Failed!");
+                throw new RuntimeException("Model loading Failed!");
+            }
+            File categoryFile = getFileFromResource(CATEGORY);
+            if (categoryFile == null) {
+                log.error("Category loading Failed!");
+                throw new RuntimeException("Category loading Failed!");
+            }
+            File lexiconFile = getFileFromResource(LEXICON);
+            if (lexiconFile == null) {
+                log.error("Lexicon loading Failed!");
+                throw new RuntimeException("Lexicon loading Failed!");
             }
             // 设置分类种类，并读取模型
-            assert(classifier.loadCategoryListFromFile(modelPath + System.getProperty("file.separator") + ClassifierConstants.CATEGORY_PATH));
+            classifier.loadCategoryListFromFile(categoryFile.getAbsolutePath());
             classifier.setTextClassifier(new LinearBigramChineseTextClassifier(classifier.getCategorySize()));
-            classifier.getTextClassifier().loadModel(modelPath);
+            classifier.getTextClassifier().loadModel(lexiconFile, modelFile);
+        }
+    }
+
+    private File getFileFromResource(String fileName) {
+        ClassLoader classLoader = getClass().getClassLoader();
+        try (InputStream inputStream = classLoader.getResourceAsStream(MODEL_PATH+SEPARATOR+fileName);
+        ) {
+            File tmpFile = Files.createTempFile(fileName, ".tmp").toFile();
+            try (OutputStream outputStream = new FileOutputStream(tmpFile)) {
+                byte[] buffer = new byte[1024];
+                int bytesRead;
+                while ((bytesRead = inputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, bytesRead);
+                }
+            }
+            inputStream.close();
+            return tmpFile;
+        } catch (Exception e) {
+            log.error("File {} not found: {}", fileName, e.getMessage());
+            return null;
         }
     }
 
