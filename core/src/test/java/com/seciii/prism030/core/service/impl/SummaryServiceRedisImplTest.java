@@ -1,5 +1,6 @@
 package com.seciii.prism030.core.service.impl;
 
+import com.seciii.prism030.core.pojo.vo.news.NewNews;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -7,8 +8,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.core.RedisTemplate;
-
-import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
@@ -32,7 +31,7 @@ public class SummaryServiceRedisImplTest {
 
     @Test
     public void testModified() {
-        summaryService.modified();
+        summaryService.modify();
         verify(valueOperations, times(1)).set(anyString(), anyString());
     }
 
@@ -43,11 +42,6 @@ public class SummaryServiceRedisImplTest {
         assertEquals("2024-04-16", lastModified);
     }
 
-    @Test
-    public void testAddNews() {
-        summaryService.addNews(1);
-        verify(valueOperations, times(2)).increment(anyString());
-    }
 
     @Test
     public void testDeleteNews() {

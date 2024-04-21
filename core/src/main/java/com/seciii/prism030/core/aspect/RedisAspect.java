@@ -33,7 +33,7 @@ public class RedisAspect {
      */
     @AfterReturning("@annotation(com.seciii.prism030.core.aspect.annotation.Modified)")
     public void afterSuccessModify() {
-        summaryService.modified();
+        summaryService.modify();
     }
 
 
@@ -46,7 +46,7 @@ public class RedisAspect {
         Object[] args = joinPoint.getArgs();
         NewNews newNews = (NewNews) args[0];
 
-        summaryService.addNews(newsDAOMongo.getNewsById(id).getCategory());
+        summaryService.addNews(newNews);
     }
 
 
