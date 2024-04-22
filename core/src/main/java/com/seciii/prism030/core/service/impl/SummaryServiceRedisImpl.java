@@ -6,6 +6,7 @@ import com.seciii.prism030.core.pojo.po.news.NewsWordPO;
 import com.seciii.prism030.core.pojo.vo.news.NewNews;
 import com.seciii.prism030.core.pojo.vo.news.NewsSourceCountVO;
 import com.seciii.prism030.core.service.SummaryService;
+import com.seciii.prism030.core.utils.DateTimeUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -110,10 +111,10 @@ public class SummaryServiceRedisImpl implements SummaryService {
         }
         int category = newsCategory.toInt();
         String source = newNews.getOriginSource();
-        LocalDate now = LocalDate.now();
+
         // 今日新闻数量+1
         // newsDate:2024-03-11:category:1:count
-        String date = now.toString();
+        String date = DateTimeUtil.onlyDateFormat(LocalDateTime.parse(newNews.getSourceTime()));
         String dateCountKey = dayCountKey(date);
         redisTemplate.opsForValue().increment(dateCountKey);
         // 今日种类新闻数量+1
