@@ -437,6 +437,10 @@ public class NewsServiceMongoImpl implements NewsService {
             resultList = redisResultList;
         } else {
             resultList = newsDAOMongo.getTopNWordCloudToday(count);
+            if (resultList != null && resultList.isEmpty()) {
+                updateWordCloudToday();
+                resultList = newsDAOMongo.getTopNWordCloudToday(count);
+            }
         }
         if (resultList == null) {
             throw new NewsException(ErrorType.NEWS_SEGMENT_SERVICE_UNAVAILABLE);
