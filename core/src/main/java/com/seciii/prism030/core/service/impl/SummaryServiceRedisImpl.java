@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -84,12 +85,13 @@ public class SummaryServiceRedisImpl implements SummaryService {
     /**
      * 修改最后一次修改时间
      */
+
     public void modify() {
         // 时间，格式：2024-03-11 12:00:00
-        String time = LocalDateTime.now().toString();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String time = LocalDateTime.now().format(formatter);
         redisTemplate.opsForValue().set(lastModifiedKey, time);
     }
-
     /**
      * 获取最后一次修改时间
      *
