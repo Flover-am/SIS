@@ -391,14 +391,19 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
         if (category != null && !category.isEmpty()) {
             query.addCriteria(Criteria.where(CATEGORY).in(category));
         }
-        Criteria timeCriteria= Criteria.where(SOURCE_TIME);
+        Criteria timeCriteria = new Criteria();
+
         if (startTime != null) {
-            timeCriteria.gte(startTime);
+            Criteria startTimeCriteria = Criteria.where(SOURCE_TIME).gte(startTime);
+            timeCriteria.andOperator(startTimeCriteria);
         }
+
         if (endTime != null) {
-            timeCriteria.lte(endTime);
+            Criteria endTimeCriteria = Criteria.where(SOURCE_TIME).lte(endTime);
+            timeCriteria.andOperator(endTimeCriteria);
         }
-        if(!(startTime==null&&endTime==null)){
+
+        if (!(startTime == null && endTime == null)) {
             query.addCriteria(timeCriteria);
         }
         if (originSource != null && !originSource.isEmpty()) {
