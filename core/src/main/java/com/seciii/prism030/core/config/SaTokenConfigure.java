@@ -46,6 +46,10 @@ public class SaTokenConfigure {
                     SaRouter.match("/**/news/**")
                             .notMatchMethod("GET")
                             .check(() -> StpUtil.checkRoleOr("super-admin", "news-admin"));
+                    SaRouter.match("/**/superAdmin/**")
+                            .check(() -> StpUtil.checkRoleOr("super-admin"));
+                    SaRouter.match("/**/graph/**")
+                            .check(StpUtil::checkLogin);
                 })
                 // 返回异常结果
                 .setError(e -> {
@@ -69,7 +73,7 @@ public class SaTokenConfigure {
                             .setHeader("Access-Control-Allow-Credentials", "true")
                             // 有效时间
                             .setHeader("Access-Control-Max-Age", "3600")
-                            
+
                     ;
                     // 如果是预检请求，则立即返回到前端
                     SaRouter.match(SaHttpMethod.OPTIONS)

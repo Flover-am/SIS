@@ -15,6 +15,9 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <fastjson.version>2.0.24</fastjson.version>
+        <common.text.version>1.9</common.text.version>
+        <amqp.version>3.0.5</amqp.version>
     </properties>
 
     <dependencies>
@@ -31,7 +34,47 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.thunlp</groupId>
+            <artifactId>thuctc-classifier-lite</artifactId>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.springframework.amqp/spring-rabbit -->
+        <dependency>
+            <groupId>org.springframework.amqp</groupId>
+            <artifactId>spring-rabbit</artifactId>
+            <version>${amqp.version}</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.alibaba/fastjson -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>${fastjson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
+            <version>${common.text.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.unfbx</groupId>
+            <artifactId>SparkDesk-Java</artifactId>
+        </dependency>
+
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>github</id>
+            <url>https://maven.pkg.github.com/mas233/thuctc-trimmed</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </repository>
+    </repositories>
+
     <build>
         <plugins>
             <plugin>
@@ -46,7 +89,36 @@
                     </excludes>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                        <configuration>
+                            <includes>
+                                <!-- 只包含特定路径下的*Impl类 -->
+                                <include>**/com/seciii/prism030/core/service/impl/*Impl.class</include>
+                            </includes>
+                            <!-- 如果需要排除某些类，可以在这里配置excludes -->
+                            <!-- <excludes>
+                                <exclude>**/SomeClassToExclude.class</exclude>
+                            </excludes> -->
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
+
     </build>
 
 </project>

@@ -43,12 +43,26 @@ public enum ErrorType {
     USER_ROLE_NOT_EXISTS(200004, "User role not exists", 500), /* 用户身份不存在 */
 
     /**
-     * 新闻获取相关错误
+     * 新闻相关错误码
      */
     NEWS_NOT_FOUND(300000, "News does not exist", 404), /* 查找的新闻不存在 */
 
-    NEWS_PAGE_OVERFLOW(300001, "News page overflow", 400); /* 新闻页码溢出 */
+    NEWS_PAGE_OVERFLOW(300001, "News page overflow", 400), /* 新闻页码溢出 */
 
+    NEWS_SEGMENT_SERVICE_UNAVAILABLE(300002, "News segment service unavailable", 500), /* 新闻分词服务不可用 */
+
+    NEWS_INSERT_DUPLICATE(300003, "News insert duplicate", 400), /* 新闻插入重复 */
+
+    /**
+     * 图数据库模块错误码
+     */
+    LLM_RESULT_ERROR(400000, "LLM result error", 500), /* LLM返回结果错误 */
+
+    GRAPH_GENERATING(400001, "Graph is generating", 400), /* 知识图谱正在生成中 */
+
+    GRAPH_NODE_EXISTS(400002, "Graph node exists", 400), /* 新闻节点已存在 */
+
+    NODE_SAVE_FAILED(400003, "Node save failed", 400); /* 节点存储失败 */
 
     /**
      * 状态码

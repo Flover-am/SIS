@@ -31,3 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
+
+
+### Server Configs ###
+**/application-prod.yml
+**/application-dev.yml

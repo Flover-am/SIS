@@ -1,10 +1,8 @@
 package com.seciii.prism030.core.controller;
 
-import com.seciii.prism030.core.pojo.vo.news.NewsVO;
+import com.seciii.prism030.core.pojo.vo.news.*;
 import com.seciii.prism030.common.Result;
 import com.seciii.prism030.core.pojo.dto.PagedNews;
-import com.seciii.prism030.core.pojo.vo.news.Filter;
-import com.seciii.prism030.core.pojo.vo.news.NewNews;
 import com.seciii.prism030.core.service.NewsService;
 import com.seciii.prism030.core.utils.DateTimeUtil;
 import org.springframework.web.bind.annotation.*;
@@ -27,8 +25,85 @@ public class NewsController {
         this.newsService = newsService;
     }
 
+
+
+    /**
+     * 获取新闻来源与数量
+     * @return 新闻来源与数量
+     */
+    @GetMapping("/news/sourceCount")
+    public Result<List<NewsSourceCountVO>> countAllSourceNews() {
+        return Result.success(newsService.countAllSourceNews());
+    }
+
+    /**
+     * 获取今日新闻数量与昨日新闻数量的差值
+     *
+     * @return 今日新闻数量与昨日新闻数量的差值
+     */
+    @GetMapping("/news/diffDays")
+    public Result<Integer> diffTodayAndYesterday() {
+        return Result.success(newsService.diffTodayAndYesterday());
+    }
+
+    /**
+     * 今日每种新闻的新闻数量
+     *
+     * @return 今日每种新闻的新闻数量
+     */
+    @GetMapping("/news/countAllCategory")
+    public Result<List<NewsCategoryCountVO>> countAllCategoryNews() {
+        return Result.success(newsService.countAllCategoryOfTodayNews());
+    }
+
+    /**
+     * 获取一段时间内每天每种的新闻数量
+     */
+    @GetMapping("/news/countPeriod")
+    public Result<List<NewsDateCountVO>> countPeriodNews(@RequestParam String startTime, @RequestParam String endTime) {
+        return Result.success(newsService.countPeriodNews(startTime, endTime));
+    }
+
+    /**
+     * 获取今日新闻数量
+     *
+     * @return 今日新闻数量
+     */
+    @GetMapping("/news/countDay")
+    public Result<Integer> countDateNews() {
+        return Result.success(newsService.countTodayNews());
+    }
+
+    /**
+     * 获取今日新闻分类数量
+     */
+    @GetMapping("/news/countCategory")
+    public Result<Integer> countCategoryNews(@RequestParam int category) {
+        return Result.success(newsService.countCategoryOfToday(category));
+    }
+
+    /**
+     * 获取最后一次修改时间
+     *
+     * @return 最后一次修改时间
+     */
+    @GetMapping("/news/lastModify")
+    public Result<String> lastModify() {
+        return Result.success(newsService.getLastModified());
+    }
+
+    /**
+     * 获取一周内新闻数量
+     */
+    @GetMapping("/news/countWeek")
+    public Result<Integer> countWeekNews() {
+        return Result.success(newsService.countWeekNews());
+    }
+
+
     /**
      * 新增新闻
+     *
      */
     @PostMapping("/news")
     public Result<Void> addNews(@RequestBody NewNews newNews) {
@@ -178,5 +253,41 @@ public class NewsController {
     public Result<Void> deleteMultiple(@RequestBody List<Long> idList) {
         newsService.deleteMultipleNews(idList);
         return Result.success();
+    }
+
+    /**
+     * 获取前N个最可能的新闻分类
+     *
+     * @param text 新闻标题字符串
+     * @param topN topN个数
+     * @return 分类结果
+     */
+    @GetMapping("/news/top-n-classify")
+    public Result<List<ClassifyResultVO>> getTopNClassify(@RequestParam String text, @RequestParam int topN) {
+        List<ClassifyResultVO> result = newsService.topNClassify(text, topN);
+        return Result.success(result);
+    }
+
+    /**
+     * 词云统计
+     *
+     * @param id 新闻id
+     */
+    @GetMapping("/news/word")
+    public Result<NewsSegmentVO> getWordCloud(@RequestParam Long id) {
+        NewsSegmentVO newsSegmentVO = newsService.getNewsWordCloud(id);
+        return Result.success(newsSegmentVO);
+    }
+
+    /**
+     * 获取今日词云
+     *
+     * @param count 词云数量
+     * @return 词云列表
+     */
+    @GetMapping("/news/wordCloudToday")
+    public Result<List<NewsWordVO>> getWordCloudToday(@RequestParam Integer count) {
+        List<NewsWordVO> resultList = newsService.getNewsWordCloudToday(count);
+        return Result.success(resultList);
     }
 }
