@@ -123,7 +123,9 @@ public class SummaryServiceRedisImpl implements SummaryService {
         redisTemplate.opsForValue().increment(categoryCountKey);
         String sourceKey = sourceKey(date);
         log.info("<----------sourceKey: {} -------->", sourceKey);
-        redisTemplate.opsForZSet().incrementScore(sourceKey, source, 1);
+        if (source != null && !source.isEmpty()) {
+            redisTemplate.opsForZSet().incrementScore(sourceKey, source, 1);
+        }
 
 //        // newsDate:2024-03-11:category:1
 //        String categoryKey = "newsDate:" + date + ":category:" + category;
