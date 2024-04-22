@@ -1,5 +1,6 @@
 package com.seciii.prism030.core.service.impl;
 
+import com.seciii.prism030.core.enums.CategoryType;
 import com.seciii.prism030.core.pojo.po.news.NewsWordPO;
 import com.seciii.prism030.core.pojo.vo.news.NewNews;
 import com.seciii.prism030.core.pojo.vo.news.NewsSourceCountVO;
@@ -97,7 +98,7 @@ public class SummaryServiceRedisImpl implements SummaryService {
      * 添加新闻
      */
     public void addNews(NewNews newNews) {
-        int category = Integer.parseInt(newNews.getCategory());
+        int category = CategoryType.of(newNews.getCategory()).toInt();
         String source = newNews.getOriginSource();
         LocalDate now = LocalDate.now();
         // 今日新闻数量+1
