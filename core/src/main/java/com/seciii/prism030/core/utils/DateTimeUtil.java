@@ -10,6 +10,7 @@ import java.time.format.DateTimeFormatter;
  * @date 2024.03.11
  */
 public class DateTimeUtil {
+    private static final String DATE_FORMAT = "yyyy-MM-dd";
     private static final String DEFAULT_FORMAT = "yyyy-MM-dd HH:mm:ss";
     private static final String BEGIN_TIME_OF_DAY = "00:00:00";
     private static final String END_TIME_OF_DAY = "23:59:59";
@@ -47,7 +48,7 @@ public class DateTimeUtil {
         if (date == null) {
             return "";
         }
-        return date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        return date.format(DateTimeFormatter.ofPattern(DATE_FORMAT));
     }
 
     public static LocalDateTime parseBeginOfDay(String date) {
