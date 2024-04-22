@@ -1,11 +1,13 @@
 package com.seciii.prism030.core.service.impl;
 
+import com.seciii.prism030.core.decorator.classifier.Classifier;
 import com.seciii.prism030.core.enums.CategoryType;
 import com.seciii.prism030.core.pojo.po.news.NewsWordPO;
 import com.seciii.prism030.core.pojo.vo.news.NewNews;
 import com.seciii.prism030.core.pojo.vo.news.NewsSourceCountVO;
 import com.seciii.prism030.core.service.SummaryService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +38,8 @@ public class SummaryServiceRedisImpl implements SummaryService {
 
     private static final String wordCloudKey = "wordCloudToday";
     private final RedisTemplate<String, Object> redisTemplate;
+    @Autowired
+    private Classifier classifier;
 
     public SummaryServiceRedisImpl(RedisTemplate<String, Object> redisTemplate) {
         this.redisTemplate = redisTemplate;
@@ -100,7 +104,11 @@ public class SummaryServiceRedisImpl implements SummaryService {
      * 添加新闻
      */
     public void addNews(NewNews newNews) {
-        int category = CategoryType.of(newNews.getCategory()).toInt();
+        CategoryType newsCategory = CategoryType.of(newNews.getCategory());
+        if (newsCategory == null) {
+            newsCategory = classifier.classify(newNews.getContent());
+        }
+        int category = newsCategory.toInt();
         String source = newNews.getOriginSource();
         LocalDate now = LocalDate.now();
         // 今日新闻数量+1
