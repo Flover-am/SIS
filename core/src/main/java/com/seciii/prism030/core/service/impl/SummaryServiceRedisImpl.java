@@ -114,7 +114,7 @@ public class SummaryServiceRedisImpl implements SummaryService {
 
         // 今日新闻数量+1
         // newsDate:2024-03-11:category:1:count
-        String date = DateTimeUtil.onlyDateFormat(LocalDateTime.parse(newNews.getSourceTime()));
+        String date = DateTimeUtil.onlyDateFormat(DateTimeUtil.defaultParse(newNews.getSourceTime()));
         String dateCountKey = dayCountKey(date);
         redisTemplate.opsForValue().increment(dateCountKey);
         // 今日种类新闻数量+1
