@@ -54,6 +54,7 @@ public class SummaryServiceRedisImplTest {
         NewNews newNews = new NewNews();
         newNews.setCategory("1");
         newNews.setOriginSource("source");
+        newNews.setCategory("财经");
         summaryService.addNews(newNews);
         verify(valueOperations, times(2)).increment(anyString());
         verify(zSetOperations, times(1)).incrementScore(anyString(), anyString(), anyDouble());
