@@ -92,6 +92,7 @@ public class SummaryServiceRedisImpl implements SummaryService {
         String time = LocalDateTime.now().format(formatter);
         redisTemplate.opsForValue().set(lastModifiedKey, time);
     }
+
     /**
      * 获取最后一次修改时间
      *
@@ -150,9 +151,13 @@ public class SummaryServiceRedisImpl implements SummaryService {
         String categoryCountKey = categoryCountKey(date, category);
         // newsDate:2024-03-11:count
         String dateCountKey = dayCountKey(date);
+        if (redisTemplate.opsForValue().get(categoryCountKey) != null && (Integer) redisTemplate.opsForValue().get(categoryCountKey) > 0) {
+            redisTemplate.opsForValue().decrement(categoryCountKey);
+        }
+        if (redisTemplate.opsForValue().get(dateCountKey) != null && (Integer) redisTemplate.opsForValue().get(dateCountKey) > 0) {
+            redisTemplate.opsForValue().decrement(dateCountKey);
+        }
 
-        redisTemplate.opsForValue().decrement(categoryCountKey);
-        redisTemplate.opsForValue().decrement(dateCountKey);
     }
 
 //----------------------------------------新闻数量------------------------------------------------//

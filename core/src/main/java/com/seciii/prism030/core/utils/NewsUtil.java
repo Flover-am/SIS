@@ -85,10 +85,10 @@ public class NewsUtil {
                         .id(newsPO.getId())
                         .title(newsPO.getTitle())
                         .originSource(newsPO.getOriginSource())
-                        .sourceTime(DateTimeUtil.defaultFormat(newsPO.getSourceTime()))
+                        .sourceTime(DateTimeUtil.fromMongoStdToDefault(newsPO.getSourceTime()))
                         .category(CategoryType.of(newsPO.getCategory()).toString())
                         .link(newsPO.getLink())
-                        .updateTime(DateTimeUtil.defaultFormat(newsPO.getUpdateTime()))
+                        .updateTime(DateTimeUtil.fromMongoStdToDefault(newsPO.getUpdateTime()))
                         .build()
         ).toList();
     }
@@ -105,7 +105,7 @@ public class NewsUtil {
                 .title(newsPO.getTitle())
                 .content(newsPO.getContent())
                 .originSource(newsPO.getOriginSource())
-                .sourceTime(DateTimeUtil.defaultFormat(newsPO.getSourceTime()))
+                .sourceTime(DateTimeUtil.fromMongoStdToDefault(newsPO.getSourceTime()))
                 .link(newsPO.getLink())
                 .sourceLink(newsPO.getSourceLink())
                 .category(CategoryType.of(newsPO.getCategory()).getCategoryEN())
@@ -129,7 +129,7 @@ public class NewsUtil {
                 .title(newNews.getTitle())
                 .content(newNews.getContent())
                 .originSource(newNews.getOriginSource())
-                .sourceTime(DateTimeUtil.defaultParse(newNews.getSourceTime()))
+                .sourceTime(DateTimeUtil.toMongoStandardFormat(DateTimeUtil.defaultParse(newNews.getSourceTime())))
                 .link(newNews.getLink())
                 .sourceLink(newNews.getSourceLink())
                 .category(category)
@@ -165,16 +165,16 @@ public class NewsUtil {
      */
     public static List<NewsWordDetail> filterNewsWordDetail(NewsWordDetail[] newsWordDetails) {
         List<NewsWordDetail> resultList = new ArrayList<>();
-        for(NewsWordDetail newsWordDetail : newsWordDetails) {
+        for (NewsWordDetail newsWordDetail : newsWordDetails) {
             if (!(newsWordDetail.getText().contains("\n") // 含有换行符
                     || Pattern.compile("[\\p{P}\\p{S}]").matcher(newsWordDetail.getText()).find() // 含有标点符号
                     || newsWordDetail.getRank() <= 1 // 词语重要性小于等于1
                     || newsWordDetail.getPartOfSpeech() == null // 词性为空
                     || ignoredParts.contains(newsWordDetail.getPartOfSpeech()) // 词性为忽略词性
-                )
-            ){
+            )
+            ) {
                 newsWordDetail.setText(newsWordDetail.getText().replaceAll("\\s", ""));
-                if(newsWordDetail.getText().length() > 1) {
+                if (newsWordDetail.getText().length() > 1) {
                     resultList.add(newsWordDetail);
                 }
             }
