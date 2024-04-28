@@ -12,6 +12,7 @@ import com.seciii.prism030.core.pojo.po.news.NewsSegmentPO;
 import com.seciii.prism030.core.pojo.po.news.NewsWordPO;
 import com.seciii.prism030.core.pojo.vo.news.*;
 import com.seciii.prism030.core.service.SummaryService;
+import com.seciii.prism030.core.utils.DateTimeUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -83,13 +84,13 @@ public class NewsServiceMongoImplTest {
                             .id((long) i)
                             .title("test" + i)
                             .originSource("test" + i + "source")
-                            .sourceTime(LocalDateTime.parse("2020-03-01 00:01:0" + i, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                            .sourceTime(DateTimeUtil.toMongoStandardFormat(LocalDateTime.parse("2020-03-01 00:01:0" + i, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))))
                             .category(i)
                             .content("testcontent" + i)
                             .link("www.test" + i + ".com")
                             .sourceLink("www.test" + i + "source.com")
-                            .createTime(currentTime)
-                            .updateTime(currentTime)
+                            .createTime(DateTimeUtil.toMongoStandardFormat(currentTime))
+                            .updateTime(DateTimeUtil.toMongoStandardFormat(currentTime))
                             .build()
             );
         }
@@ -101,10 +102,10 @@ public class NewsServiceMongoImplTest {
                 .link("www.singulartest.com")
                 .sourceLink("www.singulartestsource.com")
                 .originSource("singularTestSource")
-                .sourceTime(LocalDateTime.parse("2024-01-01 12:34:56", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                .sourceTime(DateTimeUtil.toMongoStandardFormat(LocalDateTime.parse("2024-01-01 12:34:56", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))))
                 .category(1)
-                .updateTime(currentTime)
-                .createTime(currentTime)
+                .updateTime(DateTimeUtil.toMongoStandardFormat(currentTime))
+                .createTime(DateTimeUtil.toMongoStandardFormat(currentTime))
                 .build();
         fakeNewsVO = NewsVO.builder()
                 .id(512L)
@@ -115,8 +116,8 @@ public class NewsServiceMongoImplTest {
                 .originSource("singularTestSource")
                 .sourceTime("2024-01-01 12:34:56")
                 .category(CategoryType.getCategoryType(1).toString())
-                .createTime(currentTime)
-                .updateTime(currentTime)
+                .createTime(DateTimeUtil.toMongoStandardFormat(currentTime))
+                .updateTime(DateTimeUtil.toMongoStandardFormat(currentTime))
                 .build();
         fakeNewNews = new NewNews(
                 "singularTest",
