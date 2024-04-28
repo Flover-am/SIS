@@ -1,0 +1,12 @@
+spring:
+  cloud:
+    nacos:
+      config:
+        server-addr: localhost:8848
+        file-extension: yaml
+        group: group
+        namespace: namespace
+  application:
+    name: prism030
+  profiles:
+    active: dev
