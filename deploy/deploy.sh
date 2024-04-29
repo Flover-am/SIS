@@ -2,12 +2,15 @@
 
 version=1.0.0
 environment=$1
-nacos_serveraddr=$2
-nacos_namespace=$3
-nacos_group=$4
+#nacos_serveraddr=$2
+#nacos_namespace=$3
+#nacos_group=$4
 # echo 所有的环境变量
 echo "version: $version"
 echo "environment: $environment"
+#echo "nacos_serveraddr: $nacos_serveraddr"
+#echo "nacos_namespace: $nacos_namespace"
+#echo "nacos_group: $nacos_group"
 
 image_name=prism030-backend-${environment}
 container_name=prism030-backend-${environment}
@@ -35,9 +38,6 @@ echo "$container_name is stopped and removed successfully!"
 # 运行容器，并传递环境变量
 docker run --name=$container_name -itd -p $port:8080 --restart=on-failure:3 \
 -e ENVIRONMENT=$environment \
--e NACOS_SERVERADDR=$nacos_serveraddr \
--e NACOS_NAMESPACE=$nacos_namespace \
--e NACOS_GROUP=$nacos_group \
 -e version=$version \
 $image_name:$version
 
