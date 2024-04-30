@@ -13,6 +13,6 @@ public class UpdateNewsEventListener implements ApplicationListener<UpdateNewsEv
     private SseController sseController;
     @Override
     public void onApplicationEvent(UpdateNewsEvent event) {
-        sseController.sendEvents(NewsUtil.toNewsVO(event.getNewsPO()));
+        sseController.sendEvents(event.getNewsVO());
     }
 }

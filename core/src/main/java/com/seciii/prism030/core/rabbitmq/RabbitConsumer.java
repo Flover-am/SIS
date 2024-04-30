@@ -1,6 +1,10 @@
 package com.seciii.prism030.core.rabbitmq;
 
+import com.seciii.prism030.core.enums.UpdateType;
+import com.seciii.prism030.core.event.publisher.UpdateNewsPublisher;
+import com.seciii.prism030.core.pojo.po.news.NewsPO;
 import com.seciii.prism030.core.pojo.vo.news.NewNews;
+import com.seciii.prism030.core.pojo.vo.news.NewsVO;
 import com.seciii.prism030.core.service.impl.NewsServiceMongoImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
@@ -20,6 +24,8 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 public class RabbitConsumer {
     NewsServiceMongoImpl newsServiceMongo;
+
+    UpdateNewsPublisher updateNewsPublisher;
 
     /**
      * RabbitConsumer构造函数，注入NewsServiceMongoImpl实例
@@ -45,6 +51,8 @@ public class RabbitConsumer {
 
         // 将newNews对象添加到newsServiceMongo中
         long newsId = newsServiceMongo.addNews(newNews);
+        NewsVO newsVO = newsServiceMongo.getNewsDetail(newsId);
+        updateNewsPublisher.publishModifiedNewsEvent(this, newsVO, UpdateType.ADD);
 
         // 生成并保存新闻的词云
         try {

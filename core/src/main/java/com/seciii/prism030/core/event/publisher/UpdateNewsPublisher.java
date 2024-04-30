@@ -3,6 +3,7 @@ package com.seciii.prism030.core.event.publisher;
 import com.seciii.prism030.core.enums.UpdateType;
 import com.seciii.prism030.core.event.UpdateNewsEvent;
 import com.seciii.prism030.core.pojo.po.news.NewsPO;
+import com.seciii.prism030.core.pojo.vo.news.NewsVO;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -22,4 +23,8 @@ public class UpdateNewsPublisher {
     public void publishModifiedNewsEvent(Object source, @NotNull NewsPO newsPO, UpdateType updateType) {
         publisher.publishEvent(new UpdateNewsEvent(source, newsPO, updateType));
     }
+    public void publishModifiedNewsEvent(Object source, @NotNull NewsVO newsVO, UpdateType updateType){
+        publisher.publishEvent(new UpdateNewsEvent(source, newsVO, updateType));
+    }
+
 }
