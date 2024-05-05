@@ -9,6 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
+/**
+ * 更新新闻发布者
+ *
+ * @author wang mingsong
+ * @date 2024.04.30
+ */
 @Component
 public class UpdateNewsPublisher {
     @Autowired
@@ -17,13 +23,22 @@ public class UpdateNewsPublisher {
     /**
      * 发布更新新闻事件
      *
-     * @param source 发布者
-     * @param newsPO 待发布的修改后新闻
+     * @param source     发布者
+     * @param newsPO     待发布的修改后新闻PO
+     * @param updateType 更新类型
      */
     public void publishModifiedNewsEvent(Object source, @NotNull NewsPO newsPO, UpdateType updateType) {
         publisher.publishEvent(new UpdateNewsEvent(source, newsPO, updateType));
     }
-    public void publishModifiedNewsEvent(Object source, @NotNull NewsVO newsVO, UpdateType updateType){
+
+    /**
+     * 发布更新新闻事件
+     *
+     * @param source     发布者
+     * @param newsVO     待发布的修改后新闻VO
+     * @param updateType 更新类型
+     */
+    public void publishModifiedNewsEvent(Object source, @NotNull NewsVO newsVO, UpdateType updateType) {
         publisher.publishEvent(new UpdateNewsEvent(source, newsVO, updateType));
     }
 

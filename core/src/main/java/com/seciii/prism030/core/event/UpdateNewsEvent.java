@@ -14,12 +14,27 @@ import org.springframework.context.ApplicationEvent;
  * @date 2024.04.30
  */
 public class UpdateNewsEvent extends ApplicationEvent {
-
+    /**
+     * 更新后的新闻PO
+     */
     private final NewsPO newsPO;
+    /**
+     * 更新后的新闻VO
+     */
     private NewsVO newsVO;
+    /**
+     * 更新类型
+     */
     @Getter
     private final UpdateType updateType;
 
+    /**
+     * 使用NewsPO的构造方法
+     *
+     * @param source     发布者
+     * @param newsPO     待发布的修改后新闻PO
+     * @param updateType 更新类型
+     */
     public UpdateNewsEvent(Object source, NewsPO newsPO, UpdateType updateType) {
         super(source);
         this.newsPO = newsPO;
@@ -27,6 +42,13 @@ public class UpdateNewsEvent extends ApplicationEvent {
         this.newsVO = null;
     }
 
+    /**
+     * 使用NewsVO的构造方法
+     *
+     * @param source     发布者
+     * @param newsVO     待发布的修改后新闻VO
+     * @param updateType 更新类型
+     */
     public UpdateNewsEvent(Object source, NewsVO newsVO, UpdateType updateType) {
         super(source);
         this.newsVO = newsVO;
