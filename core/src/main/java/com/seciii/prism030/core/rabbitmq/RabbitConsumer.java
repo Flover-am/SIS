@@ -52,6 +52,12 @@ public class RabbitConsumer {
         // 将newNews对象添加到newsServiceMongo中
         long newsId = newsServiceMongo.addNews(newNews);
         NewsVO newsVO = newsServiceMongo.getNewsDetail(newsId);
+
+        if (newsVO == null) {
+            log.error(String.format("Failed to get news detail after adding news, id: %d.", newsId));
+            return;
+        }
+        // 发布新闻更新事件
         updateNewsPublisher.publishModifiedNewsEvent(this, newsVO, UpdateType.ADD);
 
         // 生成并保存新闻的词云
