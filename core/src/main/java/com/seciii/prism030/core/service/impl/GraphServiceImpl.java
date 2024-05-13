@@ -14,6 +14,7 @@ import com.seciii.prism030.core.pojo.po.news.NewsPO;
 import com.seciii.prism030.core.pojo.vo.graph.EntityRelationVO;
 import com.seciii.prism030.core.pojo.vo.graph.GraphVO;
 import com.seciii.prism030.core.pojo.vo.graph.NewsEntityRelationVO;
+import com.seciii.prism030.core.pojo.vo.graph.TimeAxisVO;
 import com.seciii.prism030.core.service.GraphService;
 import com.seciii.prism030.core.utils.SparkUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -174,6 +175,18 @@ public class GraphServiceImpl implements GraphService {
             return analyzeNews(newsId);
         }
         return mapGraph(newsNode);
+    }
+
+    /**
+     * 获取实体时间轴
+     *
+     * @param entity 实体名
+     * @return 时间轴
+     */
+    @Override
+    public TimeAxisVO getTimeAxis(String entity) {
+        //TODO: 实现时间轴获取
+        return null;
     }
 
     private GraphVO mapGraph(NewsNode node) {

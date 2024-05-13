@@ -3,6 +3,7 @@ package com.seciii.prism030.core.service;
 import com.seciii.prism030.core.pojo.po.graph.node.EntityNode;
 import com.seciii.prism030.core.pojo.po.graph.node.NewsNode;
 import com.seciii.prism030.core.pojo.vo.graph.GraphVO;
+import com.seciii.prism030.core.pojo.vo.graph.TimeAxisVO;
 
 /**
  * 知识图谱服务接口
@@ -61,4 +62,12 @@ public interface GraphService {
      * @return 知识图谱
      */
     GraphVO getGraph(Long newsId);
+
+    /**
+     * 获取实体时间轴
+     *
+     * @param entity 实体名
+     * @return 时间轴
+     */
+    TimeAxisVO getTimeAxis(String entity);
 }

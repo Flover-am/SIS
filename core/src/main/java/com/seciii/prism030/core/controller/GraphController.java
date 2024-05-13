@@ -2,6 +2,7 @@ package com.seciii.prism030.core.controller;
 
 import com.seciii.prism030.common.Result;
 import com.seciii.prism030.core.pojo.vo.graph.GraphVO;
+import com.seciii.prism030.core.pojo.vo.graph.TimeAxisVO;
 import com.seciii.prism030.core.service.GraphService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -37,5 +38,11 @@ public class GraphController {
     public Result<GraphVO> getGraph(@PathVariable Long newsId) {
         GraphVO graph = graphService.getGraph(newsId);
         return Result.success(graph);
+    }
+
+    @GetMapping("/timeAxis")
+    public Result<TimeAxisVO> getTimeAxis(@RequestParam String entity){
+        TimeAxisVO timeAxisVO = graphService.getTimeAxis(entity);
+        return Result.success(timeAxisVO);
     }
 }
