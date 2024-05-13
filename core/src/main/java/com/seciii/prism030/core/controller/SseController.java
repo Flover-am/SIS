@@ -1,8 +1,7 @@
 package com.seciii.prism030.core.controller;
 
-import com.seciii.prism030.core.pojo.vo.news.NewsVO;
+import com.seciii.prism030.core.pojo.dto.UpdatedNewsDTO;
 import org.springframework.http.MediaType;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,14 +29,14 @@ public class SseController {
     }
 
     /**
-     * 发送新闻VO事件
+     * 发送新闻更新事件
      *
-     * @param newsVO 新闻VO
+     * @param updatedNewsDTO 新闻更新时间DTO
      */
-    public void sendEvents(NewsVO newsVO) {
+    public void sendEvents(UpdatedNewsDTO updatedNewsDTO) {
         for (SseEmitter emitter : emitterList) {
             try {
-                emitter.send(newsVO);
+                emitter.send(updatedNewsDTO);
             } catch (IOException e) {
                 emitter.complete();
                 emitterList.remove(emitter);

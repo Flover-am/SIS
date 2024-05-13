@@ -8,6 +8,8 @@ import com.seciii.prism030.core.dao.news.NewsDAOMongo;
 import com.seciii.prism030.core.decorator.classifier.Classifier;
 import com.seciii.prism030.core.decorator.segment.TextSegment;
 import com.seciii.prism030.core.enums.CategoryType;
+import com.seciii.prism030.core.enums.UpdateType;
+import com.seciii.prism030.core.event.publisher.UpdateNewsPublisher;
 import com.seciii.prism030.core.pojo.dto.NewsWordDetail;
 import com.seciii.prism030.core.pojo.dto.PagedNews;
 import com.seciii.prism030.core.pojo.po.news.NewsPO;
@@ -44,6 +46,8 @@ public class NewsServiceMongoImpl implements NewsService {
 
     private SummaryService summaryService;
 
+    private UpdateNewsPublisher updateNewsPublisher;
+
     @Autowired
     public void setRedisService(SummaryService summaryService) {
         this.summaryService = summaryService;
@@ -62,6 +66,11 @@ public class NewsServiceMongoImpl implements NewsService {
     @Autowired
     public void setTextSegment(TextSegment textSegment) {
         this.textSegment = textSegment;
+    }
+
+    @Autowired
+    public void setUpdateNewsPublisher(UpdateNewsPublisher updateNewsPublisher) {
+        this.updateNewsPublisher = updateNewsPublisher;
     }
 
     @Override
@@ -166,6 +175,7 @@ public class NewsServiceMongoImpl implements NewsService {
             log.error(String.format("News with id %d not found", id));
             throw new NewsException(ErrorType.NEWS_NOT_FOUND);
         }
+        updateNewsPublisher.publishModifiedNewsEvent(this, newsDAOMongo.getNewsById(id), UpdateType.MODIFY);
     }
 
     /**
@@ -182,6 +192,7 @@ public class NewsServiceMongoImpl implements NewsService {
             log.error(String.format("News with id %d not found", id));
             throw new NewsException(ErrorType.NEWS_NOT_FOUND);
         }
+        updateNewsPublisher.publishModifiedNewsEvent(this, newsDAOMongo.getNewsById(id), UpdateType.MODIFY);
     }
 
     /**
@@ -198,6 +209,7 @@ public class NewsServiceMongoImpl implements NewsService {
             log.error(String.format("News with id %d not found", id));
             throw new NewsException(ErrorType.NEWS_NOT_FOUND);
         }
+        updateNewsPublisher.publishModifiedNewsEvent(this, newsDAOMongo.getNewsById(id), UpdateType.MODIFY);
     }
 
     /**
@@ -213,6 +225,7 @@ public class NewsServiceMongoImpl implements NewsService {
             log.error(String.format("News with id %d not found", id));
             throw new NewsException(ErrorType.NEWS_NOT_FOUND);
         }
+        updateNewsPublisher.publishModifiedNewsEvent(this, NewsVO.builder().id(id).build(), UpdateType.DELETE);
     }
 
     /**
@@ -236,7 +249,12 @@ public class NewsServiceMongoImpl implements NewsService {
     @Modified
     @Add
     public long addNews(NewNews newNews) {
-        return newsDAOMongo.insert(NewsUtil.toNewsPO(newNews));
+        NewsPO newsPO = NewsUtil.toNewsPO(newNews);
+        long res = newsDAOMongo.insert(newsPO);
+        if (res != -1) {
+            updateNewsPublisher.publishModifiedNewsEvent(this, newsPO, UpdateType.ADD);
+        }
+        return res;
     }
 
     /**

@@ -6,6 +6,7 @@ import com.seciii.prism030.core.dao.news.impl.NewsDAOMongoImpl;
 import com.seciii.prism030.core.decorator.segment.TextSegment;
 import com.seciii.prism030.core.enums.CategoryType;
 import com.seciii.prism030.core.enums.SpeechPart;
+import com.seciii.prism030.core.event.publisher.UpdateNewsPublisher;
 import com.seciii.prism030.core.pojo.dto.NewsWordDetail;
 import com.seciii.prism030.core.pojo.po.news.NewsPO;
 import com.seciii.prism030.core.pojo.po.news.NewsSegmentPO;
@@ -50,6 +51,8 @@ public class NewsServiceMongoImplTest {
     private TextSegment textSegmentMock;
     @MockBean
     private SummaryService summaryServiceMock;
+    @MockBean
+    private UpdateNewsPublisher updateNewsPublisherMock;
 
     @InjectMocks
     private NewsServiceMongoImpl newsServiceMongoImpl = new NewsServiceMongoImpl();

@@ -1,31 +1,28 @@
 package com.seciii.prism030.core.rabbitmq;
 
-import com.seciii.prism030.core.enums.UpdateType;
-import com.seciii.prism030.core.event.publisher.UpdateNewsPublisher;
-import com.seciii.prism030.core.pojo.po.news.NewsPO;
 import com.seciii.prism030.core.pojo.vo.news.NewNews;
 import com.seciii.prism030.core.pojo.vo.news.NewsVO;
+import com.seciii.prism030.core.service.NewsService;
 import com.seciii.prism030.core.service.impl.NewsServiceMongoImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestClientException;
 
 import java.nio.charset.StandardCharsets;
 
 /**
  * RabbitMQ消费者类，实现获取并处理消息队列中的信息，存入mongoDB
  *
- * @author：windloong
+ * @author windloong
  */
 @Component
 @RabbitListener(queues = "news_queue")
 @Slf4j
 public class RabbitConsumer {
-    NewsServiceMongoImpl newsServiceMongo;
+    NewsService newsService;
 
-    UpdateNewsPublisher updateNewsPublisher;
+
 
     /**
      * RabbitConsumer构造函数，注入NewsServiceMongoImpl实例
@@ -33,7 +30,7 @@ public class RabbitConsumer {
      * @param newsServiceMongo NewsServiceMongoImpl实例
      */
     public RabbitConsumer(NewsServiceMongoImpl newsServiceMongo) {
-        this.newsServiceMongo = newsServiceMongo;
+        this.newsService = newsServiceMongo;
     }
 
     /**
@@ -50,21 +47,12 @@ public class RabbitConsumer {
         NewNews newNews = MessageConvertor.parseJsonToNewNews(jsonString);
 
         // 将newNews对象添加到newsServiceMongo中
-        long newsId = newsServiceMongo.addNews(newNews);
-        NewsVO newsVO = newsServiceMongo.getNewsDetail(newsId);
+        long newsId = newsService.addNews(newNews);
+        NewsVO newsVO = newsService.getNewsDetail(newsId);
 
         if (newsVO == null) {
             log.error(String.format("Failed to get news detail after adding news, id: %d.", newsId));
             return;
-        }
-        // 发布新闻更新事件
-        updateNewsPublisher.publishModifiedNewsEvent(this, newsVO, UpdateType.ADD);
-
-        // 生成并保存新闻的词云
-        try {
-            newsServiceMongo.generateAndSaveWordCloud(newsId, newNews.getContent());
-        } catch (RestClientException e) {
-            log.error(String.format("Failed to generate word cloud for news %d: %s", newsId, e.getMessage()));
         }
 
     }
