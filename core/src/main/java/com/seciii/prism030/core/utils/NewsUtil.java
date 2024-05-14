@@ -28,6 +28,7 @@ public class NewsUtil {
     public final static String UPDATE_TIME = "update_time";
     public final static String CREATE_TIME = "create_time";
 
+
     public final static List<SpeechPart> ignoredParts = Arrays.asList(
             SpeechPart.ADVERB,
             SpeechPart.PRONOUN,

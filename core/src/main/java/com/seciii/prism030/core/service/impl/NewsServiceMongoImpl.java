@@ -391,9 +391,6 @@ public class NewsServiceMongoImpl implements NewsService {
         if (text == null || text.isEmpty()) {
             return null;
         }
-        if (text.contains("责任编辑")) {
-            text = text.substring(0, text.indexOf("责任编辑"));
-        }
 
         // 获取并过滤分词结果
         NewsWordDetail[] newsWordDetails = textSegment.rank(text);
@@ -434,6 +431,49 @@ public class NewsServiceMongoImpl implements NewsService {
         }
         return newNewsSegmentPO;
     }
+
+    /**
+     * 保存新闻词云
+     *
+     * @param id                新闻id
+     * @param segmentedWordList 分词后的词语列表
+     * @return 词云结果
+     */
+    @Override
+    public NewsSegmentPO saveWordCloud(long id, List<String> segmentedWordList) {
+        List<NewsWordPO> newsWordPOList = new ArrayList<>();
+        for(String word : segmentedWordList){
+            boolean isContained = false;
+            for (NewsWordPO newsWordPO : newsWordPOList) {
+                if (newsWordPO.getText().equals(word)) {
+                    newsWordPO.setCount(newsWordPO.getCount() + 1);
+                    isContained = true;
+                    break;
+                }
+            }
+            if (!isContained) {
+                newsWordPOList.add(NewsWordPO.builder()
+                        .text(word)
+                        .count(1)
+                        .build());
+            }
+        }
+        NewsSegmentPO newsSegmentPO=NewsSegmentPO.builder()
+                .id(id)
+                .content(newsWordPOList.toArray(new NewsWordPO[0]))
+                .build();
+        try {
+            int code = newsDAOMongo.insertSegment(newsSegmentPO);
+            if (code != 0) {
+                // 插入到数据库失败，但已得到分词结果
+                log.error(String.format("Failed to insert news segment with id %d. ", id));
+            }
+        } catch (RuntimeException e) {
+            log.error(String.format("Failed to insert news segment with id %d:%s ", id, e.getMessage()));
+        }
+        return newsSegmentPO;
+    }
+
 
     /**
      * 获取今日新闻词云
