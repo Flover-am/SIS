@@ -2,14 +2,20 @@ package com.seciii.prism030.core.utils;
 
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.seciii.prism030.core.pojo.dto.EntityRelationshipDTO;
+import com.seciii.prism030.core.pojo.dto.NewsEntityRelationshipDTO;
 import com.seciii.prism030.core.pojo.vo.news.NewNews;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.StringEscapeUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 处理RabbitMQ消息格式转换的工具类
+ */
+@Slf4j
 public class RabbitUtil {
     public final static String RABBIT_TITLE = "title";
     public final static String RABBIT_CONTENT = "content";
@@ -24,8 +30,8 @@ public class RabbitUtil {
     /**
      * 将json格式新闻映射为NewNews对象
      *
-     * @param jsonString
-     * @return newNews
+     * @param jsonString json格式新闻
+     * @return NewNews对象
      */
     public static NewNews parseJsonToNewNews(String jsonString) {
 
@@ -71,7 +77,7 @@ public class RabbitUtil {
      * @param jsonStr json字符串
      * @return 实体关系列表
      */
-    public static List<EntityRelationshipDTO> getERList(String jsonStr) {
+    public static List<NewsEntityRelationshipDTO> getERList(String jsonStr) {
         JSONObject json = JSON.parseObject(jsonStr);
         String ERString = StringEscapeUtils.unescapeJava(json.getString(RABBIT_ER));
         if (ERString == null || ERString.isEmpty()) return null;
@@ -79,19 +85,23 @@ public class RabbitUtil {
         // 按行分割每一个实体关系
         String[] ERArray = ERString.split("\n");
 
-        List<EntityRelationshipDTO> resultList = new ArrayList<>();
+        List<NewsEntityRelationshipDTO> resultList = new ArrayList<>();
 
         for (String ERItem : ERArray) {
             // 每个实体关系应以"(E1 | R | E2)"格式给出
             if (!ERItem.startsWith("(") || !ERItem.endsWith(")")) {
+                log.warn("实体关系格式错误: " + ERItem);
                 continue;
             }
             String[] ERItemArray = ERItem.substring(1, ERItem.length() - 1).split("\\|");
-            if (ERItemArray.length != 3) continue;
-            resultList.add(EntityRelationshipDTO.builder()
-                    .fromEntity(ERItemArray[0].trim())
+            if (ERItemArray.length != 3) {
+                log.warn("实体关系格式错误: " + ERItem);
+                continue;
+            }
+            resultList.add(NewsEntityRelationshipDTO.builder()
+                    .entity1(ERItemArray[0].trim())
                     .relationship(ERItemArray[1].trim())
-                    .toRelationship(ERItemArray[2].trim())
+                    .entity2(ERItemArray[2].trim())
                     .build());
         }
         return resultList;
@@ -105,7 +115,7 @@ public class RabbitUtil {
      */
     public static List<String> getWordSegment(String jsonStr) {
         JSONObject json = JSON.parseObject(jsonStr);
-        return (List<String>) json.get(RABBIT_SEGMENT);
+        return ((JSONArray) json.get(RABBIT_SEGMENT)).toJavaList(String.class);
     }
 
 }

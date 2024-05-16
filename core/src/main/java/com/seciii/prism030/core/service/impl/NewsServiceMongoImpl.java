@@ -158,7 +158,7 @@ public class NewsServiceMongoImpl implements NewsService {
             log.error(String.format("News with id %d not found", id));
             throw new NewsException(ErrorType.NEWS_NOT_FOUND);
         }
-        return NewsUtil.toNewsVO(newsPO);
+        return NewsUtil.toNewsItemVO(newsPO);
     }
 
     /**
@@ -290,7 +290,7 @@ public class NewsServiceMongoImpl implements NewsService {
                 endTime,
                 originSource
         );
-        return new PagedNews(total, NewsUtil.toNewsVO(newsPOList));
+        return new PagedNews(total, NewsUtil.toNewsItemVO(newsPOList));
     }
 
     /**
@@ -329,7 +329,7 @@ public class NewsServiceMongoImpl implements NewsService {
                 endTime,
                 originSource
         );
-        return new PagedNews(total, NewsUtil.toNewsVO(newsPOList));
+        return new PagedNews(total, NewsUtil.toNewsItemVO(newsPOList));
     }
 
     /**

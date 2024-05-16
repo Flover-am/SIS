@@ -1,6 +1,6 @@
 package com.seciii.prism030.core.rabbitmq;
 
-import com.seciii.prism030.core.pojo.dto.EntityRelationshipDTO;
+import com.seciii.prism030.core.pojo.dto.NewsEntityRelationshipDTO;
 import com.seciii.prism030.core.pojo.vo.news.NewNews;
 import com.seciii.prism030.core.pojo.vo.news.NewsVO;
 import com.seciii.prism030.core.service.GraphService;
@@ -64,7 +64,7 @@ public class RabbitConsumer {
         newsService.saveWordCloud(newsId, wordSegment);
 
         // 插入新闻的实体关系
-        List<EntityRelationshipDTO> erList = RabbitUtil.getERList(jsonString);
-        //TODO:图数据库插入实体关系
+        List<NewsEntityRelationshipDTO> erList = RabbitUtil.getERList(jsonString);
+        graphService.addNewsEntities(newsId, erList);
     }
 }

@@ -62,7 +62,9 @@ public enum ErrorType {
 
     GRAPH_NODE_EXISTS(400002, "Graph node exists", 400), /* 新闻节点已存在 */
 
-    NODE_SAVE_FAILED(400003, "Node save failed", 400); /* 节点存储失败 */
+    NODE_SAVE_FAILED(400003, "Node save failed", 400), /* 节点存储失败 */
+
+    ENTITY_NOT_FOUND(400004, "Entity not found", 404); /* 实体不存在 */
 
     /**
      * 状态码
