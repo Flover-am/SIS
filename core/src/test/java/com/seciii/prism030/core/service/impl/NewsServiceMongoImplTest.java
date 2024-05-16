@@ -14,6 +14,7 @@ import com.seciii.prism030.core.pojo.po.news.NewsWordPO;
 import com.seciii.prism030.core.pojo.vo.news.*;
 import com.seciii.prism030.core.service.SummaryService;
 import com.seciii.prism030.core.utils.DateTimeUtil;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -502,6 +503,11 @@ public class NewsServiceMongoImplTest {
                 }
         );
         newsServiceMongoImpl.updateWordCloudToday();
+    }
+    @Test
+    public void saveWordCloudTest(){
+        Mockito.when(newsDAOMongoMock.insertSegment(Mockito.any())).thenReturn(0);
+        Assertions.assertDoesNotThrow(()->newsServiceMongoImpl.saveWordCloud(0L,List.of("1","2")));
     }
 
     @Test
