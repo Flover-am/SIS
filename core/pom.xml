@@ -61,6 +61,15 @@
             <groupId>com.unfbx</groupId>
             <artifactId>SparkDesk-Java</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>dashvector-java-sdk</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>dashscope-sdk-java</artifactId>
+        </dependency>
     </dependencies>
 
     <repositories>

@@ -53,6 +53,8 @@ public enum ErrorType {
 
     NEWS_INSERT_DUPLICATE(300003, "News insert duplicate", 400), /* 新闻插入重复 */
 
+    NEWS_QUERY_ERROR(300004, "News query error", 400), /* 新闻查询错误 */
+
     /**
      * 图数据库模块错误码
      */
