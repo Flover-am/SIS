@@ -35,6 +35,7 @@
         <springcloud.version>3.1.4</springcloud.version>
         <dashscope.version>2.14.4</dashscope.version>
         <dashvector.version>1.0.12</dashvector.version>
+        <common-pool2.version>2.11.1</common-pool2.version>
     </properties>
 
     <dependencyManagement>
@@ -111,6 +112,11 @@
                 <groupId>com.alibaba</groupId>
                 <artifactId>dashscope-sdk-java</artifactId>
                 <version>${dashscope.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-pool2</artifactId>
+                <version>${common-pool2.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

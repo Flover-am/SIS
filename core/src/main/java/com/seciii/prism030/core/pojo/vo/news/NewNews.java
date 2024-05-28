@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * 添加新闻VO类
@@ -41,7 +42,6 @@ public class NewNews {
     /**
      * 新闻链接
      */
-
     private String link;
     /**
      * 新闻源链接
@@ -51,4 +51,8 @@ public class NewNews {
      * 新闻分类
      */
     private String category;
+    /**
+     * 向量id
+     */
+    private List<Long> vectorId;
 }

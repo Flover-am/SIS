@@ -1,10 +1,13 @@
 package com.seciii.prism030.core.rabbitmq;
 
+import com.seciii.prism030.core.mapper.news.VectorNewsMapper;
+import com.seciii.prism030.core.pojo.po.news.VectorNewsPO;
 import com.seciii.prism030.core.pojo.vo.news.NewNews;
 import com.seciii.prism030.core.service.impl.NewsServiceMongoImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 
@@ -19,15 +22,18 @@ import java.nio.charset.StandardCharsets;
 @RabbitListener(queues = "news_queue")
 @Slf4j
 public class RabbitConsumer {
-    NewsServiceMongoImpl newsServiceMongo;
+    private final NewsServiceMongoImpl newsServiceMongo;
+
+    private final VectorNewsMapper vectorNewsMapper;
 
     /**
      * RabbitConsumer构造函数，注入NewsServiceMongoImpl实例
      *
      * @param newsServiceMongo NewsServiceMongoImpl实例
      */
-    public RabbitConsumer(NewsServiceMongoImpl newsServiceMongo) {
+    public RabbitConsumer(NewsServiceMongoImpl newsServiceMongo, VectorNewsMapper vectorNewsMapper) {
         this.newsServiceMongo = newsServiceMongo;
+        this.vectorNewsMapper = vectorNewsMapper;
     }
 
     /**
@@ -53,5 +59,11 @@ public class RabbitConsumer {
             log.error(String.format("Failed to generate word cloud for news %d: %s", newsId, e.getMessage()));
         }
 
+        for (long vectorId : newNews.getVectorId()) {
+            vectorNewsMapper.insert(VectorNewsPO.builder()
+                                        .vectorId(vectorId)
+                                        .newsId(newsId)
+                                        .build());
+        }
     }
 }

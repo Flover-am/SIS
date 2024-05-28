@@ -20,18 +20,18 @@ import java.util.Collections;
  * @date 2024.05.28
  */
 public class DashScopeUtil {
-    private static String MODEL = "qwen-plus";
-    private static double TOP_P = 0.8;
+    private static final String MODEL = "qwen-plus";
+    private static final double TOP_P = 0.8;
 
     /**
      * 与大模型进行交互
      *
      * @param apiKey apiKey
      * @param prompt prompt
+     * @param gen Generation 对象
      * @return 输出的流式结果
      */
-    public static Flowable<GenerationResult> chat(String apiKey, String prompt) {
-        Generation gen = new Generation();
+    public static Flowable<GenerationResult> chat(String apiKey, String prompt, Generation gen) {
         Message message = Message.builder().role(Role.USER.getValue()).content(prompt).build();
         GenerationParam param = GenerationParam.builder()
                 .model(MODEL)

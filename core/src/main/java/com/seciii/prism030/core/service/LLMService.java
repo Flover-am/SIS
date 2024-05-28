@@ -11,8 +11,8 @@ public interface LLMService {
     /**
      * 获取大模型输出
      *
-     * @param prompt prompt
+     * @param input 用户输入
      * @return 输出的流式结果
      */
-    Flowable<GenerationResult> getResult(String prompt);
+    Flowable<GenerationResult> getResult(String input);
 }

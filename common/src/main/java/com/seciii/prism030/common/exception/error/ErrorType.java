@@ -55,6 +55,8 @@ public enum ErrorType {
 
     NEWS_QUERY_ERROR(300004, "News query error", 400), /* 新闻查询错误 */
 
+    DASHVECTOR_ERROR(300005, "Dash vector error", 400), /* dash vector 异常 */
+
     /**
      * 图数据库模块错误码
      */
