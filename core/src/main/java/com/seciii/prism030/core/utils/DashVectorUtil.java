@@ -31,19 +31,6 @@ public class DashVectorUtil {
         return client.get(COLLECTION_NAME);
     }
 
-    /**
-     * 搜索相似向量对应的内容
-     *
-     * @param query 搜索关键词
-     * @param topK 需要搜索的条数
-     * @param collection 集合
-     * @return 搜索到的新闻内容
-     */
-    public static List<String> queryVectorNewsContent(String query, int topK, DashVectorCollection collection, String apiKey) {
-        List<Doc> docs = queryVectorDoc(query, topK, collection, apiKey);
-        return docs.stream().map(doc -> (String) doc.getFields().get("text")).toList();
-    }
-
     public static List<Doc> queryVectorDoc(String query, int topK, DashVectorCollection collection, String apiKey) {
         TextEmbedding textEmbedding = new TextEmbedding();
         TextEmbeddingResult result;
