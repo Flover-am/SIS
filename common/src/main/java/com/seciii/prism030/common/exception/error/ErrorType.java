@@ -64,7 +64,12 @@ public enum ErrorType {
 
     GRAPH_NODE_EXISTS(400002, "Graph node exists", 400), /* 新闻节点已存在 */
 
-    NODE_SAVE_FAILED(400003, "Node save failed", 400); /* 节点存储失败 */
+    NODE_SAVE_FAILED(400003, "Node save failed", 400), /* 节点存储失败 */
+
+    /**
+     * LLM模块错误码
+     */
+    LLM_REQUEST_ERROR(500000, "LLM request error", 400); /* LLM 请求错误 */
 
     /**
      * 状态码

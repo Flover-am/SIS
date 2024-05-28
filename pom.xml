@@ -33,7 +33,7 @@
         <amqp.version>3.0.5</amqp.version>
         <nacos.config.version>2021.0.5.0</nacos.config.version>
         <springcloud.version>3.1.4</springcloud.version>
-        <dashscope.version>2.13.0</dashscope.version>
+        <dashscope.version>2.14.4</dashscope.version>
         <dashvector.version>1.0.12</dashvector.version>
     </properties>
 
@@ -102,14 +102,15 @@
                 <version>${springcloud.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.alibaba</groupId>
-                <artifactId>dashscope-sdk-java</artifactId>
-                <version>${dashscope.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>com.aliyun</groupId>
                 <artifactId>dashvector-java-sdk</artifactId>
                 <version>${dashvector.version}</version>
+            </dependency>
+            <!-- https://mvnrepository.com/artifact/com.alibaba/dashscope-sdk-java -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>dashscope-sdk-java</artifactId>
+                <version>${dashscope.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

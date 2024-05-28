@@ -1,5 +1,7 @@
 package com.seciii.prism030.core.service.impl;
 
+import com.aliyun.dashvector.DashVectorClient;
+import com.aliyun.dashvector.DashVectorCollection;
 import com.seciii.prism030.common.exception.NewsException;
 import com.seciii.prism030.common.exception.error.ErrorType;
 import com.seciii.prism030.core.aspect.annotation.Add;
@@ -16,6 +18,7 @@ import com.seciii.prism030.core.pojo.po.news.NewsWordPO;
 import com.seciii.prism030.core.pojo.vo.news.*;
 import com.seciii.prism030.core.service.NewsService;
 import com.seciii.prism030.core.service.SummaryService;
+import com.seciii.prism030.core.utils.DashVectorUtil;
 import com.seciii.prism030.core.utils.NewsUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +29,10 @@ import org.springframework.web.client.ResourceAccessException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 新闻服务类的MongoDB实现
@@ -312,6 +318,21 @@ public class NewsServiceMongoImpl implements NewsService {
                 originSource
         );
         return new PagedNews(total, NewsUtil.toNewsVO(newsPOList));
+    }
+
+    @Override
+    public PagedNews searchNewsByVectorFiltered(int pageNo, int pageSize, String query, List<String> category, LocalDateTime startTime, LocalDateTime endTime, String originSource) {
+        DashVectorClient client = new DashVectorClient("", "");
+        DashVectorCollection collection = client.get("sport_news_embeddings");
+        PagedNews filterPagedNews = filterNewsPaged(pageNo, pageSize, category, startTime, endTime, originSource);
+        Set<Long> searchedIdSet = new HashSet<>(DashVectorUtil.queryVector(query, 100, collection));
+        List<NewsItemVO> news = new ArrayList<>();
+        for (NewsItemVO newsItemVO : filterPagedNews.getNewsList()) {
+            if (searchedIdSet.contains(newsItemVO.getId())) {
+                news.add(newsItemVO);
+            }
+        }
+        return new PagedNews(news.size(), news);
     }
 
     /**

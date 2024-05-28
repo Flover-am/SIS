@@ -25,8 +25,6 @@ public class NewsController {
         this.newsService = newsService;
     }
 
-
-
     /**
      * 获取新闻来源与数量
      * @return 新闻来源与数量
@@ -210,6 +208,30 @@ public class NewsController {
             @RequestParam String query,
             @RequestBody(required = false) Filter filter) {
         PagedNews pagedNews = newsService.searchNewsByTitleFiltered(current, pageSize, query,
+                filter.getCategory(),
+                DateTimeUtil.parseBeginOfDay(filter.getStartDate()),
+                DateTimeUtil.parseEndOfDay(filter.getEndDate()),
+                filter.getOriginSource()
+        );
+        return Result.success(pagedNews);
+    }
+
+    /**
+     * 模糊搜索新闻并按过滤器过滤，以分页方式返回
+     *
+     * @param current  当前页码
+     * @param pageSize 页大小
+     * @param query    搜索关键词
+     * @param filter   筛选条件
+     * @return 新闻条目VO列表
+     */
+    @PostMapping("/news/search/vector")
+    public Result<PagedNews> searchNewsByVector(
+            @RequestParam int current,
+            @RequestParam int pageSize,
+            @RequestParam String query,
+            @RequestBody(required = false) Filter filter) {
+        PagedNews pagedNews = newsService.searchNewsByVectorFiltered(current, pageSize, query,
                 filter.getCategory(),
                 DateTimeUtil.parseBeginOfDay(filter.getStartDate()),
                 DateTimeUtil.parseEndOfDay(filter.getEndDate()),
