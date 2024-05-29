@@ -236,6 +236,11 @@ public class NewsServiceMongoImpl implements NewsService {
             log.error(String.format("News with id %d not found", id));
             throw new NewsException(ErrorType.NEWS_NOT_FOUND);
         }
+        result = vectorNewsMapper.deleteVectorNewsByNewsId(id);
+        if (result == -1) {
+            log.error(String.format("News with id %d not found", id));
+            throw new NewsException(ErrorType.NEWS_NOT_FOUND);
+        }
     }
 
     /**

@@ -48,7 +48,9 @@ public class DashVectorUtil {
             throw new NewsException(ErrorType.NEWS_QUERY_ERROR);
         }
 
-        Vector vector = Vector.builder().value(result.getOutput().getEmbeddings().get(0).getEmbedding()).build();
+        Vector vector = Vector.builder().value(result.getOutput().getEmbeddings().get(0).getEmbedding().stream()
+                .map(Double::floatValue)
+                .toList()).build();
         QueryDocRequest request = QueryDocRequest.builder()
                 .vector(vector)
                 .topk(topK)

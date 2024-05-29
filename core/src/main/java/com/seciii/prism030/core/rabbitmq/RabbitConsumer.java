@@ -18,7 +18,7 @@ import java.nio.charset.StandardCharsets;
  *
  * @author：windloong
  */
-@Component
+//@Component
 @RabbitListener(queues = "news_queue")
 @Slf4j
 public class RabbitConsumer {

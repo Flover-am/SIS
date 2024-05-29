@@ -9,4 +9,4 @@ spring:
   application:
     name: prism030
   profiles:
-    active: active
+    active: dev

@@ -28,7 +28,7 @@ import java.util.List;
  */
 @Service
 public class LLMServiceImpl implements LLMService {
-    @Value("${dashscope.apiKey}")
+    @Value("${dashscope.apikey}")
     private String apiKey;
     private final GenerationPool generationPool;
     private final DashVectorClientPool dashVectorClientPool;
@@ -95,6 +95,11 @@ public class LLMServiceImpl implements LLMService {
         List<Doc> docs = DashVectorUtil.queryVectorDoc(query, topK, collection, apiKey);
         return docs.stream().map(doc -> {
             VectorNewsPO vectorNewsPO = vectorNewsMapper.getVectorNewsByVectorId(doc.getId());
+
+            if (vectorNewsPO == null) {
+                return "";
+            }
+
             Long newsId = vectorNewsPO.getNewsId();
             return "newsId: " + newsId + "\n" + doc.getFields().get("text");
         }).toList();

@@ -7,4 +7,9 @@
         FROM prism030.t_vector_news
         WHERE vector_id = #{vector_id}
     </select>
+
+    <select id="deleteVectorNewsByNewsId" parameterType="Long" resultType="int">
+        DELETE FROM t_vector_news
+        WHERE news_id = #{news_id}
+    </select>
 </mapper>
