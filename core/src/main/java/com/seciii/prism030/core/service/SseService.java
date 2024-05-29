@@ -1,6 +1,7 @@
 package com.seciii.prism030.core.service;
 
 import com.seciii.prism030.core.pojo.dto.UpdatedNewsDTO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -11,6 +12,7 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Service
+@Slf4j
 public class SseService {
     private final List<SseEmitter> newsUpdateEmitterList = new CopyOnWriteArrayList<>();
     private final Map<String,SseEmitter> chatEmitterMap = new HashMap<>();
@@ -23,8 +25,11 @@ public class SseService {
     public SseEmitter subscribeNewsUpdate(){
         SseEmitter emitter=new SseEmitter(Long.MAX_VALUE);
         newsUpdateEmitterList.add(emitter);
-        emitter.onCompletion(()->newsUpdateEmitterList.remove(emitter));
-        emitter.onTimeout(()->newsUpdateEmitterList.remove(emitter));
+        log.info("New subscriber for news update event.");
+        emitter.onTimeout(()->{
+            newsUpdateEmitterList.remove(emitter);
+            log.info("News update emitter timeout.");
+        });
         return emitter;
     }
 
@@ -63,11 +68,19 @@ public class SseService {
      * @param updatedNewsDTO 新闻更新时间DTO
      */
     public void sendUpdateNewsEvent(UpdatedNewsDTO updatedNewsDTO){
+        if(newsUpdateEmitterList.isEmpty()){
+            log.info("No subscriber for news update event.");
+        }
         for(SseEmitter emitter:newsUpdateEmitterList){
             try{
                 emitter.send(updatedNewsDTO);
             }catch (IOException e){
                 emitter.complete();
+                newsUpdateEmitterList.remove(emitter);
+            }catch (IllegalStateException e){
+                e.printStackTrace();
+                emitter.complete();
+                newsUpdateEmitterList.remove(emitter);
             }
         }
     }

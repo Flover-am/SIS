@@ -14,10 +14,11 @@ import com.seciii.prism030.core.pojo.po.news.NewsPO;
 import com.seciii.prism030.core.pojo.vo.graph.EntityRelationVO;
 import com.seciii.prism030.core.pojo.vo.graph.GraphVO;
 import com.seciii.prism030.core.pojo.vo.graph.NewsEntityRelationVO;
+import com.seciii.prism030.core.pojo.vo.graph.TimeAxisVO;
 import com.seciii.prism030.core.service.GraphService;
+import com.seciii.prism030.core.utils.NewsUtil;
 import com.seciii.prism030.core.utils.SparkUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -37,7 +38,9 @@ import java.util.concurrent.locks.ReentrantLock;
 public class GraphServiceImpl implements GraphService {
     private final EntityNodeDAO entityNodeDAO;
     private final NewsNodeDAO newsNodeDAO;
+
     private NewsDAOMongo newsDAOMongo;
+
     private final SparkUtil sparkUtil;
     private final ConcurrentHashMap<Long, Lock> newsLocks = new ConcurrentHashMap<>();
 
@@ -63,18 +66,45 @@ public class GraphServiceImpl implements GraphService {
 
     @Override
     public EntityNode addEntityNode(Long newsNodeId, String name) {
-        EntityNode entityNode = EntityNode.builder()
-                .name(name)
-                .entities(Collections.emptyList())
-                .build();
-        EntityNode node = entityNodeDAO.save(entityNode);
         NewsNode newsNode = newsNodeDAO.findById(newsNodeId).orElseThrow();
-        NewsEntityRelationship relationship = NewsEntityRelationship.builder()
-                .entity(entityNode)
-                .build();
-        newsNode.getEntities().add(relationship);
-        newsNodeDAO.save(newsNode);
-        return node;
+
+        EntityNode entityNode = entityNodeDAO.findEntityNodeByName(name);
+        if (entityNode != null) {
+            // 实体节点已经存在
+            if (entityNode.getNewsNodeIdList().contains(newsNode.getId())) {
+                // 实体节点已经与新闻节点绑定
+                return entityNode;
+            }
+            // 绑定现存实体节点与现存新闻节点
+            entityNode.getNewsNodeIdList().add(newsNode.getId());
+            entityNodeDAO.save(entityNode);
+
+            NewsEntityRelationship relationship = NewsEntityRelationship.builder()
+                    .entity(entityNode)
+                    .build();
+            newsNode.getEntities().add(relationship);
+            newsNodeDAO.save(newsNode);
+            return entityNode;
+        } else {
+            // 创建新的实体节点
+            entityNode = EntityNode.builder()
+                    .name(name)
+                    .entities(Collections.emptyList())
+                    .newsNodeIdList(new ArrayList<>() {{
+                        add(newsNode.getId());
+                    }})
+//                    .relationshipIdList(Collections.emptyList())
+                    .build();
+            EntityNode node = entityNodeDAO.save(entityNode);
+
+            // 建立新闻节点与实体节点的联系
+            NewsEntityRelationship relationship = NewsEntityRelationship.builder()
+                    .entity(entityNode)
+                    .build();
+            newsNode.getEntities().add(relationship);
+            newsNodeDAO.save(newsNode);
+            return node;
+        }
     }
 
     @Override
@@ -87,6 +117,29 @@ public class GraphServiceImpl implements GraphService {
                 .build();
         fromEntity.getEntities().add(entityRelationship);
         entityNodeDAO.save(fromEntity);
+    }
+
+    private void addRelationshipWithCycloCheck(Long fromId, Long toId, String relationship) {
+
+        EntityNode fromEntity = entityNodeDAO.findById(fromId).orElseThrow();
+        EntityNode toEntity = entityNodeDAO.findById(toId).orElseThrow();
+        if (!entityNodeDAO.isConnected(toEntity.getName(), fromEntity.getName())) {
+            // 检查是否已存在对应关系
+            if (entityNodeDAO.existsByNameAndTarget(relationship, toEntity.getName())) {
+                return;
+            }
+
+            // 未存在对应关系，创建新的对应关系
+            EntityRelationship entityRelationship = EntityRelationship.builder()
+                    .entity(toEntity)
+                    .relationship(relationship)
+                    .build();
+            fromEntity.getEntities().add(entityRelationship);
+            entityNodeDAO.save(fromEntity);
+        } else {
+            //TODO：消除环路
+            return;
+        }
     }
 
     @Override
@@ -130,10 +183,10 @@ public class GraphServiceImpl implements GraphService {
                         entities.put(tuple[0], 0L);
                         entities.put(tuple[2], 0L);
                         relations.add(NewsEntityRelationshipDTO.builder()
-                                        .entity1(tuple[0])
-                                        .entity2(tuple[2])
-                                        .relationship(tuple[1])
-                                        .build());
+                                .entity1(tuple[0])
+                                .entity2(tuple[2])
+                                .relationship(tuple[1])
+                                .build());
                     } else {
                         log.warn("大模型返回结果异常，忽略该三元组");
                     }
@@ -174,6 +227,62 @@ public class GraphServiceImpl implements GraphService {
             return analyzeNews(newsId);
         }
         return mapGraph(newsNode);
+    }
+
+    /**
+     * 获取实体时间轴
+     *
+     * @param entity 实体名
+     * @return 时间轴
+     */
+    @Override
+    public TimeAxisVO getTimeAxis(String entity) {
+
+        EntityNode entityNode = entityNodeDAO.findEntityNodeByName(entity);
+        if (entityNode == null) {
+            throw new GraphException(ErrorType.ENTITY_NOT_FOUND, "未找到对应实体");
+        }
+
+        List<Long> newsNodeIdList = entityNode.getNewsNodeIdList();
+        List<NewsPO> newsList = new ArrayList<>();
+        for (long newsNodeId : newsNodeIdList) {
+            NewsNode newsNode = newsNodeDAO.findNewsNodeByNewsId(newsNodeId);
+            if (newsNode == null) {
+                continue;
+            }
+            NewsPO newsPO = newsDAOMongo.getNewsById(newsNode.getNewsId());
+            if (newsPO == null) {
+                continue;
+            }
+            newsList.add(newsPO);
+        }
+
+        newsList.sort(Comparator.comparing(NewsPO::getSourceTime));
+        return TimeAxisVO.builder()
+                .entity(entity)
+                .newsList(NewsUtil.toNewsItemVO(newsList))
+                .build();
+    }
+
+    /**
+     * 添加新闻实体关系
+     *
+     * @param newsNodeId 新闻id
+     * @param entities   实体关系列表
+     * @return 新闻节点
+     */
+    @Override
+    public NewsNode addNewsEntities(long newsNodeId, List<NewsEntityRelationshipDTO> entities) {
+        NewsNode newsNode = getNewsNodeByNewsId(newsNodeId);
+        if (newsNode == null) {
+            throw new GraphException(ErrorType.NEWS_NOT_FOUND, "未找到对应id的新闻");
+        }
+        for (NewsEntityRelationshipDTO er : entities) {
+            EntityNode entity1Node = addEntityNode(newsNode.getId(), er.getEntity1());
+            EntityNode entity2Node = addEntityNode(newsNode.getId(), er.getEntity2());
+            addRelationshipWithCycloCheck(entity1Node.getId(), entity2Node.getId(), er.getRelationship());
+        }
+        return newsNode;
     }
 
     private GraphVO mapGraph(NewsNode node) {

@@ -63,7 +63,7 @@ public class UpdateNewsEvent extends ApplicationEvent {
      */
     public NewsVO getNewsVO() {
         if (newsVO == null) {
-            newsVO = NewsUtil.toNewsVO(newsPO);
+            newsVO = NewsUtil.toNewsItemVO(newsPO);
         }
         return newsVO;
     }

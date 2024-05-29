@@ -1,15 +1,19 @@
 package com.seciii.prism030.core.rabbitmq;
 
+import com.seciii.prism030.core.pojo.dto.NewsEntityRelationshipDTO;
 import com.seciii.prism030.core.pojo.vo.news.NewNews;
 import com.seciii.prism030.core.pojo.vo.news.NewsVO;
+import com.seciii.prism030.core.service.GraphService;
 import com.seciii.prism030.core.service.NewsService;
 import com.seciii.prism030.core.service.impl.NewsServiceMongoImpl;
+import com.seciii.prism030.core.utils.RabbitUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 /**
  * RabbitMQ消费者类，实现获取并处理消息队列中的信息，存入mongoDB
@@ -22,7 +26,7 @@ import java.nio.charset.StandardCharsets;
 public class RabbitConsumer {
     NewsService newsService;
 
-
+    GraphService graphService;
 
     /**
      * RabbitConsumer构造函数，注入NewsServiceMongoImpl实例
@@ -44,7 +48,7 @@ public class RabbitConsumer {
         String jsonString = new String(data, StandardCharsets.UTF_8);
 
         // 使用自定义的MessageConvertor将JSON字符串解析为NewNews对象
-        NewNews newNews = MessageConvertor.parseJsonToNewNews(jsonString);
+        NewNews newNews = RabbitUtil.parseJsonToNewNews(jsonString);
 
         // 将newNews对象添加到newsServiceMongo中
         long newsId = newsService.addNews(newNews);
@@ -55,5 +59,12 @@ public class RabbitConsumer {
             return;
         }
 
+        //插入词云
+        List<String> wordSegment = RabbitUtil.getWordSegment(jsonString);
+        newsService.saveWordCloud(newsId, wordSegment);
+
+        // 插入新闻的实体关系
+        List<NewsEntityRelationshipDTO> erList = RabbitUtil.getERList(jsonString);
+        graphService.addNewsEntities(newsId, erList);
     }
 }

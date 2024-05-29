@@ -28,6 +28,7 @@ public class NewsUtil {
     public final static String UPDATE_TIME = "update_time";
     public final static String CREATE_TIME = "create_time";
 
+
     public final static List<SpeechPart> ignoredParts = Arrays.asList(
             SpeechPart.ADVERB,
             SpeechPart.PRONOUN,
@@ -79,7 +80,7 @@ public class NewsUtil {
      * @param newsPOList 新闻PO列表
      * @return 新闻条目VO列表
      */
-    public static List<NewsItemVO> toNewsVO(List<NewsPO> newsPOList) {
+    public static List<NewsItemVO> toNewsItemVO(List<NewsPO> newsPOList) {
         return newsPOList.stream().map(
                 newsPO -> NewsItemVO.builder()
                         .id(newsPO.getId())
@@ -99,7 +100,7 @@ public class NewsUtil {
      * @param newsPO 新闻PO
      * @return 新闻VO
      */
-    public static NewsVO toNewsVO(NewsPO newsPO) {
+    public static NewsVO toNewsItemVO(NewsPO newsPO) {
         return NewsVO.builder()
                 .id(newsPO.getId())
                 .title(newsPO.getTitle())

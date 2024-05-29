@@ -25,8 +25,7 @@ public class SseController {
      */
     @GetMapping(path="/chat",produces=MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter subscribeChat(@RequestParam String sessionCode){
-        SseEmitter emitter = sseService.getChatStreamEmitter(sessionCode);
-        return emitter;
+        return sseService.getChatStreamEmitter(sessionCode);
     }
 
 
@@ -37,8 +36,7 @@ public class SseController {
      */
     @GetMapping(path="/newsUpdate",produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter subscribeNewsUpdate() {
-        SseEmitter emitter = sseService.subscribeNewsUpdate();
-        return emitter;
+        return sseService.subscribeNewsUpdate();
     }
 
 }
