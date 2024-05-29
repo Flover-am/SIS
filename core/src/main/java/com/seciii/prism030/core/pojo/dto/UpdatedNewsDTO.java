@@ -2,6 +2,7 @@ package com.seciii.prism030.core.pojo.dto;
 
 import com.seciii.prism030.core.enums.UpdateType;
 import com.seciii.prism030.core.pojo.vo.news.NewsVO;
+import lombok.Data;
 
 /**
  * 更新后的新闻DTO
@@ -9,6 +10,7 @@ import com.seciii.prism030.core.pojo.vo.news.NewsVO;
  * @author wang mingsong
  * @date 2024.05.13
  */
+@Data
 public class UpdatedNewsDTO {
     /**
      * 更新的新闻VO
