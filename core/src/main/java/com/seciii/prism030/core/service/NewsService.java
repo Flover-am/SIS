@@ -184,6 +184,15 @@ public interface NewsService {
     NewsSegmentPO generateAndSaveWordCloud(long id, String text);
 
     /**
+     * 保存新闻词云
+     *
+     * @param id 新闻id
+     * @param segmentedWordList 分词后的词语列表
+     * @return 词云结果
+     */
+    NewsSegmentPO saveWordCloud(long id, List<String> segmentedWordList);
+
+    /**
      * 获取今日新闻词云
      *
      * @param count 词语数量

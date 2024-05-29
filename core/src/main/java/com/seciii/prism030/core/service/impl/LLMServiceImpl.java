@@ -33,8 +33,8 @@ public class LLMServiceImpl implements LLMService {
     private final GenerationPool generationPool;
     private final DashVectorClientPool dashVectorClientPool;
     private final VectorNewsMapper vectorNewsMapper;
-    private static final String PROMPT = "请根据以上体育新闻内容，回答我的问题，并在答案后以url的格式附上你的推断来源。" +
-            "url格式:http://139.224.40.88/news/{id}，将id替换为每段新闻前附上的实际id。" +
+    private static final String PROMPT = "请根据以上信息，回答我的问题，如果能找到确切的信息来源，在答案后以url的格式附上你的推断来源。" +
+            "url格式:http://139.224.40.88/news/{id}，将id替换为每段新闻前附上的实际id。如果问题跟信息无关，就不用加上url了" +
             "我的问题为：";
 
     public LLMServiceImpl(GenerationPool generationPool, DashVectorClientPool dashVectorClientPool, VectorNewsMapper vectorNewsMapper) {

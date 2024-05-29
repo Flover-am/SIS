@@ -6,6 +6,7 @@ import com.seciii.prism030.core.dao.news.impl.NewsDAOMongoImpl;
 import com.seciii.prism030.core.decorator.segment.TextSegment;
 import com.seciii.prism030.core.enums.CategoryType;
 import com.seciii.prism030.core.enums.SpeechPart;
+import com.seciii.prism030.core.event.publisher.UpdateNewsPublisher;
 import com.seciii.prism030.core.pojo.dto.NewsWordDetail;
 import com.seciii.prism030.core.pojo.po.news.NewsPO;
 import com.seciii.prism030.core.pojo.po.news.NewsSegmentPO;
@@ -13,6 +14,7 @@ import com.seciii.prism030.core.pojo.po.news.NewsWordPO;
 import com.seciii.prism030.core.pojo.vo.news.*;
 import com.seciii.prism030.core.service.SummaryService;
 import com.seciii.prism030.core.utils.DateTimeUtil;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -50,6 +52,8 @@ public class NewsServiceMongoImplTest {
     private TextSegment textSegmentMock;
     @MockBean
     private SummaryService summaryServiceMock;
+    @MockBean
+    private UpdateNewsPublisher updateNewsPublisherMock;
 
     @InjectMocks
     private NewsServiceMongoImpl newsServiceMongoImpl = new NewsServiceMongoImpl();
@@ -499,6 +503,11 @@ public class NewsServiceMongoImplTest {
                 }
         );
         newsServiceMongoImpl.updateWordCloudToday();
+    }
+    @Test
+    public void saveWordCloudTest(){
+        Mockito.when(newsDAOMongoMock.insertSegment(Mockito.any())).thenReturn(0);
+        Assertions.assertDoesNotThrow(()->newsServiceMongoImpl.saveWordCloud(0L,List.of("1","2")));
     }
 
     @Test
