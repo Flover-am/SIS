@@ -37,7 +37,6 @@ public class MessageConvertor {
         String sourceLink = jsonObject.getString("sourceLink");
 
         String sourceTimeStr = jsonObject.getString("sourceTime");
-        sourceTimeStr = sourceTimeStr + ":00";
 
         String categoryStr = jsonObject.getString("category");
         String realCategory = StringEscapeUtils.unescapeJava(categoryStr);
