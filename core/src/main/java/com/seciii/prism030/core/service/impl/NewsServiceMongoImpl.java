@@ -1,13 +1,18 @@
 package com.seciii.prism030.core.service.impl;
 
+import com.aliyun.dashvector.DashVectorClient;
+import com.aliyun.dashvector.DashVectorCollection;
+import com.aliyun.dashvector.models.Doc;
 import com.seciii.prism030.common.exception.NewsException;
 import com.seciii.prism030.common.exception.error.ErrorType;
 import com.seciii.prism030.core.aspect.annotation.Add;
 import com.seciii.prism030.core.aspect.annotation.Modified;
+import com.seciii.prism030.core.config.poolconfig.pool.DashVectorClientPool;
 import com.seciii.prism030.core.dao.news.NewsDAOMongo;
 import com.seciii.prism030.core.decorator.classifier.Classifier;
 import com.seciii.prism030.core.decorator.segment.TextSegment;
 import com.seciii.prism030.core.enums.CategoryType;
+import com.seciii.prism030.core.mapper.news.VectorNewsMapper;
 import com.seciii.prism030.core.enums.UpdateType;
 import com.seciii.prism030.core.event.publisher.UpdateNewsPublisher;
 import com.seciii.prism030.core.pojo.dto.NewsWordDetail;
@@ -15,12 +20,15 @@ import com.seciii.prism030.core.pojo.dto.PagedNews;
 import com.seciii.prism030.core.pojo.po.news.NewsPO;
 import com.seciii.prism030.core.pojo.po.news.NewsSegmentPO;
 import com.seciii.prism030.core.pojo.po.news.NewsWordPO;
+import com.seciii.prism030.core.pojo.po.news.VectorNewsPO;
 import com.seciii.prism030.core.pojo.vo.news.*;
 import com.seciii.prism030.core.service.NewsService;
 import com.seciii.prism030.core.service.SummaryService;
+import com.seciii.prism030.core.utils.DashVectorUtil;
 import com.seciii.prism030.core.utils.NewsUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
@@ -28,7 +36,9 @@ import org.springframework.web.client.ResourceAccessException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 新闻服务类的MongoDB实现
@@ -43,9 +53,22 @@ public class NewsServiceMongoImpl implements NewsService {
     private NewsDAOMongo newsDAOMongo;
     private Classifier classifier;
     private TextSegment textSegment;
-
     private SummaryService summaryService;
+    private DashVectorClientPool dashVectorClientPool;
+    private VectorNewsMapper vectorNewsMapper;
 
+    @Value("${dashscope.apikey}")
+    private String apiKey;
+
+    @Autowired
+    public void setVectorNewsMapper(VectorNewsMapper vectorNewsMapper) {
+        this.vectorNewsMapper = vectorNewsMapper;
+    }
+
+    @Autowired
+    public void setDashVectorClientPool(DashVectorClientPool dashVectorClientPool) {
+        this.dashVectorClientPool = dashVectorClientPool;
+    }
     private UpdateNewsPublisher updateNewsPublisher;
 
     @Autowired
@@ -225,6 +248,11 @@ public class NewsServiceMongoImpl implements NewsService {
             log.error(String.format("News with id %d not found", id));
             throw new NewsException(ErrorType.NEWS_NOT_FOUND);
         }
+        result = vectorNewsMapper.deleteVectorNewsByNewsId(id);
+        if (result == -1) {
+            log.error(String.format("News with id %d not found", id));
+            throw new NewsException(ErrorType.NEWS_NOT_FOUND);
+        }
         updateNewsPublisher.publishModifiedNewsEvent(this, NewsVO.builder().id(id).build(), UpdateType.DELETE);
     }
 
@@ -330,6 +358,32 @@ public class NewsServiceMongoImpl implements NewsService {
                 originSource
         );
         return new PagedNews(total, NewsUtil.toNewsItemVO(newsPOList));
+    }
+
+    @Override
+    public PagedNews searchNewsByVectorFiltered(int pageNo, int pageSize, String query, List<String> category, LocalDateTime startTime, LocalDateTime endTime, String originSource) {
+        DashVectorClient client = null;
+        PagedNews result;
+        try {
+            client = dashVectorClientPool.borrowObject();
+            DashVectorCollection collection = client.get(DashVectorUtil.COLLECTION_NAME);
+            PagedNews filterPagedNews = filterNewsPaged(pageNo, pageSize, category, startTime, endTime, originSource);
+            Set<Long> searchedIdSet = new HashSet<>(queryVectorNewsId(query, 10, collection, apiKey));
+            List<NewsItemVO> news = new ArrayList<>();
+            for (NewsItemVO newsItemVO : filterPagedNews.getNewsList()) {
+                if (searchedIdSet.contains(newsItemVO.getId())) {
+                    news.add(newsItemVO);
+                }
+            }
+            result = new PagedNews(news.size(), news);
+        } catch (Exception e) {
+            throw new NewsException(ErrorType.DASHVECTOR_ERROR);
+        } finally {
+            if (client != null) {
+                dashVectorClientPool.returnObject(client);
+            }
+        }
+        return result;
     }
 
     /**
@@ -573,5 +627,25 @@ public class NewsServiceMongoImpl implements NewsService {
     @Override
     public List<NewsSourceCountVO> countAllSourceNews() {
         return summaryService.getSourceRank();
+    }
+
+    /**
+     * 搜索相似向量对应的id
+     *
+     * @param query 搜索关键词
+     * @param topK 需要搜索的条数
+     * @param collection 集合
+     * @return 搜索到的新闻id
+     */
+    private List<Long> queryVectorNewsId(String query, int topK, DashVectorCollection collection, String apiKey) {
+        List<Doc> docs = DashVectorUtil.queryVectorDoc(query, topK, collection, apiKey);
+        List<Long> idList = docs.stream().map(doc -> {
+            VectorNewsPO vectorNewsPO = vectorNewsMapper.getVectorNewsByVectorId(doc.getId());
+            if (vectorNewsPO == null) {
+                throw new NewsException(ErrorType.NEWS_NOT_FOUND);
+            }
+            return vectorNewsPO.getNewsId();
+        }).toList();
+        return DashVectorUtil.removeDuplicate(idList);
     }
 }

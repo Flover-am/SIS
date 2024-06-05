@@ -28,6 +28,14 @@
         <aspectj.version>1.9.19</aspectj.version>
         <thunlp.version>0.0.1-SNAPSHOT</thunlp.version>
         <spark.version>1.0.0</spark.version>
+        <fastjson.version>2.0.24</fastjson.version>
+        <common.text.version>1.9</common.text.version>
+        <amqp.version>3.0.5</amqp.version>
+        <nacos.config.version>2021.0.5.0</nacos.config.version>
+        <springcloud.version>3.1.4</springcloud.version>
+        <dashscope.version>2.14.4</dashscope.version>
+        <dashvector.version>1.0.12</dashvector.version>
+        <common-pool2.version>2.11.1</common-pool2.version>
     </properties>
 
     <dependencyManagement>
@@ -63,6 +71,52 @@
                 <groupId>com.unfbx</groupId>
                 <artifactId>SparkDesk-Java</artifactId>
                 <version>${spark.version}</version>
+            </dependency>
+            <!-- https://mvnrepository.com/artifact/org.springframework.amqp/spring-rabbit -->
+            <dependency>
+                <groupId>org.springframework.amqp</groupId>
+                <artifactId>spring-rabbit</artifactId>
+                <version>${amqp.version}</version>
+            </dependency>
+
+            <!-- https://mvnrepository.com/artifact/com.alibaba/fastjson -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-text</artifactId>
+                <version>${common.text.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+                <version>${nacos.config.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-bootstrap</artifactId>
+                <version>${springcloud.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.aliyun</groupId>
+                <artifactId>dashvector-java-sdk</artifactId>
+                <version>${dashvector.version}</version>
+            </dependency>
+            <!-- https://mvnrepository.com/artifact/com.alibaba/dashscope-sdk-java -->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>dashscope-sdk-java</artifactId>
+                <version>${dashscope.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-pool2</artifactId>
+                <version>${common-pool2.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

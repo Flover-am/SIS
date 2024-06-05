@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.StringEscapeUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -26,6 +27,7 @@ public class RabbitUtil {
     public final static String RABBIT_CATEGORY = "category";
     public final static String RABBIT_ER = "er";
     public final static String RABBIT_SEGMENT = "divided";
+    public final static String RABBIT_DASH_ID = "dashId";
 
     /**
      * 将json格式新闻映射为NewNews对象
@@ -57,6 +59,14 @@ public class RabbitUtil {
         String categoryStr = jsonObject.getString(RABBIT_CATEGORY);
         String realCategory = StringEscapeUtils.unescapeJava(categoryStr);
 
+        JSONArray dashIdJSONArray = jsonObject.getJSONArray(RABBIT_DASH_ID);
+        List<Object> dashIdObject = Arrays.asList(dashIdJSONArray.toArray());
+        List<String> dashId = new ArrayList<>();
+        for (Object obj : dashIdObject) {
+            if (obj instanceof String) {
+                dashId.add((String) obj);
+            }
+        }
 
         NewNews newNews = new NewNews();
         newNews.setTitle(realTitle); // 设置标题
@@ -66,6 +76,7 @@ public class RabbitUtil {
         newNews.setLink(link); // 设置链接
         newNews.setSourceLink(sourceLink); // 设置源链接
         newNews.setCategory(realCategory); // 设置分类
+        newNews.setDashId(dashId);
 
         return newNews;
     }

@@ -53,6 +53,10 @@ public enum ErrorType {
 
     NEWS_INSERT_DUPLICATE(300003, "News insert duplicate", 400), /* 新闻插入重复 */
 
+    NEWS_QUERY_ERROR(300004, "News query error", 400), /* 新闻查询错误 */
+
+    DASHVECTOR_ERROR(300005, "Dash vector error", 400), /* dash vector 异常 */
+
     /**
      * 图数据库模块错误码
      */
@@ -64,7 +68,12 @@ public enum ErrorType {
 
     NODE_SAVE_FAILED(400003, "Node save failed", 400), /* 节点存储失败 */
 
-    ENTITY_NOT_FOUND(400004, "Entity not found", 404); /* 实体不存在 */
+    ENTITY_NOT_FOUND(400004, "Entity not found", 404), /* 实体不存在 */
+
+    /**
+     * LLM模块错误码
+     */
+    LLM_REQUEST_ERROR(500000, "LLM request error", 400); /* LLM 请求错误 */
 
     /**
      * 状态码

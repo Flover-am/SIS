@@ -1,6 +1,8 @@
 package com.seciii.prism030.core.rabbitmq;
 
+import com.seciii.prism030.core.mapper.news.VectorNewsMapper;
 import com.seciii.prism030.core.pojo.dto.NewsEntityRelationshipDTO;
+import com.seciii.prism030.core.pojo.po.news.VectorNewsPO;
 import com.seciii.prism030.core.pojo.vo.news.NewNews;
 import com.seciii.prism030.core.pojo.vo.news.NewsVO;
 import com.seciii.prism030.core.service.GraphService;
@@ -24,17 +26,21 @@ import java.util.List;
 @RabbitListener(queues = "news_queue")
 @Slf4j
 public class RabbitConsumer {
-    NewsService newsService;
+    private final VectorNewsMapper vectorNewsMapper;
 
-    GraphService graphService;
+    private final NewsService newsService;
+
+    private final GraphService graphService;
 
     /**
      * RabbitConsumer构造函数，注入NewsServiceMongoImpl实例
      *
      * @param newsServiceMongo NewsServiceMongoImpl实例
      */
-    public RabbitConsumer(NewsServiceMongoImpl newsServiceMongo) {
+    public RabbitConsumer(NewsServiceMongoImpl newsServiceMongo, VectorNewsMapper vectorNewsMapper, GraphService graphService) {
         this.newsService = newsServiceMongo;
+        this.vectorNewsMapper = vectorNewsMapper;
+        this.graphService = graphService;
     }
 
     /**
@@ -59,12 +65,21 @@ public class RabbitConsumer {
             return;
         }
 
+        for (String vectorId : newNews.getDashId()) {
+            VectorNewsPO vectorNews = VectorNewsPO.builder()
+                    .vectorId(vectorId)
+                    .newsId(newsId)
+                    .build();
+            vectorNewsMapper.insert(vectorNews);
+        }
+
         //插入词云
         List<String> wordSegment = RabbitUtil.getWordSegment(jsonString);
         newsService.saveWordCloud(newsId, wordSegment);
 
         // 插入新闻的实体关系
         List<NewsEntityRelationshipDTO> erList = RabbitUtil.getERList(jsonString);
+        graphService.addNewsNode(newsId, newNews.getTitle());
         graphService.addNewsEntities(newsId, erList);
     }
 }
