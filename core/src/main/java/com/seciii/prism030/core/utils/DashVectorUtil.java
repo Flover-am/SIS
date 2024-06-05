@@ -26,7 +26,7 @@ import java.util.Set;
  * @date 2024.05.22
  */
 public class DashVectorUtil {
-    public static final String COLLECTION_NAME = "sport_news_embedings";
+    public static final String COLLECTION_NAME = "sport_news_embeddings";
     public static DashVectorCollection getCollection(DashVectorClient client) {
         return client.get(COLLECTION_NAME);
     }

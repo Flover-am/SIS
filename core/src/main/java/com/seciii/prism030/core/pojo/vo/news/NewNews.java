@@ -54,5 +54,5 @@ public class NewNews {
     /**
      * 向量id
      */
-    private List<Long> vectorId;
+    private List<String> dashId;
 }

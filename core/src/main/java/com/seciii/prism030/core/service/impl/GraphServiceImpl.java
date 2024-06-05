@@ -275,6 +275,7 @@ public class GraphServiceImpl implements GraphService {
     public NewsNode addNewsEntities(long newsNodeId, List<NewsEntityRelationshipDTO> entities) {
         NewsNode newsNode = getNewsNodeByNewsId(newsNodeId);
         if (newsNode == null) {
+            log.error(String.format("News not found with id %d. ", newsNodeId));
             throw new GraphException(ErrorType.NEWS_NOT_FOUND, "未找到对应id的新闻");
         }
         for (NewsEntityRelationshipDTO er : entities) {

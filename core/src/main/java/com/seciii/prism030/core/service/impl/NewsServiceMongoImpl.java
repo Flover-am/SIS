@@ -368,7 +368,7 @@ public class NewsServiceMongoImpl implements NewsService {
             client = dashVectorClientPool.borrowObject();
             DashVectorCollection collection = client.get(DashVectorUtil.COLLECTION_NAME);
             PagedNews filterPagedNews = filterNewsPaged(pageNo, pageSize, category, startTime, endTime, originSource);
-            Set<Long> searchedIdSet = new HashSet<>(queryVectorNewsId(query, 100, collection, apiKey));
+            Set<Long> searchedIdSet = new HashSet<>(queryVectorNewsId(query, 10, collection, apiKey));
             List<NewsItemVO> news = new ArrayList<>();
             for (NewsItemVO newsItemVO : filterPagedNews.getNewsList()) {
                 if (searchedIdSet.contains(newsItemVO.getId())) {

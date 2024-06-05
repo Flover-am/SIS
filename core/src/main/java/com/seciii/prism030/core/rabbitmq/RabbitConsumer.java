@@ -28,18 +28,19 @@ import java.util.List;
 public class RabbitConsumer {
     private final VectorNewsMapper vectorNewsMapper;
 
-    NewsService newsService;
+    private final NewsService newsService;
 
-    GraphService graphService;
+    private final GraphService graphService;
 
     /**
      * RabbitConsumer构造函数，注入NewsServiceMongoImpl实例
      *
      * @param newsServiceMongo NewsServiceMongoImpl实例
      */
-    public RabbitConsumer(NewsServiceMongoImpl newsServiceMongo, VectorNewsMapper vectorNewsMapper) {
+    public RabbitConsumer(NewsServiceMongoImpl newsServiceMongo, VectorNewsMapper vectorNewsMapper, GraphService graphService) {
         this.newsService = newsServiceMongo;
         this.vectorNewsMapper = vectorNewsMapper;
+        this.graphService = graphService;
     }
 
     /**
@@ -64,11 +65,12 @@ public class RabbitConsumer {
             return;
         }
 
-        for (long vectorId : newNews.getVectorId()) {
-            vectorNewsMapper.insert(VectorNewsPO.builder()
-                                        .vectorId(vectorId)
-                                        .newsId(newsId)
-                                        .build());
+        for (String vectorId : newNews.getDashId()) {
+            VectorNewsPO vectorNews = VectorNewsPO.builder()
+                    .vectorId(vectorId)
+                    .newsId(newsId)
+                    .build();
+            vectorNewsMapper.insert(vectorNews);
         }
 
         //插入词云
@@ -77,6 +79,7 @@ public class RabbitConsumer {
 
         // 插入新闻的实体关系
         List<NewsEntityRelationshipDTO> erList = RabbitUtil.getERList(jsonString);
+        graphService.addNewsNode(newsId, newNews.getTitle());
         graphService.addNewsEntities(newsId, erList);
     }
 }
