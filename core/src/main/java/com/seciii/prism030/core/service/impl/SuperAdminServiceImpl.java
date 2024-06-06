@@ -14,7 +14,6 @@ import com.seciii.prism030.core.pojo.vo.user.UserVO;
 import com.seciii.prism030.core.service.SuperAdminService;
 import com.seciii.prism030.core.service.UserService;
 import lombok.extern.slf4j.Slf4j;
-import lombok.var;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
