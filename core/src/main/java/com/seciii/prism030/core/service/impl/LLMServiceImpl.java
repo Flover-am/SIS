@@ -11,6 +11,7 @@ import com.seciii.prism030.core.config.poolconfig.pool.DashVectorClientPool;
 import com.seciii.prism030.core.config.poolconfig.pool.GenerationPool;
 import com.seciii.prism030.core.mapper.news.VectorNewsMapper;
 import com.seciii.prism030.core.pojo.po.news.VectorNewsPO;
+import com.seciii.prism030.core.pojo.vo.news.TimelineUnitVO;
 import com.seciii.prism030.core.service.LLMService;
 import com.seciii.prism030.core.utils.DashScopeUtil;
 import com.seciii.prism030.core.utils.DashVectorUtil;
@@ -42,6 +43,8 @@ public class LLMServiceImpl implements LLMService {
             "以上是示例内容" +
             "我的问题为：";
 
+    private static final String TIMELINE_PROMPT
+
     public LLMServiceImpl(GenerationPool generationPool, DashVectorClientPool dashVectorClientPool, VectorNewsMapper vectorNewsMapper) {
         this.generationPool = generationPool;
         this.dashVectorClientPool = dashVectorClientPool;
@@ -68,6 +71,12 @@ public class LLMServiceImpl implements LLMService {
 
         return result;
     }
+
+    @Override
+    public List<TimelineUnitVO> getTimeline(String input) {
+        return null;
+    }
+
 
     private String buildPrompt(String input) {
         // 构造提示词
