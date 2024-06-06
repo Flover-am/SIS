@@ -6,12 +6,16 @@ import com.aliyun.dashvector.DashVectorClient;
 import com.aliyun.dashvector.DashVectorCollection;
 import com.aliyun.dashvector.models.Doc;
 import com.seciii.prism030.common.exception.LLMException;
+import com.seciii.prism030.common.exception.NewsException;
 import com.seciii.prism030.common.exception.error.ErrorType;
 import com.seciii.prism030.core.config.poolconfig.pool.DashVectorClientPool;
 import com.seciii.prism030.core.config.poolconfig.pool.GenerationPool;
+import com.seciii.prism030.core.dao.news.NewsDAOMongo;
 import com.seciii.prism030.core.mapper.news.VectorNewsMapper;
+import com.seciii.prism030.core.pojo.po.news.NewsPO;
 import com.seciii.prism030.core.pojo.po.news.VectorNewsPO;
-import com.seciii.prism030.core.pojo.vo.news.TimelineUnitVO;
+import com.seciii.prism030.core.pojo.vo.llm.ReliabilityVO;
+import com.seciii.prism030.core.pojo.vo.llm.TimelineUnitVO;
 import com.seciii.prism030.core.service.LLMService;
 import com.seciii.prism030.core.utils.DashScopeUtil;
 import com.seciii.prism030.core.utils.DashVectorUtil;
@@ -35,6 +39,7 @@ public class LLMServiceImpl implements LLMService {
     private final GenerationPool generationPool;
     private final DashVectorClientPool dashVectorClientPool;
     private final VectorNewsMapper vectorNewsMapper;
+    private final NewsDAOMongo newsDAOMongo;
     private static final String PROMPT =
             "请根据以上信息，回答我的问题，如果能找到确切的信息来源，在答案后以url的格式附上你的推断来源。" +
             "url格式:http://139.224.40.88/news/{id}，将id替换为每段新闻前附上的实际id。如果问题跟信息无关，就不用加上url了" +
@@ -54,10 +59,23 @@ public class LLMServiceImpl implements LLMService {
             "例子结束。\n" +
             "下面是我的输入：";
 
-    public LLMServiceImpl(GenerationPool generationPool, DashVectorClientPool dashVectorClientPool, VectorNewsMapper vectorNewsMapper) {
+    private static final String RELIABILITY_PROMPT =
+            "请根据互联网搜索内容，判断下面这段信息的可信度。将可信度分为0，1，2，3，4五个等级，可信度依次升高，分别代表“完全不可信”，“比较不可信”，“中等”，“比较可信”，“非常可信”。\n" +
+            "请输出可信度等级，并说明你的判断依据，格式为：\n" +
+            "( 可信度等级 | 判断依据 )\n" +
+            "举个例子：\n" +
+            "我的信息为：\n" +
+            "马龙是羽毛球运动员。\n" +
+            "你的回答为：\n" +
+            "( 0 | 根据相关资料，马龙是一位乒乓球运动员，而不是羽毛球运动员 )\n" +
+            "例子结束。\n" +
+            "下面是我的输入内容：";
+
+    public LLMServiceImpl(GenerationPool generationPool, DashVectorClientPool dashVectorClientPool, VectorNewsMapper vectorNewsMapper, NewsDAOMongo newsDAOMongo) {
         this.generationPool = generationPool;
         this.dashVectorClientPool = dashVectorClientPool;
         this.vectorNewsMapper = vectorNewsMapper;
+        this.newsDAOMongo = newsDAOMongo;
     }
 
     @Override
@@ -89,7 +107,7 @@ public class LLMServiceImpl implements LLMService {
         try {
             // 从池中取对象
             gen = generationPool.borrowObject();
-            result = DashScopeUtil.chat(apiKey, prompt, gen);
+            result = DashScopeUtil.chat(apiKey, prompt, gen, false);
         } catch (Exception e) {
             throw new LLMException(ErrorType.LLM_REQUEST_ERROR);
         } finally {
@@ -100,6 +118,32 @@ public class LLMServiceImpl implements LLMService {
         }
         String output = result.getOutput().toString();
         return timelineMapper(output);
+    }
+
+    @Override
+    public ReliabilityVO getReliability(Long newsId) {
+        NewsPO news = newsDAOMongo.getNewsById(newsId);
+        if (news == null) {
+            throw new NewsException(ErrorType.NEWS_NOT_FOUND);
+        }
+
+        Generation gen = null;
+        GenerationResult result;
+        String prompt = RELIABILITY_PROMPT + news.getContent();
+        try {
+            // 从池中取对象
+            gen = generationPool.borrowObject();
+            result = DashScopeUtil.chat(apiKey, prompt, gen, true);
+        } catch (Exception e) {
+            throw new LLMException(ErrorType.LLM_REQUEST_ERROR);
+        } finally {
+            if (gen != null) {
+                // 返还池对象
+                generationPool.returnObject(gen);
+            }
+        }
+        String output = result.getOutput().toString();
+        return reliabilityMapper(output);
     }
 
 
@@ -165,5 +209,14 @@ public class LLMServiceImpl implements LLMService {
                 .time(elements[0])
                 .newsId(Long.parseLong(elements[2]))
                 .build();
+    }
+
+    private ReliabilityVO reliabilityMapper(String unit) {
+        String strip = unit.substring(2, unit.length() - 2);
+        String[] elements = strip.split(" | ");
+        if (elements.length != 2) {
+            throw new LLMException(ErrorType.LLM_RELIABILITY_RESPONSE_ERROR);
+        }
+        return ReliabilityVO.builder().reliability(Integer.parseInt(elements[0])).reason(elements[1]).build();
     }
 }

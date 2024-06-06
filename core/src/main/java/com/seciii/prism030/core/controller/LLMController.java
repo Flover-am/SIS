@@ -1,17 +1,15 @@
 package com.seciii.prism030.core.controller;
 
-import com.alibaba.dashscope.aigc.generation.GenerationOutput;
 import com.alibaba.dashscope.aigc.generation.GenerationResult;
 import com.seciii.prism030.common.Result;
-import com.seciii.prism030.core.pojo.vo.news.TimelineUnitVO;
+import com.seciii.prism030.core.pojo.vo.llm.ReliabilityVO;
+import com.seciii.prism030.core.pojo.vo.llm.TimelineUnitVO;
 import com.seciii.prism030.core.service.LLMService;
 import io.reactivex.Flowable;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -30,13 +28,36 @@ public class LLMController {
         this.llmService = llmService;
     }
 
+    /**
+     * 与大模型进行问答，进行流式输出
+     *
+     * @param input 输入
+     * @return 输出
+     */
     @GetMapping(value = "/llm", produces = "text/event-stream")
     public Flowable<GenerationResult> getOutput(@RequestParam String input) {
         return llmService.getResult(input);
     }
 
-    @GetMapping(value = "/llm/timeline")
+    /**
+     * 获取时间轴
+     *
+     * @param input 输入
+     * @return 时间轴
+     */
+    @GetMapping("/llm/timeline")
     public Result<List<TimelineUnitVO>> getTimeline(@RequestParam String input) {
         return Result.success(llmService.getTimeline(input));
+    }
+
+    /**
+     * 获取新闻可信度
+     *
+     * @param newsId 新闻id
+     * @return 可信度VO
+     */
+    @GetMapping("/llm/reliability/{newsId}")
+    public Result<ReliabilityVO> getReliability(@PathVariable @NotNull Long newsId) {
+        return Result.success(llmService.getReliability(newsId));
     }
 }

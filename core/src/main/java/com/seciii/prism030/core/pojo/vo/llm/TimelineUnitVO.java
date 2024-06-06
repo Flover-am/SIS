@@ -1,4 +1,4 @@
-package com.seciii.prism030.core.pojo.vo.news;
+package com.seciii.prism030.core.pojo.vo.llm;
 
 
 import lombok.Builder;

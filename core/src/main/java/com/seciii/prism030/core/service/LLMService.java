@@ -1,7 +1,8 @@
 package com.seciii.prism030.core.service;
 
 import com.alibaba.dashscope.aigc.generation.GenerationResult;
-import com.seciii.prism030.core.pojo.vo.news.TimelineUnitVO;
+import com.seciii.prism030.core.pojo.vo.llm.ReliabilityVO;
+import com.seciii.prism030.core.pojo.vo.llm.TimelineUnitVO;
 import io.reactivex.Flowable;
 
 import java.util.List;
@@ -26,4 +27,12 @@ public interface LLMService {
      * @return 输出的流式结果
      */
     List<TimelineUnitVO> getTimeline(String input);
+
+    /**
+     * 获取对应新闻的可信度
+     *
+     * @param newsId 新闻id
+     * @return 可信度
+     */
+    ReliabilityVO getReliability(Long newsId);
 }

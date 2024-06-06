@@ -50,7 +50,7 @@ public class DashScopeUtil {
         return result;
     }
 
-    public static GenerationResult chat(String apiKey, String prompt, Generation gen) {
+    public static GenerationResult chat(String apiKey, String prompt, Generation gen, Boolean enableSearch) {
         Message message = Message.builder().role(Role.USER.getValue()).content(prompt).build();
         GenerationParam param = GenerationParam.builder()
                 .model(MODEL)
@@ -59,6 +59,7 @@ public class DashScopeUtil {
                 .resultFormat(GenerationParam.ResultFormat.MESSAGE)
                 .topP(TOP_P)
                 .incrementalOutput(false)
+                .enableSearch(enableSearch)
                 .build();
         GenerationResult result;
         try {
