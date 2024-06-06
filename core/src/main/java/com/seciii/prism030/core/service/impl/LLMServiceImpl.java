@@ -19,6 +19,7 @@ import io.reactivex.Flowable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -43,7 +44,15 @@ public class LLMServiceImpl implements LLMService {
             "以上是示例内容" +
             "我的问题为：";
 
-    private static final String TIMELINE_PROMPT
+    private static final String TIMELINE_PROMPT =
+            "你是一名提取善于分析事件的时间顺序的专家。请根据以上信息，将文本中涉及到的主要事件提取出来，并按照(时间 | 事件 | id)的格式输出，输出顺序为时间顺序。其中，时间的格式为\"yyyy-MM-dd\"，如\"2024-05-22\"，id为每段新闻前附上的实际id。对于不确定时间的事件，请将时间设置为NULL。\n" +
+            "下面是一个输出的例子：\n" +
+            "(2024-05-02 | 第十一届“亲相见杯”乒乓球俱乐部联盟赛在山东威海南海国家乒乓球训练基地举行 | 13)\n" +
+            "(2024-05-05 | 第十一届“亲相见杯”乒乓球俱乐部联盟赛结束 | 13)\n" +
+            "(NULL | 张宸睿在丁组混合单打比赛中勇夺冠军 | 15)\n" +
+            "(NULL | 张宸睿孪生哥哥张宸硕获得该组别第4名 | 16)\n" +
+            "例子结束。\n" +
+            "下面是我的输入：";
 
     public LLMServiceImpl(GenerationPool generationPool, DashVectorClientPool dashVectorClientPool, VectorNewsMapper vectorNewsMapper) {
         this.generationPool = generationPool;
@@ -55,11 +64,11 @@ public class LLMServiceImpl implements LLMService {
     public Flowable<GenerationResult> getResult(String input) {
         Generation gen = null;
         Flowable<GenerationResult> result;
-        String prompt = buildPrompt(input);
+        String prompt = buildPrompt(PROMPT, input);
         try {
             // 从池中取对象
             gen = generationPool.borrowObject();
-            result = DashScopeUtil.chat(apiKey, prompt, gen);
+            result = DashScopeUtil.streamChat(apiKey, prompt, gen);
         } catch (Exception e) {
             throw new LLMException(ErrorType.LLM_REQUEST_ERROR);
         } finally {
@@ -74,11 +83,27 @@ public class LLMServiceImpl implements LLMService {
 
     @Override
     public List<TimelineUnitVO> getTimeline(String input) {
-        return null;
+        Generation gen = null;
+        GenerationResult result;
+        String prompt = buildPrompt(TIMELINE_PROMPT, input);
+        try {
+            // 从池中取对象
+            gen = generationPool.borrowObject();
+            result = DashScopeUtil.chat(apiKey, prompt, gen);
+        } catch (Exception e) {
+            throw new LLMException(ErrorType.LLM_REQUEST_ERROR);
+        } finally {
+            if (gen != null) {
+                // 返还池对象
+                generationPool.returnObject(gen);
+            }
+        }
+        String output = result.getOutput().toString();
+        return timelineMapper(output);
     }
 
 
-    private String buildPrompt(String input) {
+    private String buildPrompt(String prompt, String input) {
         // 构造提示词
         DashVectorClient client = null;
         String result;
@@ -86,7 +111,7 @@ public class LLMServiceImpl implements LLMService {
             client = dashVectorClientPool.borrowObject();
             DashVectorCollection collection = client.get(DashVectorUtil.COLLECTION_NAME);
             List<String> contents = queryVectorNewsContent(input, 10, collection, apiKey);
-            result = String.join("\n", contents) + "\n" + PROMPT + input;
+            result = String.join("\n", contents) + "\n" + prompt + input;
         } catch (Exception e) {
             throw new LLMException(ErrorType.DASHVECTOR_ERROR);
         } finally {
@@ -117,5 +142,28 @@ public class LLMServiceImpl implements LLMService {
             Long newsId = vectorNewsPO.getNewsId();
             return "newsId: " + newsId + "\n" + doc.getFields().get("text");
         }).toList();
+    }
+
+    private List<TimelineUnitVO> timelineMapper(String output) {
+        // 将输出映射为时间轴数据结构
+        String[] splits = output.split("\n");
+        List<TimelineUnitVO> timeline = new ArrayList<>();
+        for (String split : splits) {
+            timeline.add(timelineUnitMapper(split));
+        }
+        return timeline;
+    }
+
+    private TimelineUnitVO timelineUnitMapper(String unit) {
+        String strip = unit.substring(2, unit.length() - 2);
+        String[] elements = strip.split(" | ");
+        if (elements.length != 3) {
+            throw new LLMException(ErrorType.LLM_TIMELINE_RESPONSE_ERROR);
+        }
+        return TimelineUnitVO.builder()
+                .event(elements[1])
+                .time(elements[0])
+                .newsId(Long.parseLong(elements[2]))
+                .build();
     }
 }

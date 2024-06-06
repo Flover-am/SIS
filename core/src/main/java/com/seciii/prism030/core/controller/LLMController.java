@@ -2,6 +2,8 @@ package com.seciii.prism030.core.controller;
 
 import com.alibaba.dashscope.aigc.generation.GenerationOutput;
 import com.alibaba.dashscope.aigc.generation.GenerationResult;
+import com.seciii.prism030.common.Result;
+import com.seciii.prism030.core.pojo.vo.news.TimelineUnitVO;
 import com.seciii.prism030.core.service.LLMService;
 import io.reactivex.Flowable;
 import lombok.extern.slf4j.Slf4j;
@@ -31,5 +33,10 @@ public class LLMController {
     @GetMapping(value = "/llm", produces = "text/event-stream")
     public Flowable<GenerationResult> getOutput(@RequestParam String input) {
         return llmService.getResult(input);
+    }
+
+    @GetMapping(value = "/llm/timeline")
+    public Result<List<TimelineUnitVO>> getTimeline(@RequestParam String input) {
+        return Result.success(llmService.getTimeline(input));
     }
 }

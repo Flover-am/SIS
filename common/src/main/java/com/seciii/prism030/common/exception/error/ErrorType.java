@@ -73,7 +73,9 @@ public enum ErrorType {
     /**
      * LLM模块错误码
      */
-    LLM_REQUEST_ERROR(500000, "LLM request error", 400); /* LLM 请求错误 */
+    LLM_REQUEST_ERROR(500000, "LLM request error", 400), /* LLM 请求错误 */
+
+    LLM_TIMELINE_RESPONSE_ERROR(500001, "LLM timeline response error", 400); /* LLM 时间轴异常 */
 
     /**
      * 状态码
