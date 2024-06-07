@@ -416,8 +416,8 @@ public class GraphServiceImpl implements GraphService {
      * @return 查询语句
      */
     private String generateQuery(String firstNodeName, String secondNodeName, String relationshipName, int limit) {
-        String firstNodeQuery = firstNodeName == null ? "(n:entity)" : "(n:entity {name:'" + firstNodeName + "'})";
-        if (secondNodeName == null && relationshipName == null) {
+        String firstNodeQuery = (firstNodeName == null||firstNodeName.isEmpty()) ? "(n:entity)" : "(n:entity {name:'" + firstNodeName + "'})";
+        if ((secondNodeName == null||secondNodeName.isEmpty()) && (relationshipName == null || relationshipName.isEmpty())) {
             return String.format(
                     "MATCH %s OPTIONAL MATCH p=(n)-[r:RELATE_TO*]->(m:entity) " +
                             "WHERE NOT (m)-[:RELATE_TO]->(:entity) " +
@@ -425,12 +425,12 @@ public class GraphServiceImpl implements GraphService {
                             "RETURN n, COLLECT(p) AS r LIMIT %d",
                     firstNodeQuery, limit);
         } else {
-            String relationQuery = relationshipName == null ? "[r:RELATE_TO*]" : "[r:RELATE_TO {relationship:'" + relationshipName + "'}]";
-            String secondNodeQuery = secondNodeName == null ? "(m:entity)" : "(m:entity {name:'" + secondNodeName + "'})";
+            String relationQuery = (relationshipName == null||relationshipName.isEmpty()) ? "[r:RELATE_TO*]" : "[r:RELATE_TO {relationship:'" + relationshipName + "'}]";
+            String secondNodeQuery = (secondNodeName == null||secondNodeName.isEmpty()) ? "(m:entity)" : "(m:entity {name:'" + secondNodeName + "'})";
             return String.format(
                     "MATCH p=" + firstNodeQuery +
                             "-" + relationQuery + "->" + secondNodeQuery +
-                            "WHERE NOT (m)-[:RELATE_TO]->(:entity) " +
+//                            "WHERE NOT (m)-[:RELATE_TO]->(:entity) " +
                             "RETURN m,n, COLLECT(p) AS r LIMIT %d", limit
             );
         }
