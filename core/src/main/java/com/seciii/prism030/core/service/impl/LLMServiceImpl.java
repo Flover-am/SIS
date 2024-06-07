@@ -56,6 +56,7 @@ public class LLMServiceImpl implements LLMService {
             - 孙杨结束禁赛 [参考1](http://139.224.40.88/news/1)
             - 皇马赢得冠军 [参考2](http://139.224.40.88/news/2)
             以上是示例内容。
+            如果询问的内容和统计数据相关，就不用按照上述格式返回。
             我的问题为：
             """;
 
