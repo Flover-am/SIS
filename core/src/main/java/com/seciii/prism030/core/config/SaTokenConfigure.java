@@ -51,6 +51,7 @@ public class SaTokenConfigure {
                     SaRouter.match("/**/graph/**")
                             .check(StpUtil::checkLogin);
                     SaRouter.match("/**/llm/**")
+                            .notMatch("/**/llm")
                             .check(StpUtil::checkLogin);
                 })
                 // 返回异常结果

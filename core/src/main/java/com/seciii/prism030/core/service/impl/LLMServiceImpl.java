@@ -57,17 +57,18 @@ public class LLMServiceImpl implements LLMService {
             "(NULL | 张宸睿在丁组混合单打比赛中勇夺冠军 | 15)\n" +
             "(NULL | 张宸睿孪生哥哥张宸硕获得该组别第4名 | 16)\n" +
             "例子结束。\n" +
+            "如果没有找到任何和信息相关的时间轴顺序，就直接返回NULL，不要输出其他内容。\n" +
             "下面是我的输入：";
 
     private static final String RELIABILITY_PROMPT =
             "请根据互联网搜索内容，判断下面这段信息的可信度。将可信度分为0，1，2，3，4五个等级，可信度依次升高，分别代表“完全不可信”，“比较不可信”，“中等”，“比较可信”，“非常可信”。\n" +
             "请输出可信度等级，并说明你的判断依据，格式为：\n" +
-            "( 可信度等级 | 判断依据 )\n" +
+            "(可信度等级 | 判断依据)\n" +
             "举个例子：\n" +
             "我的信息为：\n" +
             "马龙是羽毛球运动员。\n" +
             "你的回答为：\n" +
-            "( 0 | 根据相关资料，马龙是一位乒乓球运动员，而不是羽毛球运动员 )\n" +
+            "(0 | 根据相关资料，马龙是一位乒乓球运动员，而不是羽毛球运动员)\n" +
             "例子结束。\n" +
             "下面是我的输入内容：";
 
@@ -116,7 +117,7 @@ public class LLMServiceImpl implements LLMService {
                 generationPool.returnObject(gen);
             }
         }
-        String output = result.getOutput().toString();
+        String output = result.getOutput().getChoices().get(0).getMessage().getContent();
         return timelineMapper(output);
     }
 
@@ -142,7 +143,7 @@ public class LLMServiceImpl implements LLMService {
                 generationPool.returnObject(gen);
             }
         }
-        String output = result.getOutput().toString();
+        String output = result.getOutput().getChoices().get(0).getMessage().getContent();
         return reliabilityMapper(output);
     }
 
@@ -189,6 +190,9 @@ public class LLMServiceImpl implements LLMService {
     }
 
     private List<TimelineUnitVO> timelineMapper(String output) {
+        if (!output.startsWith("(") || !output.endsWith(")")) {
+            return new ArrayList<>();
+        }
         // 将输出映射为时间轴数据结构
         String[] splits = output.split("\n");
         List<TimelineUnitVO> timeline = new ArrayList<>();
@@ -199,21 +203,21 @@ public class LLMServiceImpl implements LLMService {
     }
 
     private TimelineUnitVO timelineUnitMapper(String unit) {
-        String strip = unit.substring(2, unit.length() - 2);
-        String[] elements = strip.split(" | ");
+        String strip = unit.strip().substring(1, unit.length() - 1);
+        String[] elements = strip.split(" \\| ");
         if (elements.length != 3) {
             throw new LLMException(ErrorType.LLM_TIMELINE_RESPONSE_ERROR);
         }
         return TimelineUnitVO.builder()
                 .event(elements[1])
                 .time(elements[0])
-                .newsId(Long.parseLong(elements[2]))
+                .newsId(elements[2])
                 .build();
     }
 
     private ReliabilityVO reliabilityMapper(String unit) {
-        String strip = unit.substring(2, unit.length() - 2);
-        String[] elements = strip.split(" | ");
+        String strip = unit.strip().substring(1, unit.length() - 1);
+        String[] elements = strip.split(" \\| ");
         if (elements.length != 2) {
             throw new LLMException(ErrorType.LLM_RELIABILITY_RESPONSE_ERROR);
         }

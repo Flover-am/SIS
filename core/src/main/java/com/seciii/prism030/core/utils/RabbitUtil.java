@@ -100,13 +100,14 @@ public class RabbitUtil {
 
         for (String ERItem : ERArray) {
             // 每个实体关系应以"(E1 | R | E2)"格式给出
+            ERItem = ERItem.strip();
             if (!ERItem.startsWith("(") || !ERItem.endsWith(")")) {
                 log.warn("实体关系格式错误: " + ERItem);
                 continue;
             }
             String[] ERItemArray = ERItem.substring(1, ERItem.length() - 1).split("\\|");
             if (ERItemArray.length != 3) {
-                log.warn("实体关系格式错误: " + ERItem);
+                log.warn("实体关系格式错误: " + ERItem + " " + ERItemArray.toString());
                 continue;
             }
             resultList.add(NewsEntityRelationshipDTO.builder()

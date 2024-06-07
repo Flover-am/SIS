@@ -26,5 +26,5 @@ public class TimelineUnitVO {
     /**
      * 新闻id
      */
-    private Long newsId;
+    private String newsId;
 }
