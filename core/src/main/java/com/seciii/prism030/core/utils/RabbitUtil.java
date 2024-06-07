@@ -107,7 +107,11 @@ public class RabbitUtil {
             }
             String[] ERItemArray = ERItem.substring(1, ERItem.length() - 1).split("\\|");
             if (ERItemArray.length != 3) {
-                log.warn("实体关系格式错误: " + ERItem + " " + ERItemArray.toString());
+                log.warn("实体关系格式错误: " + ERItem + " " + Arrays.toString(ERItemArray));
+                continue;
+            }
+            if (ERItemArray[0].equals(ERItemArray[2])) {
+                log.warn("实体关系自身成环：" + Arrays.toString(ERItemArray));
                 continue;
             }
             resultList.add(NewsEntityRelationshipDTO.builder()

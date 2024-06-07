@@ -16,6 +16,8 @@ import com.seciii.prism030.core.pojo.po.news.NewsPO;
 import com.seciii.prism030.core.pojo.po.news.VectorNewsPO;
 import com.seciii.prism030.core.pojo.vo.llm.ReliabilityVO;
 import com.seciii.prism030.core.pojo.vo.llm.TimelineUnitVO;
+import com.seciii.prism030.core.pojo.vo.news.NewsCategoryCountVO;
+import com.seciii.prism030.core.pojo.vo.news.NewsDateCountVO;
 import com.seciii.prism030.core.service.LLMService;
 import com.seciii.prism030.core.utils.DashScopeUtil;
 import com.seciii.prism030.core.utils.DashVectorUtil;
@@ -23,6 +25,7 @@ import io.reactivex.Flowable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,50 +43,63 @@ public class LLMServiceImpl implements LLMService {
     private final DashVectorClientPool dashVectorClientPool;
     private final VectorNewsMapper vectorNewsMapper;
     private final NewsDAOMongo newsDAOMongo;
-    private static final String PROMPT =
-            "请根据以上信息，回答我的问题，如果能找到确切的信息来源，在答案后以url的格式附上你的推断来源。" +
-            "url格式:http://139.224.40.88/news/{id}，将id替换为每段新闻前附上的实际id。如果问题跟信息无关，就不用加上url了" +
-            "请按照markdown的格式返回结果，如示例：" +
-            "- 孙杨结束禁赛[参考1](http://139.224.40.88/news/1)\n" +
-            "- 皇马赢得冠军[参考2](http://139.224.40.88/news/2)\n" +
-            "以上是示例内容" +
-            "我的问题为：";
+    private final NewsServiceMongoImpl newsServiceMongo;
+    private static final Integer STATISTIC_DAYS = 7;
+    private static final String STATISTIC_PROMPT =
+            """
+            下面是一个系统的数据，代表近7天内每种分类在某天增加的新闻数量：
+            """;
+    private static final String QA_PROMPT =
+            """
+            请根据以上信息，回答我的问题，如果能找到确切的信息来源，在答案后以url的格式附上你的推断来源。url格式:http://139.224.40.88/news/{id}，将id替换为每段新闻前附上的实际id。如果问题跟信息无关，就不用加上url了。
+            请按照markdown的格式返回结果，如示例：
+            - 孙杨结束禁赛 [参考1](http://139.224.40.88/news/1)
+            - 皇马赢得冠军 [参考2](http://139.224.40.88/news/2)
+            以上是示例内容。
+            我的问题为：
+            """;
 
     private static final String TIMELINE_PROMPT =
-            "你是一名提取善于分析事件的时间顺序的专家。请根据以上信息，将文本中涉及到的主要事件提取出来，并按照(时间 | 事件 | id)的格式输出，输出顺序为时间顺序。其中，时间的格式为\"yyyy-MM-dd\"，如\"2024-05-22\"，id为每段新闻前附上的实际id。对于不确定时间的事件，请将时间设置为NULL。\n" +
-            "下面是一个输出的例子：\n" +
-            "(2024-05-02 | 第十一届“亲相见杯”乒乓球俱乐部联盟赛在山东威海南海国家乒乓球训练基地举行 | 13)\n" +
-            "(2024-05-05 | 第十一届“亲相见杯”乒乓球俱乐部联盟赛结束 | 13)\n" +
-            "(NULL | 张宸睿在丁组混合单打比赛中勇夺冠军 | 15)\n" +
-            "(NULL | 张宸睿孪生哥哥张宸硕获得该组别第4名 | 16)\n" +
-            "例子结束。\n" +
-            "如果没有找到任何和信息相关的时间轴顺序，就直接返回NULL，不要输出其他内容。\n" +
-            "下面是我的输入：";
+            """
+            你是一名提取善于分析事件的时间顺序的专家。请根据以上信息，将文本中涉及到的主要事件提取出来，并按照(时间 | 事件 | id)的格式输出，输出顺序为时间顺序。其中，时间的格式为"yyyy-MM-dd"，如"2024-05-22"，id为每段新闻前附上的实际id。对于不确定时间的事件，请将时间设置为NULL。
+            下面是一个输出的例子：
+            (2024-05-02 | 第十一届“亲相见杯”乒乓球俱乐部联盟赛在山东威海南海国家乒乓球训练基地举行 | 13)
+            (2024-05-05 | 第十一届“亲相见杯”乒乓球俱乐部联盟赛结束 | 13)
+            (NULL | 张宸睿在丁组混合单打比赛中勇夺冠军 | 15)
+            (NULL | 张宸睿孪生哥哥张宸硕获得该组别第4名 | 16)
+            例子结束。
+            如果没有找到任何和信息相关的时间轴顺序，就直接返回NULL，不要输出其他内容。
+            下面是我的输入：
+            """;
 
     private static final String RELIABILITY_PROMPT =
-            "请根据互联网搜索内容，判断下面这段信息的可信度。将可信度分为0，1，2，3，4五个等级，可信度依次升高，分别代表“完全不可信”，“比较不可信”，“中等”，“比较可信”，“非常可信”。\n" +
-            "请输出可信度等级，并说明你的判断依据，格式为：\n" +
-            "(可信度等级 | 判断依据)\n" +
-            "举个例子：\n" +
-            "我的信息为：\n" +
-            "马龙是羽毛球运动员。\n" +
-            "你的回答为：\n" +
-            "(0 | 根据相关资料，马龙是一位乒乓球运动员，而不是羽毛球运动员)\n" +
-            "例子结束。\n" +
-            "下面是我的输入内容：";
+            """
+            请根据互联网搜索内容，判断下面这段信息的可信度。将可信度分为0，1，2，3，4五个等级，可信度依次升高，分别代表“完全不可信”，“比较不可信”，“中等”，“比较可信”，“非常可信”。
+            请输出可信度等级，并说明你的判断依据，格式为：
+            (可信度等级 | 判断依据)
+            举个例子：
+            我的信息为：
+            马龙是羽毛球运动员。
+            你的回答为：
+            (0 | 根据相关资料，马龙是一位乒乓球运动员，而不是羽毛球运动员)
+            例子结束。
+            下面是你的输入内容：
+            """;
 
-    public LLMServiceImpl(GenerationPool generationPool, DashVectorClientPool dashVectorClientPool, VectorNewsMapper vectorNewsMapper, NewsDAOMongo newsDAOMongo) {
+
+    public LLMServiceImpl(GenerationPool generationPool, DashVectorClientPool dashVectorClientPool, VectorNewsMapper vectorNewsMapper, NewsDAOMongo newsDAOMongo, NewsServiceMongoImpl newsServiceMongo) {
         this.generationPool = generationPool;
         this.dashVectorClientPool = dashVectorClientPool;
         this.vectorNewsMapper = vectorNewsMapper;
         this.newsDAOMongo = newsDAOMongo;
+        this.newsServiceMongo = newsServiceMongo;
     }
 
     @Override
     public Flowable<GenerationResult> getResult(String input) {
         Generation gen = null;
         Flowable<GenerationResult> result;
-        String prompt = buildPrompt(PROMPT, input);
+        String prompt = buildPrompt(dataPrompt(STATISTIC_DAYS) + QA_PROMPT, input);
         try {
             // 从池中取对象
             gen = generationPool.borrowObject();
@@ -222,5 +238,22 @@ public class LLMServiceImpl implements LLMService {
             throw new LLMException(ErrorType.LLM_RELIABILITY_RESPONSE_ERROR);
         }
         return ReliabilityVO.builder().reliability(Integer.parseInt(elements[0])).reason(elements[1]).build();
+    }
+
+    private String dataPrompt(int day) {
+        LocalDate today = LocalDate.now();
+        LocalDate begin = today.minusDays(day);
+        List<NewsDateCountVO> newsDateCountVOS = newsServiceMongo.countPeriodNews(begin.toString(), today.toString());
+        StringBuilder sb = new StringBuilder(STATISTIC_PROMPT);
+        for (NewsDateCountVO newsDateCountVO : newsDateCountVOS) {
+            sb.append(newsDateCountVO.getDate())
+                    .append(":\n");
+            for (NewsCategoryCountVO newsCategoryCountVO : newsDateCountVO.getNewsCategoryCounts()) {
+                sb.append(newsCategoryCountVO.getCategory()).append(": ")
+                        .append(newsCategoryCountVO.getCount()).append("\n");
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
     }
 }
