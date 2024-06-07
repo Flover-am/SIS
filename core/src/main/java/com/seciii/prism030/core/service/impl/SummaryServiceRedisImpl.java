@@ -77,6 +77,9 @@ public class SummaryServiceRedisImpl implements SummaryService {
         for (var entry : list) {
             res.add(NewsSourceCountVO.builder().source(entry.getKey()).count(entry.getValue()).build());
         }
+        if (res.size() > 7) {
+            return res.subList(0, 7);
+        }
         return res;
     }
 
