@@ -4,6 +4,7 @@ import com.seciii.prism030.core.pojo.dto.NewsEntityRelationshipDTO;
 import com.seciii.prism030.core.pojo.po.graph.node.EntityNode;
 import com.seciii.prism030.core.pojo.po.graph.node.NewsNode;
 import com.seciii.prism030.core.pojo.vo.graph.GraphVO;
+import com.seciii.prism030.core.pojo.vo.graph.KnowledgeGraphVO;
 import com.seciii.prism030.core.pojo.vo.graph.TimeAxisVO;
 
 import java.util.List;
@@ -82,4 +83,15 @@ public interface GraphService {
      * @return 新闻节点
      */
     NewsNode addNewsEntities(long newsId, List<NewsEntityRelationshipDTO> entities);
+
+    /**
+     * 获取知识图谱
+     *
+     * @param limit            返回节点上限数
+     * @param firstEntityName  第一个实体名
+     * @param secondEntityName 第二个实体名
+     * @param relationshipName 关系名
+     * @return 知识图谱节点
+     */
+    KnowledgeGraphVO getKnowledgeGraph(Integer limit, String firstEntityName, String secondEntityName, String relationshipName);
 }

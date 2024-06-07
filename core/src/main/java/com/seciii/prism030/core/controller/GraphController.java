@@ -2,10 +2,13 @@ package com.seciii.prism030.core.controller;
 
 import com.seciii.prism030.common.Result;
 import com.seciii.prism030.core.pojo.vo.graph.GraphVO;
+import com.seciii.prism030.core.pojo.vo.graph.KnowledgeGraphVO;
 import com.seciii.prism030.core.pojo.vo.graph.TimeAxisVO;
 import com.seciii.prism030.core.service.GraphService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Nullable;
 
 /**
  * 图数据库控制器类
@@ -44,5 +47,16 @@ public class GraphController {
     public Result<TimeAxisVO> getTimeAxis(@RequestParam String entity){
         TimeAxisVO timeAxisVO = graphService.getTimeAxis(entity);
         return Result.success(timeAxisVO);
+    }
+
+    @GetMapping("/knowledgeGraph")
+    public Result<KnowledgeGraphVO> getKnowledgeGraph(
+            @RequestParam @Nullable Integer limit,
+            @RequestParam @Nullable String firstEntityName,
+            @RequestParam @Nullable String secondEntityName,
+            @RequestParam @Nullable String relationshipName
+    ){
+        KnowledgeGraphVO knowledgeGraph = graphService.getKnowledgeGraph(limit, firstEntityName, secondEntityName, relationshipName);
+        return Result.success(knowledgeGraph);
     }
 }
