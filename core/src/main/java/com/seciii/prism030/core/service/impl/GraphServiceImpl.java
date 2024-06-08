@@ -425,16 +425,16 @@ public class GraphServiceImpl implements GraphService {
         }
         // 遍历所有实体节点，将其关联的新闻标题加入newsList
         for (EntityNodePO po : entityNodeMap.values()) {
-            List<NewsNodePO> newsNodeList = getNewsListByIdList(po.getRelatedNews(), getLimit(maxNodes));
-            newsNodeList.stream().forEach(
-                    newsNodePO -> {
-                        if (!newsList.contains(newsNodePO.getTitle())) {
-                            newsList.add(newsNodePO.getTitle());
-                            newsEntityRelationList.add(NewsEntityRelationVO.builder()
-                                    .title(newsNodePO.getTitle())
-                                    .entity(po.getName())
-                                    .build());
-                        }
+            List<String> newsNameList = getNewsListByIdList(po.getRelatedNews(), getLimit(maxNodes)).stream().map(
+                    NewsNodePO::getTitle
+            ).toList();
+            newsNameList.stream().forEach(
+                    newsName -> {
+                        newsList.add(newsName);
+                        newsEntityRelationList.add(NewsEntityRelationVO.builder()
+                                .title(newsName)
+                                .entity(po.getName())
+                                .build());
                     }
             );
         }
@@ -453,10 +453,11 @@ public class GraphServiceImpl implements GraphService {
      * @return 新闻最大值
      */
     private int getLimit(int limit) {
-        if (limit <= 10) return 10;
-        else if (limit <= 25) return 5;
-        else if (limit <= 50) return 3;
-        return 2;
+        if (limit < 10) return 10;
+        else if (limit < 20) return 5;
+        else if (limit < 25) return 4;
+        else if (limit < 50) return 2;
+        return 1;
     }
 
     /**
