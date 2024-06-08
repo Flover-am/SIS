@@ -419,13 +419,13 @@ public class GraphServiceImpl implements GraphService {
         String firstNodeQuery = (firstNodeName == null||firstNodeName.isEmpty()) ? "(n:entity)" : "(n:entity {name:'" + firstNodeName + "'})";
         if ((secondNodeName == null||secondNodeName.isEmpty()) && (relationshipName == null || relationshipName.isEmpty())) {
             return String.format(
-                    "MATCH %s OPTIONAL MATCH p=(n)-[r:RELATE_TO*]->(m:entity) " +
+                    "MATCH %s OPTIONAL MATCH p=(n)-[r:RELATE_TO*..2]->(m:entity) " +
                             "WHERE NOT (m)-[:RELATE_TO]->(:entity) " +
 //                            "AND NOT (n)-[*]->(n)" +
                             "RETURN n, COLLECT(p) AS r LIMIT %d",
                     firstNodeQuery, limit);
         } else {
-            String relationQuery = (relationshipName == null||relationshipName.isEmpty()) ? "[r:RELATE_TO*]" : "[r:RELATE_TO {relationship:'" + relationshipName + "'}]";
+            String relationQuery = (relationshipName == null||relationshipName.isEmpty()) ? "[r:RELATE_TO*..2]" : "[r:RELATE_TO {relationship:'" + relationshipName + "'}]";
             String secondNodeQuery = (secondNodeName == null||secondNodeName.isEmpty()) ? "(m:entity)" : "(m:entity {name:'" + secondNodeName + "'})";
             return String.format(
                     "MATCH p=" + firstNodeQuery +
