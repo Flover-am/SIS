@@ -625,7 +625,7 @@ public class GraphServiceImpl implements GraphService {
                 : String.format("(%s:%s {%s:'%s'})", FIRST_NODE_TAG, ENTITY_NODE_TAG, ENTITY_NODE_NAME, firstNodeName);
         if ((secondNodeName == null || secondNodeName.isEmpty()) && (relationshipName == null || relationshipName.isEmpty())) {
             return String.format(
-                    "MATCH %s OPTIONAL MATCH %s=(%s)-[%s:RELATE_TO*..2]->(%s:%s) WHERE NOT (%s)-[:RELATE_TO]->(:%s) " +
+                    "MATCH %s OPTIONAL MATCH %s=(%s)-[%s:RELATE_TO*..1]->(%s:%s) WHERE NOT (%s)-[:RELATE_TO]->(:%s) " +
 //                            "AND NOT (n)-[*]->(n)" +
                             "RETURN %s, COLLECT(%s) AS %s LIMIT %d",
                     firstNodeQuery, PATH_TAG, FIRST_NODE_TAG, RELATION_TAG, SECOND_NODE_TAG, ENTITY_NODE_TAG, SECOND_NODE_TAG,
@@ -633,7 +633,7 @@ public class GraphServiceImpl implements GraphService {
                     limit);
         } else {
             String relationQuery = (relationshipName == null || relationshipName.isEmpty())
-                    ? String.format("[%s:RELATE_TO*..2]", RELATION_TAG)
+                    ? String.format("[%s:RELATE_TO*..1]", RELATION_TAG)
                     : String.format("[%s:RELATE_TO {%s:'%s'}]", RELATION_TAG, RELATION_NAME, relationshipName);
             String secondNodeQuery = (secondNodeName == null || secondNodeName.isEmpty())
                     ? String.format("(%s:%s)", SECOND_NODE_TAG, ENTITY_NODE_TAG)
@@ -693,7 +693,7 @@ public class GraphServiceImpl implements GraphService {
      */
     private List<NewsNodePO> getNewsListByIdList(List<Long> newsIdList) {
         String listString = listToString(newsIdList);
-        String query = String.format("MATCH (%s:%s) WHERE id(%s) IN %s RETURN %s",
+        String query = String.format("MATCH (%s:%s) WHERE id(%s) IN %s RETURN %s LIMIT 25",
                 FIRST_NODE_TAG, NEWS_NODE_TAG, FIRST_NODE_TAG, listString, FIRST_NODE_TAG);
         return neo4jClient.query(query).in(DB_NAME).fetchAs(NewsNodePO.class).mappedBy(
                 (typeSystem, record) -> NewsNodePO.builder()
