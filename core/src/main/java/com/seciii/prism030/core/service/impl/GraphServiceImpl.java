@@ -589,7 +589,7 @@ public class GraphServiceImpl implements GraphService {
         }
         // 遍历所有实体节点，将其关联的新闻标题加入newsList
         for (EntityNodePO po : entityNodeMap.values()) {
-            List<NewsNodePO> newsNodeList = getNewsListByIdList(po.getRelatedNews());
+            List<NewsNodePO> newsNodeList = getNewsListByIdList(po.getRelatedNews(),getLimit(maxNodes));
             newsNodeList.stream().forEach(
                     newsNodePO -> {
                         if (!newsList.contains(newsNodePO.getTitle())) {
@@ -609,7 +609,12 @@ public class GraphServiceImpl implements GraphService {
                 .newsEntityRelationList(newsEntityRelationList)
                 .build();
     }
-
+    private int getLimit(int limit){
+        if(limit<=10)return 10;
+        else if(limit<=25) return 5;
+        else if(limit<=50) return 3;
+        return 2;
+    }
     /**
      * 生成查询语句
      *
@@ -691,10 +696,10 @@ public class GraphServiceImpl implements GraphService {
      * @param newsIdList id列表
      * @return 新闻节点列表
      */
-    private List<NewsNodePO> getNewsListByIdList(List<Long> newsIdList) {
+    private List<NewsNodePO> getNewsListByIdList(List<Long> newsIdList,int limit) {
         String listString = listToString(newsIdList);
-        String query = String.format("MATCH (%s:%s) WHERE id(%s) IN %s RETURN %s LIMIT 25",
-                FIRST_NODE_TAG, NEWS_NODE_TAG, FIRST_NODE_TAG, listString, FIRST_NODE_TAG);
+        String query = String.format("MATCH (%s:%s) WHERE id(%s) IN %s RETURN %s LIMIT %d",
+                FIRST_NODE_TAG, NEWS_NODE_TAG, FIRST_NODE_TAG, listString, FIRST_NODE_TAG,limit);
         return neo4jClient.query(query).in(DB_NAME).fetchAs(NewsNodePO.class).mappedBy(
                 (typeSystem, record) -> NewsNodePO.builder()
                         .id(record.get(FIRST_NODE_TAG).asNode().id())
