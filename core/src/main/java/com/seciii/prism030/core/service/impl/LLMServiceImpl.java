@@ -54,10 +54,10 @@ public class LLMServiceImpl implements LLMService {
             """;
     private static final String QA_PROMPT =
             """
-            请根据以上信息，回答我的问题，如果能找到确切的信息来源，在答案后以url的格式附上你的推断来源。url格式:http://139.224.40.88:80/detail?id={id}，将{id}替换为每段新闻前附上的实际id。如果问题跟信息无关，就不用加上url了。
+            请根据以上信息，回答我的问题，如果能找到确切的信息来源，在答案后以url的格式附上你的推断来源。url格式:http://139.224.40.88:82/detail?id={id}，将{id}替换为每段新闻前附上的实际id。如果问题跟信息无关，就不用加上url了。
             请按照markdown的格式返回结果，如示例：
-            - 孙杨结束禁赛 [参考1](http://139.224.40.88:80/detail?id=1)
-            - 皇马赢得冠军 [参考2](http://139.224.40.88:80/detail?id=2)
+            - 孙杨结束禁赛 [参考1](http://139.224.40.88:82/detail?id=1)
+            - 皇马赢得冠军 [参考2](http://139.224.40.88:82/detail?id=2)
             以上是示例内容。
             我的问题为：
             """;
