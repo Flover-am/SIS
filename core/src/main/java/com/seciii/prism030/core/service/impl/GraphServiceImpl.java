@@ -430,7 +430,9 @@ public class GraphServiceImpl implements GraphService {
             ).toList();
             newsNameList.stream().forEach(
                     newsName -> {
-                        newsList.add(newsName);
+                        if(!newsList.contains(newsName)){
+                            newsList.add(newsName);
+                        }
                         newsEntityRelationList.add(NewsEntityRelationVO.builder()
                                 .title(newsName)
                                 .entity(po.getName())
