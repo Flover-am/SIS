@@ -52,15 +52,6 @@ public interface GraphService {
     NewsNode getNewsNode(Long id);
 
     /**
-     * 抽取新闻实体关系并持久化
-     *
-     * @param newsId 新闻id
-     * @return 知识图谱
-     */
-    @Deprecated
-    GraphVO analyzeNews(Long newsId);
-
-    /**
      * 获取知识图谱
      *
      * @param newsId 新闻id

@@ -10,13 +10,10 @@ import com.seciii.prism030.core.pojo.po.graph.neo.EntityNodePO;
 import com.seciii.prism030.core.pojo.po.graph.neo.NewsNodePO;
 import com.seciii.prism030.core.pojo.po.graph.node.EntityNode;
 import com.seciii.prism030.core.pojo.po.graph.node.NewsNode;
-import com.seciii.prism030.core.pojo.po.graph.relationship.EntityRelationship;
-import com.seciii.prism030.core.pojo.po.graph.relationship.NewsEntityRelationship;
 import com.seciii.prism030.core.pojo.po.news.NewsPO;
 import com.seciii.prism030.core.pojo.vo.graph.*;
 import com.seciii.prism030.core.service.GraphService;
 import com.seciii.prism030.core.utils.NewsUtil;
-import com.seciii.prism030.core.utils.SparkUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.neo4j.driver.Value;
 import org.neo4j.driver.types.Path;
@@ -26,11 +23,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Nullable;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * 知识图谱实现类
@@ -48,9 +41,6 @@ public class GraphServiceImpl implements GraphService {
 
     private final Neo4jClient neo4jClient;
 
-
-    private final SparkUtil sparkUtil;
-    private final ConcurrentHashMap<Long, Lock> newsLocks = new ConcurrentHashMap<>();
 
     private static final String DB_NAME = "neo4j";
 
@@ -76,13 +66,11 @@ public class GraphServiceImpl implements GraphService {
     public GraphServiceImpl(EntityNodeDAO entityNodeDAO,
                             NewsNodeDAO newsNodeDAO,
                             NewsDAOMongo newsDAOMongo,
-                            SparkUtil sparkUtil,
                             Neo4jClient neo4jClient
     ) {
         this.entityNodeDAO = entityNodeDAO;
         this.newsNodeDAO = newsNodeDAO;
         this.newsDAOMongo = newsDAOMongo;
-        this.sparkUtil = sparkUtil;
         this.neo4jClient = neo4jClient;
     }
 
@@ -174,86 +162,30 @@ public class GraphServiceImpl implements GraphService {
                         SECOND_NODE_TAG, FIRST_NODE_TAG)
         ).in(DB_NAME).run();
 
-
-        System.out.println("lol");
         return entityNode;
     }
-//    @Deprecated
-//    public EntityNode addEntityNode(Long newsNodeId, String name) {
-//        NewsNode newsNode = newsNodeDAO.findById(newsNodeId).orElseThrow();
-//
-//        EntityNode entityNode = entityNodeDAO.findEntityNodeByName(name);
-//        if (entityNode != null) {
-//            // 实体节点已经存在
-//            if (entityNode.getNewsNodeIdList().contains(newsNode.getId())) {
-//                // 实体节点已经与新闻节点绑定
-//                return entityNode;
-//            }
-//            // 绑定现存实体节点与现存新闻节点
-//            entityNode.getNewsNodeIdList().add(newsNode.getId());
-//            entityNodeDAO.save(entityNode);
-//
-//            NewsEntityRelationship relationship = NewsEntityRelationship.builder()
-//                    .entity(entityNode)
-//                    .build();
-//            newsNode.getEntities().add(relationship);
-//            newsNodeDAO.save(newsNode);
-//            return entityNode;
-//        } else {
-//            // 创建新的实体节点
-//            entityNode = EntityNode.builder()
-//                    .name(name)
-//                    .entities(Collections.emptyList())
-//                    .newsNodeIdList(new ArrayList<>() {{
-//                        add(newsNode.getId());
-//                    }})
-////                    .relationshipIdList(Collections.emptyList())
-//                    .build();
-//            EntityNode node = entityNodeDAO.save(entityNode);
-//
-//            // 建立新闻节点与实体节点的联系
-//            NewsEntityRelationship relationship = NewsEntityRelationship.builder()
-//                    .entity(entityNode)
-//                    .build();
-//            newsNode.getEntities().add(relationship);
-//            newsNodeDAO.save(newsNode);
-//            return node;
-//        }
-//    }
 
-    //    @Override
-//    @Deprecated
-//    public void addEntityRelationship(Long fromId, Long toId, String relationship) {
-//        EntityNode fromEntity = entityNodeDAO.findById(fromId).orElseThrow();
-//        EntityNode toEntity = entityNodeDAO.findById(toId).orElseThrow();
-//        EntityRelationship entityRelationship = EntityRelationship.builder()
-//                .entity(toEntity)
-//                .relationship(relationship)
-//                .build();
-//        fromEntity.getEntities().add(entityRelationship);
-//        entityNodeDAO.save(fromEntity);
-//    }
     @Override
     public void addEntityRelationship(Long fromId, Long toId, String relationship) {
         if (fromId.equals(toId)) {
             return;
         }
-        boolean existed=!neo4jClient.query(String.format(
+        boolean existed = !neo4jClient.query(String.format(
                 "MATCH(%s:%s)-[%s:RELATE_TO{%s:'%s'}]->(%s:%s) WHERE id(%s)=%d AND id(%s)=%d RETURN %s",
-                FIRST_NODE_TAG,ENTITY_NODE_TAG,RELATION_TAG,RELATION_NAME,relationship,
-                SECOND_NODE_TAG,ENTITY_NODE_TAG,
-                FIRST_NODE_TAG,fromId,
-                SECOND_NODE_TAG,toId,
+                FIRST_NODE_TAG, ENTITY_NODE_TAG, RELATION_TAG, RELATION_NAME, relationship,
+                SECOND_NODE_TAG, ENTITY_NODE_TAG,
+                FIRST_NODE_TAG, fromId,
+                SECOND_NODE_TAG, toId,
                 RELATION_TAG
         )).in(DB_NAME).fetchAs(String.class).mappedBy(
-                (typeSystem, record)->{
-                    if(record.get(RELATION_TAG).isNull()){
+                (typeSystem, record) -> {
+                    if (record.get(RELATION_TAG).isNull()) {
                         return null;
                     }
                     return record.get(RELATION_TAG).asRelationship().get(RELATION_NAME).asString();
                 }
         ).all().isEmpty();
-        if(existed){
+        if (existed) {
             return;
         }
         String query = String.format(
@@ -266,108 +198,12 @@ public class GraphServiceImpl implements GraphService {
         neo4jClient.query(query).in(DB_NAME).run();
     }
 
-//    private void addRelationshipWithCycloCheck(Long fromId, Long toId, String relationship) {
-//
-//        EntityNode fromEntity = entityNodeDAO.findById(fromId).orElseThrow();
-//        EntityNode toEntity = entityNodeDAO.findById(toId).orElseThrow();
-//        if (!entityNodeDAO.isConnected(toEntity.getName(), fromEntity.getName())) {
-//            // 检查是否已存在对应关系
-//            if (entityNodeDAO.existsByNameAndTarget(relationship, toEntity.getName())) {
-//                return;
-//            }
-//
-//            // 未存在对应关系，创建新的对应关系
-//            EntityRelationship entityRelationship = EntityRelationship.builder()
-//                    .entity(toEntity)
-//                    .relationship(relationship)
-//                    .build();
-//            fromEntity.getEntities().add(entityRelationship);
-//            entityNodeDAO.save(fromEntity);
-//        } else {
-//
-//            return;
-//        }
-//    }
 
     @Override
     public NewsNode getNewsNode(Long id) {
         return newsNodeDAO.findById(id).orElseThrow();
     }
 
-    @Override
-    @Deprecated
-    public GraphVO analyzeNews(Long newsId) {
-        //TODO: REFACTOR
-        ReentrantLock lock = (ReentrantLock) newsLocks.computeIfAbsent(newsId, k -> new ReentrantLock());
-        try {
-            // 尝试为该id对应的新闻加锁
-            if (!lock.tryLock(1, TimeUnit.SECONDS)) {
-                // 无法加锁，说明已经被锁
-                throw new GraphException(ErrorType.GRAPH_GENERATING, "知识图谱正在生成中");
-            }
-            NewsNode newsNode = getNewsNodeByNewsId(newsId);
-            if (newsNode != null) {
-                // neo4j中已有该节点，直接返回
-                return mapGraph(newsNode);
-            }
-            NewsPO news = newsDAOMongo.getNewsById(newsId);
-            if (news == null) {
-                // 未找到新闻，抛出异常
-                throw new GraphException(ErrorType.NEWS_NOT_FOUND, "未找到对应id的新闻");
-            }
-            String title = news.getTitle();
-            String content = news.getContent();
-
-            // 获取大模型返回结果
-            String llmResult = sparkUtil.chat(content);
-            Map<String, Long> entities = new HashMap<>();
-            List<NewsEntityRelationshipDTO> relations = new ArrayList<>();
-            if (llmResult != null) {
-                // 获取结果按照模型返回结果格式解析
-                String[] split = llmResult.split("\\n");
-                for (String s : split) {
-                    String[] tuple = s.substring(1, s.length() - 1).
-                            split(" \\| ");
-                    if (tuple.length == 3) {
-                        entities.put(tuple[0], 0L);
-                        entities.put(tuple[2], 0L);
-                        relations.add(NewsEntityRelationshipDTO.builder()
-                                .entity1(tuple[0])
-                                .entity2(tuple[2])
-                                .relationship(tuple[1])
-                                .build());
-                    } else {
-                        log.warn("大模型返回结果异常，忽略该三元组");
-                    }
-                }
-            }
-
-            // 将新闻节点添加进neo4j
-            newsNode = addNewsNode(newsId, title);
-
-            for (String entity : entities.keySet()) {
-                EntityNodePO entityNode = addEntityNode(newsNode.getId(), entity);
-                entities.put(entity, entityNode.getId());
-            }
-
-            for (NewsEntityRelationshipDTO relation : relations) {
-                addEntityRelationship(entities.get(relation.getEntity1()), entities.get(relation.getEntity2()), relation.getRelationship());
-            }
-        } catch (InterruptedException e) {
-            throw new GraphException(ErrorType.ILLEGAL_ARGUMENTS);
-        } finally {
-            if (lock.isHeldByCurrentThread()) {
-                lock.unlock();
-                newsLocks.remove(newsId);
-            }
-        }
-
-        NewsNode newsNode = getNewsNodeByNewsId(newsId);
-        if (newsNode == null) {
-            throw new GraphException(ErrorType.NODE_SAVE_FAILED, "新闻分析失败");
-        }
-        return mapGraph(newsNode);
-    }
 
     @Override
     public GraphVO getGraph(Long newsId) {
@@ -589,9 +425,10 @@ public class GraphServiceImpl implements GraphService {
         }
         // 遍历所有实体节点，将其关联的新闻标题加入newsList
         for (EntityNodePO po : entityNodeMap.values()) {
-            List<NewsNodePO> newsNodeList = getNewsListByIdList(po.getRelatedNews(),getLimit(maxNodes));
+            List<NewsNodePO> newsNodeList = getNewsListByIdList(po.getRelatedNews(), getLimit(maxNodes));
             newsNodeList.stream().forEach(
                     newsNodePO -> {
+                        if (newsList.size() >= getLimit(maxNodes)) return;
                         if (!newsList.contains(newsNodePO.getTitle())) {
                             newsList.add(newsNodePO.getTitle());
                             newsEntityRelationList.add(NewsEntityRelationVO.builder()
@@ -609,12 +446,20 @@ public class GraphServiceImpl implements GraphService {
                 .newsEntityRelationList(newsEntityRelationList)
                 .build();
     }
-    private int getLimit(int limit){
-        if(limit<=10)return 10;
-        else if(limit<=25) return 5;
-        else if(limit<=50) return 3;
+
+    /**
+     * 根据节点最大值获取新闻最大值
+     *
+     * @param limit 节点最大值
+     * @return 新闻最大值
+     */
+    private int getLimit(int limit) {
+        if (limit <= 10) return 10;
+        else if (limit <= 25) return 5;
+        else if (limit <= 50) return 3;
         return 2;
     }
+
     /**
      * 生成查询语句
      *
@@ -625,20 +470,25 @@ public class GraphServiceImpl implements GraphService {
      * @return 查询语句
      */
     private String generateQueryFromNodeRelationNames(String firstNodeName, String secondNodeName, String relationshipName, int limit) {
+        int maxDepth = (firstNodeName == null || firstNodeName.isEmpty()) ? 1 : 2;
         String firstNodeQuery = (firstNodeName == null || firstNodeName.isEmpty())
                 ? String.format("(%s:%s)", FIRST_NODE_TAG, ENTITY_NODE_TAG)
                 : String.format("(%s:%s {%s:'%s'})", FIRST_NODE_TAG, ENTITY_NODE_TAG, ENTITY_NODE_NAME, firstNodeName);
         if ((secondNodeName == null || secondNodeName.isEmpty()) && (relationshipName == null || relationshipName.isEmpty())) {
+            String pathCondition = (firstNodeName == null || firstNodeName.isEmpty())
+                    ? String.format(
+                    "WHERE NOT (%s)-[:RELATE_TO]->(:%s) ", SECOND_NODE_TAG, ENTITY_NODE_TAG)
+                    : "";
             return String.format(
-                    "MATCH %s OPTIONAL MATCH %s=(%s)-[%s:RELATE_TO*..1]->(%s:%s) WHERE NOT (%s)-[:RELATE_TO]->(:%s) " +
+                    "MATCH %s OPTIONAL MATCH %s=(%s)-[%s:RELATE_TO*..%d]->(%s:%s) %s " +
 //                            "AND NOT (n)-[*]->(n)" +
-                            "RETURN %s, COLLECT(%s) AS %s LIMIT %d",
-                    firstNodeQuery, PATH_TAG, FIRST_NODE_TAG, RELATION_TAG, SECOND_NODE_TAG, ENTITY_NODE_TAG, SECOND_NODE_TAG,
-                    ENTITY_NODE_TAG, FIRST_NODE_TAG, PATH_TAG, RELATION_TAG,
+                            "RETURN %s,%s,COLLECT(%s) AS %s LIMIT %d",
+                    firstNodeQuery, PATH_TAG, FIRST_NODE_TAG, RELATION_TAG, maxDepth, SECOND_NODE_TAG, ENTITY_NODE_TAG, pathCondition,
+                    FIRST_NODE_TAG, SECOND_NODE_TAG, PATH_TAG, RELATION_TAG,
                     limit);
         } else {
             String relationQuery = (relationshipName == null || relationshipName.isEmpty())
-                    ? String.format("[%s:RELATE_TO*..1]", RELATION_TAG)
+                    ? String.format("[%s:RELATE_TO*..2]", RELATION_TAG)
                     : String.format("[%s:RELATE_TO {%s:'%s'}]", RELATION_TAG, RELATION_NAME, relationshipName);
             String secondNodeQuery = (secondNodeName == null || secondNodeName.isEmpty())
                     ? String.format("(%s:%s)", SECOND_NODE_TAG, ENTITY_NODE_TAG)
@@ -654,31 +504,6 @@ public class GraphServiceImpl implements GraphService {
         }
     }
 
-    private GraphVO mapGraph(NewsNode node) {
-        //TODO:REFACTOR
-
-        // 将node映射为知识图谱
-        List<EntityNode> entityList = node.getEntities().stream().map(NewsEntityRelationship::getEntity).toList();
-        List<EntityRelationVO> relationList = new ArrayList<>();
-        for (EntityNode entity : entityList) {
-            for (EntityRelationship relationship : entity.getEntities()) {
-                relationList.add(EntityRelationVO.builder()
-                        .source(entity.getName())
-                        .relation(relationship.getRelationship())
-                        .target(relationship.getEntity().getName())
-                        .build());
-            }
-        }
-        return GraphVO.builder()
-                .title(node.getTitle())
-                .entityList(entityList.stream().map(EntityNode::getName).toList())
-                .newsEntityRelationList(node.getEntities().stream().map(relation -> NewsEntityRelationVO.builder()
-                        .title(node.getTitle())
-                        .entity(relation.getEntity().getName())
-                        .build()).toList())
-                .entityRelationList(relationList)
-                .build();
-    }
 
     /**
      * 根据Mongo的新闻id获取新闻节点
@@ -696,10 +521,10 @@ public class GraphServiceImpl implements GraphService {
      * @param newsIdList id列表
      * @return 新闻节点列表
      */
-    private List<NewsNodePO> getNewsListByIdList(List<Long> newsIdList,int limit) {
+    private List<NewsNodePO> getNewsListByIdList(List<Long> newsIdList, int limit) {
         String listString = listToString(newsIdList);
         String query = String.format("MATCH (%s:%s) WHERE id(%s) IN %s RETURN %s LIMIT %d",
-                FIRST_NODE_TAG, NEWS_NODE_TAG, FIRST_NODE_TAG, listString, FIRST_NODE_TAG,limit);
+                FIRST_NODE_TAG, NEWS_NODE_TAG, FIRST_NODE_TAG, listString, FIRST_NODE_TAG, limit);
         return neo4jClient.query(query).in(DB_NAME).fetchAs(NewsNodePO.class).mappedBy(
                 (typeSystem, record) -> NewsNodePO.builder()
                         .id(record.get(FIRST_NODE_TAG).asNode().id())
