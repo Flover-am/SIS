@@ -238,6 +238,24 @@ public class GraphServiceImpl implements GraphService {
         if (fromId.equals(toId)) {
             return;
         }
+        boolean existed=!neo4jClient.query(String.format(
+                "MATCH(%s:%s)-[%s:RELATE_TO{%s:'%s'}]->(%s:%s) WHERE id(%s)=%d AND id(%s)=%d RETURN %s",
+                FIRST_NODE_TAG,ENTITY_NODE_TAG,RELATION_TAG,RELATION_NAME,relationship,
+                SECOND_NODE_TAG,ENTITY_NODE_TAG,
+                FIRST_NODE_TAG,fromId,
+                SECOND_NODE_TAG,toId,
+                RELATION_TAG
+        )).in(DB_NAME).fetchAs(String.class).mappedBy(
+                (typeSystem, record)->{
+                    if(record.get(RELATION_TAG).isNull()){
+                        return null;
+                    }
+                    return record.get(RELATION_TAG).asRelationship().get(RELATION_NAME).asString();
+                }
+        ).all().isEmpty();
+        if(existed){
+            return;
+        }
         String query = String.format(
                 "MATCH (%s:%s),(%s:%s) WHERE id(%s)=%d AND id(%s)=%d CREATE (%s)-[:RELATE_TO {%s:'%s'}]->(%s)",
                 FIRST_NODE_TAG, ENTITY_NODE_TAG, SECOND_NODE_TAG, ENTITY_NODE_TAG,
@@ -266,7 +284,7 @@ public class GraphServiceImpl implements GraphService {
 //            fromEntity.getEntities().add(entityRelationship);
 //            entityNodeDAO.save(fromEntity);
 //        } else {
-//            //TODO：消除环路
+//
 //            return;
 //        }
 //    }

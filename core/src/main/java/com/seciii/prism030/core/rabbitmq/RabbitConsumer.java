@@ -22,8 +22,8 @@ import java.util.List;
  *
  * @author windloong
  */
-@Component
-@RabbitListener(queues = "news_queue")
+//@Component
+//@RabbitListener(queues = "news_queue")
 @Slf4j
 public class RabbitConsumer {
     private final VectorNewsMapper vectorNewsMapper;
