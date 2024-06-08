@@ -47,7 +47,7 @@ public class LLMController {
      */
     @GetMapping(value = "/llm/data", produces = "text/event-stream")
     public Flowable<GenerationResult> getDataOutput(@RequestParam String input) {
-        return llmService.getResult(input);
+        return llmService.getDataResult(input);
     }
 
 

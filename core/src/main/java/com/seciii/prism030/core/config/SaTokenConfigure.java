@@ -52,6 +52,7 @@ public class SaTokenConfigure {
                             .check(StpUtil::checkLogin);
                     SaRouter.match("/**/llm/**")
                             .notMatch("/**/llm")
+                            .notMatch("/**/llm/data")
                             .check(StpUtil::checkLogin);
                 })
                 // 返回异常结果
