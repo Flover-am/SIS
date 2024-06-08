@@ -130,7 +130,7 @@ public class NewsServiceMongoImplTest {
                 "2024-01-01 12:34:56",
                 "www.singulartest.com",
                 "www.singulartestsource.com",
-                CategoryType.getCategoryType(1).toString()
+                CategoryType.getCategoryType(1).toString(),null
         );
         fakeClassifyResult = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
