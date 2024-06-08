@@ -47,7 +47,10 @@ public class LLMServiceImpl implements LLMService {
     private static final Integer STATISTIC_DAYS = 7;
     private static final String STATISTIC_PROMPT =
             """
+            今天的日期是%s。
             下面是一个系统的数据，代表近7天内每种分类在某天增加的新闻数量：
+            %s
+            请根据以上信息，回答我的问题。我的问题为：
             """;
     private static final String QA_PROMPT =
             """
@@ -56,7 +59,6 @@ public class LLMServiceImpl implements LLMService {
             - 孙杨结束禁赛 [参考1](http://139.224.40.88/news/1)
             - 皇马赢得冠军 [参考2](http://139.224.40.88/news/2)
             以上是示例内容。
-            如果询问的内容和统计数据相关，就不用按照上述格式返回。
             我的问题为：
             """;
 
@@ -84,7 +86,7 @@ public class LLMServiceImpl implements LLMService {
             你的回答为：
             (0 | 根据相关资料，马龙是一位乒乓球运动员，而不是羽毛球运动员)
             例子结束。
-            下面是你的输入内容：
+            下面是我的输入内容：
             """;
 
 
@@ -100,7 +102,28 @@ public class LLMServiceImpl implements LLMService {
     public Flowable<GenerationResult> getResult(String input) {
         Generation gen = null;
         Flowable<GenerationResult> result;
-        String prompt = buildPrompt(dataPrompt(STATISTIC_DAYS) + QA_PROMPT, input);
+        String prompt = buildPrompt(QA_PROMPT, input);
+        try {
+            // 从池中取对象
+            gen = generationPool.borrowObject();
+            result = DashScopeUtil.streamChat(apiKey, prompt, gen);
+        } catch (Exception e) {
+            throw new LLMException(ErrorType.LLM_REQUEST_ERROR);
+        } finally {
+            if (gen != null) {
+                // 返还池对象
+                generationPool.returnObject(gen);
+            }
+        }
+
+        return result;
+    }
+
+    @Override
+    public Flowable<GenerationResult> getDataResult(String input) {
+        Generation gen = null;
+        Flowable<GenerationResult> result;
+        String prompt = dataPrompt(STATISTIC_DAYS) + input;
         try {
             // 从池中取对象
             gen = generationPool.borrowObject();
@@ -245,7 +268,7 @@ public class LLMServiceImpl implements LLMService {
         LocalDate today = LocalDate.now();
         LocalDate begin = today.minusDays(day);
         List<NewsDateCountVO> newsDateCountVOS = newsServiceMongo.countPeriodNews(begin.toString(), today.toString());
-        StringBuilder sb = new StringBuilder(STATISTIC_PROMPT);
+        StringBuilder sb = new StringBuilder();
         for (NewsDateCountVO newsDateCountVO : newsDateCountVOS) {
             sb.append(newsDateCountVO.getDate())
                     .append(":\n");
@@ -255,6 +278,6 @@ public class LLMServiceImpl implements LLMService {
             }
             sb.append("\n");
         }
-        return sb.toString();
+        return String.format(STATISTIC_PROMPT, today, sb);
     }
 }

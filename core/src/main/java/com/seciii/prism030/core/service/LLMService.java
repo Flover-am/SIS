@@ -21,6 +21,14 @@ public interface LLMService {
     Flowable<GenerationResult> getResult(String input);
 
     /**
+     * 获取大模型数据提问输出
+     *
+     * @param input 用户输入
+     * @return 输出的流式结果
+     */
+    Flowable<GenerationResult> getDataResult(String input);
+
+    /**
      * 获取时间轴
      *
      * @param input 用户输入

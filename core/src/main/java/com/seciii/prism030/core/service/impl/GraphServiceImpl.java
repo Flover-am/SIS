@@ -235,6 +235,9 @@ public class GraphServiceImpl implements GraphService {
 //    }
     @Override
     public void addEntityRelationship(Long fromId, Long toId, String relationship) {
+        if (fromId.equals(toId)) {
+            return;
+        }
         String query = String.format(
                 "MATCH (%s:%s),(%s:%s) WHERE id(%s)=%d AND id(%s)=%d CREATE (%s)-[:RELATE_TO {%s:'%s'}]->(%s)",
                 FIRST_NODE_TAG, ENTITY_NODE_TAG, SECOND_NODE_TAG, ENTITY_NODE_TAG,
@@ -356,16 +359,18 @@ public class GraphServiceImpl implements GraphService {
         Map<Long, String> entityMap = new HashMap<>();
         List<EntityRelationVO> entityRelations = new ArrayList<>();
 
-        NewsNodePO newsNodePO = neo4jClient.query(String.format(
-                "MATCH (%s:%s) WHERE id(%s)=%d " +
+        String query = String.format(
+                "MATCH (%s:%s {newsId:%d}) " +
                         "OPTIONAL MATCH (%s)-[CONTAINS]->(%s:%s) " +
-                        "OPTIONAL MATCH %s=(%s)-[:RELATE_TO*]->(k:%s) WHERE %s.%s<>k.%s AND NOT (k)-[:RELATE_TO]->(:%s) " +
+                        "OPTIONAL MATCH %s=(%s)-[:RELATE_TO*..2]->(k:%s) WHERE %s.%s<>k.%s AND NOT (k)-[:RELATE_TO]->(:%s) " +
                         "RETURN %s,COLLECT(%s) AS %s ,COLLECT(%s) AS %s",
-                FIRST_NODE_TAG, NEWS_NODE_TAG, FIRST_NODE_TAG, newsId,
+                FIRST_NODE_TAG, NEWS_NODE_TAG, newsId,
                 FIRST_NODE_TAG, SECOND_NODE_TAG, ENTITY_NODE_TAG,
                 PATH_TAG, SECOND_NODE_TAG, ENTITY_NODE_TAG, SECOND_NODE_TAG, ENTITY_NODE_NAME, ENTITY_NODE_NAME, ENTITY_NODE_TAG,
                 FIRST_NODE_TAG, SECOND_NODE_TAG, NEWS_CONTAINING_ENTITY, PATH_TAG, RELATION_TAG
-        )).in(DB_NAME).fetchAs(NewsNodePO.class).mappedBy(
+        );
+
+        NewsNodePO newsNodePO = neo4jClient.query(query).in(DB_NAME).fetchAs(NewsNodePO.class).mappedBy(
                 (typeSystem, record) -> {
                     if (record.get(FIRST_NODE_TAG).isNull()) {
                         return null;

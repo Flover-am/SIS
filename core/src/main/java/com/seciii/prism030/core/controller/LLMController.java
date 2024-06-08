@@ -40,6 +40,18 @@ public class LLMController {
     }
 
     /**
+     * 与大模型进行问答，进行流式输出
+     *
+     * @param input 输入
+     * @return 输出
+     */
+    @GetMapping(value = "/llm/data", produces = "text/event-stream")
+    public Flowable<GenerationResult> getDataOutput(@RequestParam String input) {
+        return llmService.getResult(input);
+    }
+
+
+    /**
      * 获取时间轴
      *
      * @param input 输入

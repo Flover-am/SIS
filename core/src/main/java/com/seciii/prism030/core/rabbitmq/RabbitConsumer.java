@@ -54,7 +54,15 @@ public class RabbitConsumer {
         String jsonString = new String(data, StandardCharsets.UTF_8);
 
         // 使用自定义的MessageConvertor将JSON字符串解析为NewNews对象
-        NewNews newNews = RabbitUtil.parseJsonToNewNews(jsonString);
+        NewNews newNews = null;
+        List<NewsEntityRelationshipDTO> erList;
+        try {
+            newNews = RabbitUtil.parseJsonToNewNews(jsonString);
+            erList = RabbitUtil.getERList(jsonString);
+        } catch (Exception e) {
+            log.error("Failed to process: " + jsonString + " " + e.getMessage());
+            return;
+        }
 
         // 将newNews对象添加到newsServiceMongo中
         long newsId = newsService.addNews(newNews);
@@ -65,6 +73,7 @@ public class RabbitConsumer {
             return;
         }
 
+        // 插入新闻的向量id
         for (String vectorId : newNews.getDashId()) {
             VectorNewsPO vectorNews = VectorNewsPO.builder()
                     .vectorId(vectorId)
@@ -73,13 +82,12 @@ public class RabbitConsumer {
             vectorNewsMapper.insert(vectorNews);
         }
 
+        // 插入新闻的实体关系
+        graphService.addNewsNode(newsId, newNews.getTitle());
+        graphService.addNewsEntities(newsId, erList);
+
         //插入词云
         List<String> wordSegment = RabbitUtil.getWordSegment(jsonString);
         newsService.saveWordCloud(newsId, wordSegment);
-
-        // 插入新闻的实体关系
-        List<NewsEntityRelationshipDTO> erList = RabbitUtil.getERList(jsonString);
-        graphService.addNewsNode(newsId, newNews.getTitle());
-        graphService.addNewsEntities(newsId, erList);
     }
 }
