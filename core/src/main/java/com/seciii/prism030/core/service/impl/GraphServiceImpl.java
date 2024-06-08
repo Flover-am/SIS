@@ -625,16 +625,20 @@ public class GraphServiceImpl implements GraphService {
                 : String.format("(%s:%s {%s:'%s'})", FIRST_NODE_TAG, ENTITY_NODE_TAG, ENTITY_NODE_NAME, firstNodeName);
         if ((secondNodeName == null || secondNodeName.isEmpty()) && (relationshipName == null || relationshipName.isEmpty())) {
             return String.format(
-                    "MATCH %s OPTIONAL MATCH p=(n)-[r:RELATE_TO*..2]->(m:entity) " +
-                            "WHERE NOT (m)-[:RELATE_TO]->(:entity) " +
+                    "MATCH %s OPTIONAL MATCH %s=(%s)-[%s:RELATE_TO*..2]->(%s:%s) WHERE NOT (%s)-[:RELATE_TO]->(:%s) " +
 //                            "AND NOT (n)-[*]->(n)" +
                             "RETURN %s, COLLECT(%s) AS %s LIMIT %d",
                     firstNodeQuery, PATH_TAG, FIRST_NODE_TAG, RELATION_TAG, SECOND_NODE_TAG, ENTITY_NODE_TAG, SECOND_NODE_TAG,
                     ENTITY_NODE_TAG, FIRST_NODE_TAG, PATH_TAG, RELATION_TAG,
                     limit);
         } else {
-            String relationQuery = (relationshipName == null||relationshipName.isEmpty()) ? "[r:RELATE_TO*..2]" : "[r:RELATE_TO {relationship:'" + relationshipName + "'}]";
-            String secondNodeQuery = (secondNodeName == null||secondNodeName.isEmpty()) ? "(m:entity)" : "(m:entity {name:'" + secondNodeName + "'})";
+            String relationQuery = (relationshipName == null || relationshipName.isEmpty())
+                    ? String.format("[%s:RELATE_TO*..2]", RELATION_TAG)
+                    : String.format("[%s:RELATE_TO {%s:'%s'}]", RELATION_TAG, RELATION_NAME, relationshipName);
+            String secondNodeQuery = (secondNodeName == null || secondNodeName.isEmpty())
+                    ? String.format("(%s:%s)", SECOND_NODE_TAG, ENTITY_NODE_TAG)
+                    : String.format("(%s:%s {%s:'%s'})", SECOND_NODE_TAG, ENTITY_NODE_TAG, ENTITY_NODE_NAME, secondNodeName);
+
             return String.format(
                     "MATCH p=%s-%s->%s" +
 //                            "WHERE NOT (m)-[:RELATE_TO]->(:entity) " +
