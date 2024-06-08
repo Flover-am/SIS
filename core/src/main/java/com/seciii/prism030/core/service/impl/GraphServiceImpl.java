@@ -216,7 +216,7 @@ public class GraphServiceImpl implements GraphService {
         String query = String.format(
                 "MATCH (%s:%s {newsId:%d}) " +
                         "OPTIONAL MATCH (%s)-[CONTAINS]->(%s:%s) " +
-                        "OPTIONAL MATCH %s=(%s)-[:RELATE_TO*..2]->(k:%s) WHERE %s.%s<>k.%s AND NOT (k)-[:RELATE_TO]->(:%s) " +
+                        "OPTIONAL MATCH %s=(%s)-[:RELATE_TO*..1]->(k:%s) WHERE %s.%s<>k.%s AND NOT (k)-[:RELATE_TO]->(:%s) " +
                         "RETURN %s,COLLECT(%s) AS %s ,COLLECT(%s) AS %s",
                 FIRST_NODE_TAG, NEWS_NODE_TAG, newsId,
                 FIRST_NODE_TAG, SECOND_NODE_TAG, ENTITY_NODE_TAG,
@@ -428,7 +428,6 @@ public class GraphServiceImpl implements GraphService {
             List<NewsNodePO> newsNodeList = getNewsListByIdList(po.getRelatedNews(), getLimit(maxNodes));
             newsNodeList.stream().forEach(
                     newsNodePO -> {
-                        if (newsList.size() >= getLimit(maxNodes)) return;
                         if (!newsList.contains(newsNodePO.getTitle())) {
                             newsList.add(newsNodePO.getTitle());
                             newsEntityRelationList.add(NewsEntityRelationVO.builder()
