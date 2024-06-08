@@ -53,6 +53,21 @@ public class GraphServiceImpl implements GraphService {
 
     private static final String DB_NAME = "neo4j";
 
+    private static final String FIRST_NODE_TAG = "n";
+    private static final String RELATION_TAG = "r";
+    private static final String SECOND_NODE_TAG = "m";
+
+    private static final String PATH_TAG = "p";
+    private static final String ENTITY_NODE_TAG="entity";
+    private static final String NEWS_NODE_TAG = "news";
+    private static final String ENTITY_NODE_NAME = "name";
+
+    private static final String ENTITY_NEWS_LIST = "newsNodeIdList";
+
+    private static final String RELATION_NAME = "relationship";
+
+    private static final String NEWS_NODE_TITLE = "title";
+
     private static final int MAX_NODES = 25;
 
     public GraphServiceImpl(EntityNodeDAO entityNodeDAO,
@@ -329,24 +344,24 @@ public class GraphServiceImpl implements GraphService {
                 (typeSystem, record) -> {
 
                     // 判断查询的目标节点是否存在，并加入entityNodeMap中
-                    if (!record.get("m").isNull()) {
-                        long entityNodeId = record.get("m").asNode().id();
+                    if (!record.get(SECOND_NODE_TAG).isNull()) {
+                        long entityNodeId = record.get(SECOND_NODE_TAG).asNode().id();
                         if (!entityNodeIdSet.contains(entityNodeId)) {
                             EntityNodePO targetPO = EntityNodePO.builder()
-                                    .id(record.get("m").asNode().id())
-                                    .name(record.get("m").get("name").asString())
-                                    .relatedNews(record.get("m").get("newsNodeIdList").asList(Value::asLong))
+                                    .id(record.get(SECOND_NODE_TAG).asNode().id())
+                                    .name(record.get(SECOND_NODE_TAG).get(ENTITY_NODE_NAME).asString())
+                                    .relatedNews(record.get(SECOND_NODE_TAG).get(ENTITY_NEWS_LIST).asList(Value::asLong))
                                     .build();
                             entityNodeIdSet.add(entityNodeId);
                             entityNodeMap.put(entityNodeId, targetPO);
                         }
                     }
                     // 将源节点加入entityNodeMap中
-                    long entityNodeId = record.get("n").asNode().id();
+                    long entityNodeId = record.get(FIRST_NODE_TAG).asNode().id();
                     EntityNodePO po = EntityNodePO.builder()
                             .id(entityNodeId)
-                            .name(record.get("n").get("name").asString())
-                            .relatedNews(record.get("n").get("newsNodeIdList").asList(Value::asLong))
+                            .name(record.get(FIRST_NODE_TAG).get(ENTITY_NODE_NAME).asString())
+                            .relatedNews(record.get(FIRST_NODE_TAG).get(ENTITY_NEWS_LIST).asList(Value::asLong))
                             .build();
                     if (!entityNodeIdSet.contains(entityNodeId)) {
                         entityNodeIdSet.add(entityNodeId);
@@ -354,7 +369,7 @@ public class GraphServiceImpl implements GraphService {
                     }
 
                     // 将所有路径中所有关系加入relationships
-                    List<Path> pathList = record.get("r").asList().stream().map(
+                    List<Path> pathList = record.get(RELATION_TAG).asList().stream().map(
                             path -> (Path) path
                     ).toList();
                     for (Path path : pathList) {
@@ -378,7 +393,7 @@ public class GraphServiceImpl implements GraphService {
             if (entityNodeIdSet.contains(r.startNodeId()) && entityNodeIdSet.contains(r.endNodeId())) {
                 entityRelationVOList.add(EntityRelationVO.builder()
                         .source(entityNodeMap.get(r.startNodeId()).getName())
-                        .relation(r.get("relationship").asString())
+                        .relation(r.get(RELATION_NAME).asString())
                         .target(entityNodeMap.get(r.endNodeId()).getName())
                         .build());
             }
@@ -416,22 +431,30 @@ public class GraphServiceImpl implements GraphService {
      * @return 查询语句
      */
     private String generateQuery(String firstNodeName, String secondNodeName, String relationshipName, int limit) {
-        String firstNodeQuery = (firstNodeName == null||firstNodeName.isEmpty()) ? "(n:entity)" : "(n:entity {name:'" + firstNodeName + "'})";
+        String firstNodeQuery = (firstNodeName == null||firstNodeName.isEmpty())
+                ? String.format("(%s:%s)",FIRST_NODE_TAG,ENTITY_NODE_TAG)
+                : String.format("(%s:%s {%s:'%s'})",FIRST_NODE_TAG,ENTITY_NODE_TAG,ENTITY_NODE_NAME,firstNodeName);
         if ((secondNodeName == null||secondNodeName.isEmpty()) && (relationshipName == null || relationshipName.isEmpty())) {
             return String.format(
-                    "MATCH %s OPTIONAL MATCH p=(n)-[r:RELATE_TO*]->(m:entity) " +
-                            "WHERE NOT (m)-[:RELATE_TO]->(:entity) " +
+                    "MATCH %s OPTIONAL MATCH %s=(%s)-[%s:RELATE_TO*]->(%s:%s) WHERE NOT (%s)-[:RELATE_TO]->(:%s) " +
 //                            "AND NOT (n)-[*]->(n)" +
-                            "RETURN n, COLLECT(p) AS r LIMIT %d",
-                    firstNodeQuery, limit);
+                            "RETURN %s, COLLECT(%s) AS %s LIMIT %d",
+                    firstNodeQuery,PATH_TAG,FIRST_NODE_TAG,RELATION_TAG,SECOND_NODE_TAG,ENTITY_NODE_TAG,SECOND_NODE_TAG,
+                    ENTITY_NODE_TAG,FIRST_NODE_TAG,PATH_TAG,RELATION_TAG,
+                    limit);
         } else {
-            String relationQuery = (relationshipName == null||relationshipName.isEmpty()) ? "[r:RELATE_TO*]" : "[r:RELATE_TO {relationship:'" + relationshipName + "'}]";
-            String secondNodeQuery = (secondNodeName == null||secondNodeName.isEmpty()) ? "(m:entity)" : "(m:entity {name:'" + secondNodeName + "'})";
+            String relationQuery = (relationshipName == null||relationshipName.isEmpty())
+                    ? String.format("[%s:RELATE_TO*]",RELATION_TAG)
+                    : String.format("[%s:RELATE_TO {%s:'%s'}]",RELATION_TAG,RELATION_NAME,relationshipName);
+            String secondNodeQuery = (secondNodeName == null||secondNodeName.isEmpty())
+                    ? String.format("(%s:%s)",SECOND_NODE_TAG,ENTITY_NODE_TAG)
+                    : String.format("(%s:%s {%s:'%s'})",SECOND_NODE_TAG,ENTITY_NODE_TAG,ENTITY_NODE_NAME,secondNodeName);
             return String.format(
-                    "MATCH p=" + firstNodeQuery +
-                            "-" + relationQuery + "->" + secondNodeQuery +
+                    "MATCH p=%s-%s->%s"+
 //                            "WHERE NOT (m)-[:RELATE_TO]->(:entity) " +
-                            "RETURN m,n, COLLECT(p) AS r LIMIT %d", limit
+                            "RETURN %s,%s, COLLECT(%s) AS %s LIMIT %d",
+                    firstNodeQuery,relationQuery,secondNodeQuery,SECOND_NODE_TAG,FIRST_NODE_TAG,PATH_TAG,RELATION_TAG,
+                    limit
             );
         }
     }
@@ -478,11 +501,12 @@ public class GraphServiceImpl implements GraphService {
      */
     private List<NewsNodePO> getNewsListByIdList(List<Long> newsIdList) {
         String listString = listToString(newsIdList);
-        String query = String.format("MATCH (n:news) WHERE id(n) IN %s RETURN n", listString);
+        String query = String.format("MATCH (%s:%s) WHERE id(%s) IN %s RETURN %s",
+                FIRST_NODE_TAG,NEWS_NODE_TAG,FIRST_NODE_TAG,listString,FIRST_NODE_TAG);
         return neo4jClient.query(query).in(DB_NAME).fetchAs(NewsNodePO.class).mappedBy(
                 (typeSystem, record) -> NewsNodePO.builder()
-                        .id(record.get("n").asNode().id())
-                        .title(record.get("n").get("title").asString())
+                        .id(record.get(FIRST_NODE_TAG).asNode().id())
+                        .title(record.get(FIRST_NODE_TAG).get(NEWS_NODE_TITLE).asString())
                         .build()
         ).all().stream().toList();
     }
