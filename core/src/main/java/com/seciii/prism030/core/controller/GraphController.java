@@ -31,6 +31,7 @@ public class GraphController {
      * @param newsId 新闻id
      * @return 响应结果
      */
+    @Deprecated
     @PostMapping("/graph/{newsId}")
     public Result<GraphVO> analyzeGraph(@PathVariable Long newsId) {
         GraphVO graph = graphService.analyzeNews(newsId);

@@ -1,7 +1,7 @@
 package com.seciii.prism030.core.service;
 
 import com.seciii.prism030.core.pojo.dto.NewsEntityRelationshipDTO;
-import com.seciii.prism030.core.pojo.po.graph.node.EntityNode;
+import com.seciii.prism030.core.pojo.po.graph.neo.EntityNodePO;
 import com.seciii.prism030.core.pojo.po.graph.node.NewsNode;
 import com.seciii.prism030.core.pojo.vo.graph.GraphVO;
 import com.seciii.prism030.core.pojo.vo.graph.KnowledgeGraphVO;
@@ -31,7 +31,7 @@ public interface GraphService {
      * @param newsNodeId 对应新闻id
      * @param name       实体名
      */
-    EntityNode addEntityNode(Long newsNodeId, String name);
+    EntityNodePO addEntityNode(Long newsNodeId, String name);
 
 
     /**
@@ -57,6 +57,7 @@ public interface GraphService {
      * @param newsId 新闻id
      * @return 知识图谱
      */
+    @Deprecated
     GraphVO analyzeNews(Long newsId);
 
     /**
