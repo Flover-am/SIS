@@ -693,7 +693,7 @@ public class GraphServiceImpl implements GraphService {
      */
     private List<NewsNodePO> getNewsListByIdList(List<Long> newsIdList) {
         String listString = listToString(newsIdList);
-        String query = String.format("MATCH (%s:%s) WHERE id(%s) IN %s RETURN %s LIMIT 25",
+        String query = String.format("MATCH (%s:%s) WHERE id(%s) IN %s RETURN %s LIMIT 5",
                 FIRST_NODE_TAG, NEWS_NODE_TAG, FIRST_NODE_TAG, listString, FIRST_NODE_TAG);
         return neo4jClient.query(query).in(DB_NAME).fetchAs(NewsNodePO.class).mappedBy(
                 (typeSystem, record) -> NewsNodePO.builder()
