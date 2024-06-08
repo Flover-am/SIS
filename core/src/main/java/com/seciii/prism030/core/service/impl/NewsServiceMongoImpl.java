@@ -592,10 +592,10 @@ public class NewsServiceMongoImpl implements NewsService {
                     log.error(String.format("News with id %d not found. ", id));
                     continue;
                 }
-                if (newsPO.getCategory() == CategoryType.LOTTERY.ordinal() || newsPO.getCategory() == CategoryType.SPORTS.ordinal()) {
-                    generateAndSaveWordCloud(id, newsPO.getTitle());
-                    continue;
-                }
+//                if (newsPO.getCategory() == CategoryType.LOTTERY.ordinal() || newsPO.getCategory() == CategoryType.SPORTS.ordinal()) {
+//                    generateAndSaveWordCloud(id, newsPO.getTitle());
+//                    continue;
+//                }
                 if (null == generateAndSaveWordCloud(id, newsPO.getContent())) {
                     log.error(String.format("News with id %d has no content. Use title instead. ", id));
                     generateAndSaveWordCloud(id, newsPO.getTitle());
