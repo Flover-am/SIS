@@ -60,10 +60,10 @@ public class NewsVO {
      * 新闻创建时间戳
      */
     @NotNull
-    private String createTime;
+    private LocalDateTime createTime;
     /**
      * 新闻更新时间戳
      */
     @NotNull
-    private String updateTime;
+    private LocalDateTime updateTime;
 }

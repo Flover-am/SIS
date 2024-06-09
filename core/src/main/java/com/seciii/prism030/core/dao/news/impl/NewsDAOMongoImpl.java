@@ -13,13 +13,13 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.GroupOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
-import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -42,6 +42,8 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
 
     private static final String COLLECTION_NEWS = "news";
     private static final String COLLECTION_SEGMENT = "news_segment";
+
+    private static final String FORMALIZED_DATE = "formalized_date";
 
     private MongoTemplate mongoTemplate;
 
@@ -72,9 +74,9 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
      */
     @Override
     public long insert(NewsPO newsPO) {
-        Query query = new Query(Criteria.where(ID).is(newsPO.getId()));
-        if (mongoTemplate.exists(query, COLLECTION_NEWS)) {
-            mongoTemplate.remove(query, COLLECTION_NEWS);
+        Query query=new Query(Criteria.where(ID).is(newsPO.getId()));
+        if(mongoTemplate.exists(query,COLLECTION_NEWS)){
+            mongoTemplate.remove(query,COLLECTION_NEWS);
         }
         NewsPO inserted = mongoTemplate.insert(newsPO, COLLECTION_NEWS);
         return inserted.getId();
@@ -288,11 +290,11 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
     @Override
     public List<NewsWordPO> getTopNWordCloudToday(int count) {
         ArrayList<Map.Entry<String, Integer>> sortedMap = new ArrayList<>(getSortedWordCloud());
-        sortedMap.sort((e1, e2) -> {
-            if (e1.getValue().equals(e2.getValue())) {
+        sortedMap.sort((e1,e2)->{
+            if(e1.getValue().equals(e2.getValue())){
                 return e1.getKey().compareTo(e2.getKey());
             }
-            return e2.getValue() - e1.getValue();
+            return e2.getValue()-e1.getValue();
         });
         return sortedMap.stream()
                 .limit(count)
@@ -356,22 +358,22 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
      * @return 修改成功返回0，否则返回-1
      */
     private int modifyById(Long id, Update update) {
-        update.set(UPDATE_TIME, DateTimeUtil.toMongoStandardFormat(LocalDateTime.now()));
+        update.set(UPDATE_TIME, LocalDateTime.now());
         NewsPO newsPO = mongoTemplate.findAndModify(Query.query(Criteria.where(ID).is(id)), update, NewsPO.class, COLLECTION_NEWS);
         return newsPO == null ? -1 : 0;
     }
 
     /**
-     * 获取查询条件
+     * 根据查询条件获取查询对象
      *
-     * @param pageSize     页面大小
+     * @param pageSize     页码大小
      * @param pageOffset   页码偏移
-     * @param title        标题
-     * @param category     类别
+     * @param title        新闻标题
+     * @param category     新闻类别
      * @param startTime    开始时间
      * @param endTime      结束时间
-     * @param originSource 来源
-     * @return 查询条件
+     * @param originSource 新闻来源
+     * @return 查询对象
      */
     private Query getQuery(
             int pageSize,
@@ -382,53 +384,56 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
             LocalDateTime endTime,
             String originSource
     ) {
-        Query query = new Query();
+        Query query = new Query().with(Sort.by(Sort.Direction.DESC, SOURCE_TIME));
         if (title != null && !title.isEmpty()) {
             query.addCriteria(Criteria.where(TITLE).regex(getRegex(title)));
         }
         if (category != null && !category.isEmpty()) {
             query.addCriteria(Criteria.where(CATEGORY).in(category));
         }
+        Criteria timeCriteria = new Criteria();
+
+        if (startTime != null) {
+            Criteria startTimeCriteria = Criteria.where(SOURCE_TIME).gte(startTime);
+            timeCriteria.andOperator(startTimeCriteria);
+        }
+
+        if (endTime != null) {
+            Criteria endTimeCriteria = Criteria.where(SOURCE_TIME).lte(endTime);
+            timeCriteria.andOperator(endTimeCriteria);
+        }
+
+        if (!(startTime == null && endTime == null)) {
+            query.addCriteria(timeCriteria);
+        }
         if (originSource != null && !originSource.isEmpty()) {
             query.addCriteria(Criteria.where(SOURCE).regex(getRegex(originSource)));
         }
-        List<Criteria> timeCriteriaList = new ArrayList<>();
-        if (startTime != null) {
-            timeCriteriaList.add(Criteria.where(SOURCE_TIME).gte(DateTimeUtil.toMongoStandardFormat(startTime)));
-        }
-        if (endTime != null) {
-            timeCriteriaList.add(Criteria.where(SOURCE_TIME).lte(DateTimeUtil.toMongoStandardFormat(endTime)));
-        }
-        if (!timeCriteriaList.isEmpty()) {
-            Criteria timeCriteria = (timeCriteriaList.size() == 1)
-                    ? timeCriteriaList.get(0)
-                    : timeCriteriaList.get(0).andOperator(timeCriteriaList.get(1));
-            query.addCriteria(timeCriteria);
-        }
         if (pageSize > 0) {
-            if (pageOffset < 0) {
-                pageOffset = 0;
-            }
-            query.skip(pageOffset);
-            query.limit(pageSize);
+            if (pageOffset < 0) pageOffset = 0;
+            query.skip(pageOffset).limit(pageSize);
         }
-        query.with(Sort.by(Sort.Direction.DESC, SOURCE_TIME));
         return query;
     }
 
     /**
-     * 根据时间获取新闻
-     *
+     * 根据时间筛选新闻
      * @param startTime 开始时间
-     * @param endTime   结束时间
+     * @param endTime 结束时间
      * @return 新闻列表
      */
-    private List<NewsPO> selectByTime(@NotNull LocalDateTime startTime, @NotNull LocalDateTime endTime) {
-        String startTimeString = DateTimeUtil.toMongoStandardFormat(startTime);
-        String endTimeString = DateTimeUtil.toMongoStandardFormat(endTime);
-        Query query = new Query();
-        query.addCriteria(Criteria.where(SOURCE_TIME).gte(startTimeString).lte(endTimeString));
-        return mongoTemplate.find(query, NewsPO.class, COLLECTION_NEWS);
+    private List<NewsPO> selectByTime(LocalDateTime startTime, LocalDateTime endTime) {
+        String startTimeString = DateTimeUtil.onlyDateFormat(startTime);
+        String endTimeString = DateTimeUtil.onlyDateFormat(endTime);
+        AggregationOperation project = Aggregation.project().and(SOURCE_TIME)
+                .dateAsFormattedString("%Y-%m-%d").as(FORMALIZED_DATE);
+        AggregationOperation match = Aggregation.match(
+                Criteria.where(FORMALIZED_DATE)
+                        .gte(startTimeString)
+                        .andOperator(Criteria.where(FORMALIZED_DATE).lte(endTimeString)));
+        Aggregation aggregation = Aggregation.newAggregation(project, match);
+        var res = mongoTemplate.aggregate(aggregation, COLLECTION_NEWS, NewsPO.class);
+        return res.getMappedResults();
     }
 
     /**
@@ -437,9 +442,8 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
      * @param query 查询条件
      * @return 新闻数量
      */
-
     private Long getCountByQuery(Query query) {
-        return mongoTemplate.count(query, NewsPO.class, COLLECTION_NEWS);
+        return mongoTemplate.count(query, NewsPO.class);
     }
 
     /**
@@ -449,7 +453,7 @@ public class NewsDAOMongoImpl implements NewsDAOMongo {
      * @return 新闻列表
      */
     private List<NewsPO> getItemsByQuery(Query query) {
-        return mongoTemplate.find(query, NewsPO.class, COLLECTION_NEWS);
+        return mongoTemplate.find(query, NewsPO.class);
     }
 
     /**

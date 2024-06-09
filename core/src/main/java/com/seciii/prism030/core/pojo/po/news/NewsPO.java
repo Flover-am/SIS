@@ -46,7 +46,7 @@ public class NewsPO implements Serializable {
      */
     @Indexed
     @Field("source_time")
-    private String sourceTime;
+    private LocalDateTime sourceTime;
     /**
      * 新闻链接
      */
@@ -66,12 +66,12 @@ public class NewsPO implements Serializable {
      * 新闻创建时间戳
      */
     @Field(value = "create_time")
-    private String createTime;
+    private LocalDateTime createTime;
     /**
      * 新闻更新时间戳
      */
     @Field(value = "update_time")
-    private String updateTime;
+    private LocalDateTime updateTime;
 
     @Override
     public String toString() {
