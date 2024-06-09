@@ -1,5 +1,7 @@
 package com.seciii.prism030.core.rabbitmq;
 
+import com.seciii.prism030.common.exception.GraphException;
+import com.seciii.prism030.common.exception.error.ErrorType;
 import com.seciii.prism030.core.mapper.news.VectorNewsMapper;
 import com.seciii.prism030.core.pojo.dto.NewsEntityRelationshipDTO;
 import com.seciii.prism030.core.pojo.po.news.VectorNewsPO;
@@ -83,8 +85,13 @@ public class RabbitConsumer {
         }
 
         // 插入新闻的实体关系
-        graphService.addNewsNode(newsId, newNews.getTitle());
-        graphService.addNewsEntities(newsId, erList);
+        try {
+            graphService.addNewsNode(newsId, newNews.getTitle());
+            graphService.addNewsEntities(newsId, erList);
+        } catch (Exception e) {
+            log.error("Node save failed " + newNews);
+            throw new GraphException(ErrorType.NODE_SAVE_FAILED);
+        }
 
         //插入词云
         List<String> wordSegment = RabbitUtil.getWordSegment(jsonString);
