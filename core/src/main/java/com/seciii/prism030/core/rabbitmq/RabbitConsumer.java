@@ -90,7 +90,7 @@ public class RabbitConsumer {
             graphService.addNewsEntities(newsId, erList);
         } catch (Exception e) {
             log.error("Node save failed " + newNews);
-            throw new GraphException(ErrorType.NODE_SAVE_FAILED);
+            return;
         }
 
         //插入词云
