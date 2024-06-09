@@ -1,48 +1,33 @@
 package com.seciii.prism030.core.rabbitmq;
 
-import com.seciii.prism030.common.exception.GraphException;
-import com.seciii.prism030.common.exception.error.ErrorType;
-import com.seciii.prism030.core.mapper.news.VectorNewsMapper;
-import com.seciii.prism030.core.pojo.dto.NewsEntityRelationshipDTO;
-import com.seciii.prism030.core.pojo.po.news.VectorNewsPO;
 import com.seciii.prism030.core.pojo.vo.news.NewNews;
-import com.seciii.prism030.core.pojo.vo.news.NewsVO;
-import com.seciii.prism030.core.service.GraphService;
-import com.seciii.prism030.core.service.NewsService;
 import com.seciii.prism030.core.service.impl.NewsServiceMongoImpl;
-import com.seciii.prism030.core.utils.RabbitUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClientException;
 
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 /**
  * RabbitMQ消费者类，实现获取并处理消息队列中的信息，存入mongoDB
  *
- * @author windloong
+ * @author：windloong
  */
 @Component
 @RabbitListener(queues = "news_queue")
 @Slf4j
 public class RabbitConsumer {
-    private final VectorNewsMapper vectorNewsMapper;
-
-    private final NewsService newsService;
-
-    private final GraphService graphService;
+    NewsServiceMongoImpl newsServiceMongo;
 
     /**
      * RabbitConsumer构造函数，注入NewsServiceMongoImpl实例
      *
      * @param newsServiceMongo NewsServiceMongoImpl实例
      */
-    public RabbitConsumer(NewsServiceMongoImpl newsServiceMongo, VectorNewsMapper vectorNewsMapper, GraphService graphService) {
-        this.newsService = newsServiceMongo;
-        this.vectorNewsMapper = vectorNewsMapper;
-        this.graphService = graphService;
+    public RabbitConsumer(NewsServiceMongoImpl newsServiceMongo) {
+        this.newsServiceMongo = newsServiceMongo;
     }
 
     /**
@@ -56,49 +41,17 @@ public class RabbitConsumer {
         String jsonString = new String(data, StandardCharsets.UTF_8);
 
         // 使用自定义的MessageConvertor将JSON字符串解析为NewNews对象
-        NewNews newNews = null;
-        List<NewsEntityRelationshipDTO> erList;
-        try {
-            newNews = RabbitUtil.parseJsonToNewNews(jsonString);
-            erList = RabbitUtil.getERList(jsonString);
-        } catch (Exception e) {
-            log.error("Failed to process: " + jsonString + " " + e.getMessage());
-            return;
-        }
+        NewNews newNews = MessageConvertor.parseJsonToNewNews(jsonString);
 
         // 将newNews对象添加到newsServiceMongo中
-        long newsId = newsService.addNews(newNews);
-        NewsVO newsVO = newsService.getNewsDetail(newsId);
+        long newsId = newsServiceMongo.addNews(newNews);
 
-        if (newsVO == null) {
-            log.error(String.format("Failed to get news detail after adding news, id: %d.", newsId));
-            return;
-        }
-
-        // 插入新闻的向量id
-        for (String vectorId : newNews.getDashId()) {
-            VectorNewsPO vectorNews = VectorNewsPO.builder()
-                    .vectorId(vectorId)
-                    .newsId(newsId)
-                    .build();
-            vectorNewsMapper.insert(vectorNews);
-        }
-
-        // 插入新闻的实体关系
+        // 生成并保存新闻的词云
         try {
-            graphService.addNewsNode(newsId, newNews.getTitle());
-            graphService.addNewsEntities(newsId, erList);
-        } catch (Exception e) {
-            log.error("Node save failed " + newNews);
-            return;
+            newsServiceMongo.generateAndSaveWordCloud(newsId, newNews.getContent());
+        } catch (RestClientException e) {
+            log.error(String.format("Failed to generate word cloud for news %d: %s", newsId, e.getMessage()));
         }
 
-        //插入词云
-        try {
-            List<String> wordSegment = RabbitUtil.getWordSegment(jsonString);
-            newsService.saveWordCloud(newsId, wordSegment);
-        } catch (Exception e) {
-            log.error("Word cloud error: " + jsonString);
-        }
     }
 }

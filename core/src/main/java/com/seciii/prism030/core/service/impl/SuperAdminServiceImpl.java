@@ -74,12 +74,6 @@ public class SuperAdminServiceImpl implements SuperAdminService {
         } else {
             res = userMapper.getUsersByRoleId(pageSize, pageOffset, roleType.getRoleId());
         }
-        for (UserRolePO userRolePO : res) {
-            if (userRolePO.getUserId().equals(StpUtil.getLoginIdAsLong())) {
-                res.remove(userRolePO);
-                break;
-            }
-        }
         return toUserVo(res);
     }
 
@@ -101,13 +95,10 @@ public class SuperAdminServiceImpl implements SuperAdminService {
     @Override
     public void modifyRole(String username, RoleType roleType) {
         UserPO user = userMapper.getUserByUsername(username);
+
         if (user == null) {
             log.error(String.format("User: %s not exist.", username));
             throw new UserException(ErrorType.USER_NOT_EXISTS, "用户不存在");
-        }
-        if (user.getId().equals(StpUtil.getLoginIdAsLong())) {
-            log.error("Can not modify role to self.");
-            throw new UserException(ErrorType.FORBIDDEN, "无法修改自己的角色");
         }
         if (roleType.equals(RoleType.SUPER_ADMIN)) {
             log.error("Can not modify role to super admin.");

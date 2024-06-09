@@ -28,7 +28,6 @@ public class NewsUtil {
     public final static String UPDATE_TIME = "update_time";
     public final static String CREATE_TIME = "create_time";
 
-
     public final static List<SpeechPart> ignoredParts = Arrays.asList(
             SpeechPart.ADVERB,
             SpeechPart.PRONOUN,
@@ -80,16 +79,16 @@ public class NewsUtil {
      * @param newsPOList 新闻PO列表
      * @return 新闻条目VO列表
      */
-    public static List<NewsItemVO> toNewsItemVO(List<NewsPO> newsPOList) {
+    public static List<NewsItemVO> toNewsVO(List<NewsPO> newsPOList) {
         return newsPOList.stream().map(
                 newsPO -> NewsItemVO.builder()
                         .id(newsPO.getId())
                         .title(newsPO.getTitle())
                         .originSource(newsPO.getOriginSource())
-                        .sourceTime(DateTimeUtil.fromMongoStdToDefault(newsPO.getSourceTime()))
+                        .sourceTime(DateTimeUtil.defaultFormat(newsPO.getSourceTime()))
                         .category(CategoryType.of(newsPO.getCategory()).toString())
                         .link(newsPO.getLink())
-                        .updateTime(DateTimeUtil.fromMongoStdToDefault(newsPO.getUpdateTime()))
+                        .updateTime(DateTimeUtil.defaultFormat(newsPO.getUpdateTime()))
                         .build()
         ).toList();
     }
@@ -100,13 +99,13 @@ public class NewsUtil {
      * @param newsPO 新闻PO
      * @return 新闻VO
      */
-    public static NewsVO toNewsItemVO(NewsPO newsPO) {
+    public static NewsVO toNewsVO(NewsPO newsPO) {
         return NewsVO.builder()
                 .id(newsPO.getId())
                 .title(newsPO.getTitle())
                 .content(newsPO.getContent())
                 .originSource(newsPO.getOriginSource())
-                .sourceTime(DateTimeUtil.fromMongoStdToDefault(newsPO.getSourceTime()))
+                .sourceTime(DateTimeUtil.defaultFormat(newsPO.getSourceTime()))
                 .link(newsPO.getLink())
                 .sourceLink(newsPO.getSourceLink())
                 .category(CategoryType.of(newsPO.getCategory()).getCategoryEN())
@@ -130,7 +129,7 @@ public class NewsUtil {
                 .title(newNews.getTitle())
                 .content(newNews.getContent())
                 .originSource(newNews.getOriginSource())
-                .sourceTime(DateTimeUtil.toMongoStandardFormat(DateTimeUtil.defaultParse(newNews.getSourceTime())))
+                .sourceTime(DateTimeUtil.defaultParse(newNews.getSourceTime()))
                 .link(newNews.getLink())
                 .sourceLink(newNews.getSourceLink())
                 .category(category)
@@ -166,16 +165,16 @@ public class NewsUtil {
      */
     public static List<NewsWordDetail> filterNewsWordDetail(NewsWordDetail[] newsWordDetails) {
         List<NewsWordDetail> resultList = new ArrayList<>();
-        for (NewsWordDetail newsWordDetail : newsWordDetails) {
+        for(NewsWordDetail newsWordDetail : newsWordDetails) {
             if (!(newsWordDetail.getText().contains("\n") // 含有换行符
                     || Pattern.compile("[\\p{P}\\p{S}]").matcher(newsWordDetail.getText()).find() // 含有标点符号
                     || newsWordDetail.getRank() <= 1 // 词语重要性小于等于1
                     || newsWordDetail.getPartOfSpeech() == null // 词性为空
                     || ignoredParts.contains(newsWordDetail.getPartOfSpeech()) // 词性为忽略词性
-            )
-            ) {
+                )
+            ){
                 newsWordDetail.setText(newsWordDetail.getText().replaceAll("\\s", ""));
-                if (newsWordDetail.getText().length() > 1) {
+                if(newsWordDetail.getText().length() > 1) {
                     resultList.add(newsWordDetail);
                 }
             }

@@ -6,7 +6,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.data.redis.core.*;
 
@@ -63,7 +62,6 @@ public class SummaryServiceRedisImplTest {
 
     @Test
     public void testDeleteNews() {
-        when(mockRedisTemplate.opsForValue().get(any())).thenReturn(2);
         summaryService.deleteNews(1);
         verify(valueOperations, times(2)).decrement(anyString());
     }

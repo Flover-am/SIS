@@ -144,20 +144,6 @@ public interface NewsService {
     PagedNews searchNewsByTitleFiltered(int pageNo, int pageSize, String title, List<String> category, LocalDateTime startTime, LocalDateTime endTime, String originSource);
 
     /**
-     * 按标题模糊搜索新闻并过滤,分页返回
-     *
-     * @param pageNo       页数
-     * @param pageSize     页大小
-     * @param query        搜索词
-     * @param category     新闻分类
-     * @param startTime    开始时间
-     * @param endTime      结束时间
-     * @param originSource 新闻来源
-     * @return 搜索结果新闻列表
-     */
-    PagedNews searchNewsByVectorFiltered(int pageNo, int pageSize, String query, List<String> category, LocalDateTime startTime, LocalDateTime endTime, String originSource);
-
-    /**
      * 获取新闻前N可能的分类结果
      *
      * @param text 新闻标题字符串
@@ -182,15 +168,6 @@ public interface NewsService {
      * @return 词云结果
      */
     NewsSegmentPO generateAndSaveWordCloud(long id, String text);
-
-    /**
-     * 保存新闻词云
-     *
-     * @param id 新闻id
-     * @param segmentedWordList 分词后的词语列表
-     * @return 词云结果
-     */
-    NewsSegmentPO saveWordCloud(long id, List<String> segmentedWordList);
 
     /**
      * 获取今日新闻词云
