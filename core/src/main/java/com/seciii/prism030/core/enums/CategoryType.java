@@ -14,22 +14,23 @@ public enum CategoryType {
     /**
      * 新闻分类
      */
-    FINANCE("财经", "finance"),
-    EDUCATION("教育", "education"),
-    REAL_ESTATE("房产", "real_estate"),
-    ASTROLOGY("星座", "astrology"),
-    TECHNOLOGY("科技", "technology"),
-    FASHION("时尚", "fashion"),
-    LOTTERY("彩票", "lottery"),
-    SPORTS("体育", "sports"),
-    GAME("游戏", "game"),
-    POLITICS("时政", "politics"),
-    STOCK("股票", "stock"),
-    ENTERTAINMENT("娱乐", "entertainment"),
-
-    SOCIETY("社会", "society"),
-    HOUSEHOLD("家居", "household"),
-    OTHER("其他", "other");
+    NBA("NBA", "NBA"),
+    CBA("CBA", "CBA"),
+    CSL("中超", "CSL"),
+    AS("亚冠", "AS"),
+    PL("英超", "PL"),
+    CL("欧冠", "CL"),
+    LA_LIGA("西甲", "LaLiga"),
+    BUNDESLIGA("德甲", "Bundesliga"),
+    UEFA("欧联", "UEFA"),
+    CNFB("国足", "CNFB"),
+    BADMINTON("羽毛球", "Badminton"),
+    BILLIARD("台球", "Billiard"),
+    VOLLEYBALL("排球", "Volleyball"),
+    SWIM_DIVE("游泳/跳水", "Swim/Dive"),
+    PINGPONG("乒乓球", "PingPong"),
+    ATHLETICS("田径", "Athletics"),
+    OTHER("其他", "Other");
 
     private final String categoryCN;
     private final String categoryEN;

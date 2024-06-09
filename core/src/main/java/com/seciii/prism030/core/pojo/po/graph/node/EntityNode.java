@@ -31,8 +31,16 @@ public class EntityNode {
     private String name;
 
     /**
+     * 相关新闻ID
+     */
+    @Property("newsNodeIdList")
+    private List<Long> newsNodeIdList;
+
+
+    /**
      * 实体关系
      */
     @Relationship(type = "RELATE_TO", direction = Relationship.Direction.OUTGOING)
     private List<EntityRelationship> entities;
+
 }
