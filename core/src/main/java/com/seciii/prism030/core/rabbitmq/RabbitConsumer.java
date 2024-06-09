@@ -94,7 +94,11 @@ public class RabbitConsumer {
         }
 
         //插入词云
-        List<String> wordSegment = RabbitUtil.getWordSegment(jsonString);
-        newsService.saveWordCloud(newsId, wordSegment);
+        try {
+            List<String> wordSegment = RabbitUtil.getWordSegment(jsonString);
+            newsService.saveWordCloud(newsId, wordSegment);
+        } catch (Exception e) {
+            log.error("Word cloud error: " + jsonString);
+        }
     }
 }
