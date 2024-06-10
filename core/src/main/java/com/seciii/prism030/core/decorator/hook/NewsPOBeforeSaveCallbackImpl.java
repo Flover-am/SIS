@@ -1,6 +1,7 @@
 package com.seciii.prism030.core.decorator.hook;
 
 import com.seciii.prism030.core.pojo.po.news.NewsPO;
+import com.seciii.prism030.core.utils.DateTimeUtil;
 import org.bson.Document;
 import org.springframework.data.mongodb.core.mapping.event.BeforeSaveCallback;
 import org.springframework.stereotype.Component;
@@ -31,13 +32,13 @@ public class NewsPOBeforeSaveCallbackImpl implements BeforeSaveCallback<NewsPO> 
     public NewsPO onBeforeSave(NewsPO newsPO, Document document, String collection) {
         LocalDateTime now = LocalDateTime.now();
         if (newsPO.getCreateTime() == null) {
-            newsPO.setCreateTime(now);
+            newsPO.setCreateTime(DateTimeUtil.toMongoStandardFormat(now));
         }
         if (!document.containsKey(CREATE_TIME)) {
-            document.put(CREATE_TIME, now);
+            document.put(CREATE_TIME, DateTimeUtil.toMongoStandardFormat(now));
         }
-        document.put(UPDATE_TIME, now);
-        newsPO.setUpdateTime(now);
+        document.put(UPDATE_TIME, DateTimeUtil.toMongoStandardFormat(now));
+        newsPO.setUpdateTime(DateTimeUtil.toMongoStandardFormat(now));
         return newsPO;
     }
 
