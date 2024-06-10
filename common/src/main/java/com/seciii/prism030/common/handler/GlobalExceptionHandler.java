@@ -3,6 +3,7 @@ package com.seciii.prism030.common.handler;
 import cn.dev33.satoken.exception.SaTokenException;
 import com.seciii.prism030.common.Result;
 import com.seciii.prism030.common.exception.GraphException;
+import com.seciii.prism030.common.exception.LLMException;
 import com.seciii.prism030.common.exception.NewsException;
 import com.seciii.prism030.common.exception.UserException;
 import com.seciii.prism030.common.exception.error.ErrorType;
@@ -69,6 +70,18 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(GraphException.class)
     public Result<Void> handleGraphException(GraphException e) {
+        log.error(e.getMessage());
+        e.printStackTrace();
+        return Result.error(e.getErrorType().getCode(), e.getMessage());
+    }
+
+    /**
+     * 处理知识图谱异常
+     * @param e 新闻异常
+     * @return 响应结果
+     */
+    @ExceptionHandler(LLMException.class)
+    public Result<Void> handleLLMException(GraphException e) {
         log.error(e.getMessage());
         e.printStackTrace();
         return Result.error(e.getErrorType().getCode(), e.getMessage());

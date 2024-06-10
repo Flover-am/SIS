@@ -153,20 +153,24 @@ public class SuperAdminServiceImplTest {
 
     @Test
     void getUsersTest() {
+        StpUtil.login(2L);
         // 测试获取用户列表
         Assertions.assertEquals(1, superAdminService.getUsers(null, 1, 1).size());
         // 测试获取用户数量
         Assertions.assertEquals(1, superAdminService.getUsersCount(null));
         Assertions.assertEquals(30, superAdminService.getUsersCount(RoleType.USER));
+        StpUtil.logout();
     }
 
     @Test
     void modifyRoleTest() {
+        StpUtil.login(2L);
         // 测试修改不存在用户角色
         Assertions.assertThrows(UserException.class, () -> superAdminService.modifyRole("newUser", RoleType.USER));
         // 修改为超级管理员
         Assertions.assertThrows(UserException.class, () -> superAdminService.modifyRole("existUser", RoleType.SUPER_ADMIN));
         // 测试修改存在用户角色
         Assertions.assertDoesNotThrow(() -> superAdminService.modifyRole("existUser", RoleType.USER));
+        StpUtil.logout();
     }
 }
